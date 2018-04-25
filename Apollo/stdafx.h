@@ -10,6 +10,13 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <windows.h>
+#include <wrl/client.h>
+#include <wrl.h>
+#include <d3d11.h>
+#include <vector>
+#include <list>
+#include <string>
 
 
 // TODO:  在此处引用程序需要的其他头文件

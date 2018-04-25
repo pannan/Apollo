@@ -87,11 +87,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(TargetPath) $(SolutionDir)bin\ /Y
+xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -141,11 +146,22 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Base\miniz.h" />
+    <ClInclude Include="Base\ofbx.h" />
+    <ClInclude Include="Base\Singleton.h" />
+    <ClInclude Include="DX11\DXGIAdapter.h" />
+    <ClInclude Include="DX11\DXGIOutput.h" />
+    <ClInclude Include="DX11\RendererDX11.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Apollo.cpp" />
+    <ClCompile Include="Base\miniz.cpp" />
+    <ClCompile Include="Base\ofbx.cpp" />
+    <ClCompile Include="DX11\DXGIAdapter.cpp" />
+    <ClCompile Include="DX11\DXGIOutput.cpp" />
+    <ClCompile Include="DX11\RendererDX11.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
