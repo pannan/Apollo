@@ -45,3 +45,33 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# 编译中间文件
+*.ilk
+*.obj
+
+# 编译文件
+*.pdb
+*.exe
+*.lib
+*.dll
+*.pch
+
+# log文件
+*.log
+
+# Debug目录文件
+*.lastbuildstate
+*.tlog
+*.idb
+
+# vc文件
+*.db
+*.opendb
+*.filters
+
+# 
+*.txt
+*.suo
+*.ipch
+
