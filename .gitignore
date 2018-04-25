@@ -68,10 +68,10 @@ Temporary Items
 # vc文件
 *.db
 *.opendb
-*.filters
+//*.filters
 
 # 
 *.txt
-*.suo
+//*.suo
 *.ipch
 
