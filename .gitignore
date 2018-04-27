@@ -66,8 +66,8 @@ Temporary Items
 *.idb
 
 # vc文件
-*.db
-*.opendb
+//*.db
+//*.opendb
 //*.filters
 
 # 

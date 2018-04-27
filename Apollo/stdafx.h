@@ -17,6 +17,14 @@
 #include <vector>
 #include <list>
 #include <string>
+#include <assert.h>
+#include <memory>
+
+#include "imgui.h"
+
+#define GLYPH_PI 3.14159265f
+
+#define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}
 
 
 // TODO:  在此处引用程序需要的其他头文件
