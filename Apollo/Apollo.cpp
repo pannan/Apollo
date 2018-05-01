@@ -8,12 +8,19 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 #include <tchar.h>
+#include "AssetsDirectoryManager.h"
+#include "UIRoot.h"
+
+using namespace Apollo;
 
 // Data
 static ID3D11Device*            g_pd3dDevice = NULL;
 static ID3D11DeviceContext*     g_pd3dDeviceContext = NULL;
 static IDXGISwapChain*          g_pSwapChain = NULL;
 static ID3D11RenderTargetView*  g_mainRenderTargetView = NULL;
+
+int g_windowsWidth = 1280;
+int g_windowsHeight = 800;
 
 void CreateRenderTarget()
 {
@@ -133,7 +140,7 @@ int main(int, char**)
 	// Create application window
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, LoadCursor(NULL, IDC_ARROW), NULL, NULL, _T("ImGui Example"), NULL };
 	RegisterClassEx(&wc);
-	HWND hwnd = CreateWindow(_T("ImGui Example"), _T("ImGui DirectX11 Example"), WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, wc.hInstance, NULL);
+	HWND hwnd = CreateWindow(_T("ImGui Example"), _T("ImGui DirectX11 Example"), WS_OVERLAPPEDWINDOW, 100, 100, g_windowsWidth, g_windowsHeight, NULL, NULL, wc.hInstance, NULL);
 
 	// Initialize Direct3D
 	if (CreateDeviceD3D(hwnd) < 0)
@@ -165,6 +172,11 @@ int main(int, char**)
 	bool show_another_window = false;
 	ImVec4 clear_col = ImColor(114, 144, 154);
 
+	AssetsDirectoryManager* directoryManager = new AssetsDirectoryManager;
+	directoryManager->init("..\\bin\\Assets");
+
+	UIRoot uiRoot;
+
 	// Main loop
 	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
@@ -180,37 +192,41 @@ int main(int, char**)
 
 		// 1. Show a simple window
 		// Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
-		{
-			static float f = 0.0f;
-			ImGui::Text("Hello, world!");
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-			ImGui::ColorEdit3("clear color", (float*)&clear_col);
-			if (ImGui::Button("Test Window")) show_test_window ^= 1;
-			if (ImGui::Button("Another Window")) show_another_window ^= 1;
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		}
+		//{
+		//	static float f = 0.0f;
+		//	ImGui::Text("Hello, world!");
+		//	ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+		//	ImGui::ColorEdit3("clear color", (float*)&clear_col);
+		//	if (ImGui::Button("Test Window")) show_test_window ^= 1;
+		//	if (ImGui::Button("Another Window")) show_another_window ^= 1;
+		//	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		//}
 
-		// 2. Show another simple window, this time using an explicit Begin/End pair
-		if (show_another_window)
-		{
-			ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);
-			ImGui::Begin("Another Window", &show_another_window);
-			ImGui::Text("Hello");
-			ImGui::End();
-		}
+		//// 2. Show another simple window, this time using an explicit Begin/End pair
+		//if (show_another_window)
+		//{
+		//	ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);
+		//	ImGui::Begin("Another Window", &show_another_window);
+		//	ImGui::Text("Hello");
+		//	ImGui::End();
+		//}
 
-		// 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-		if (show_test_window)
-		{
-			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-			ImGui::ShowTestWindow(&show_test_window);
-		}
+		//// 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
+		//if (show_test_window)
+		//{
+		//	ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
+		//	ImGui::ShowTestWindow(&show_test_window);
+		//}
+
+		uiRoot.render(g_windowsWidth,g_windowsHeight);
 
 		// Rendering
 		g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, (float*)&clear_col);
 		ImGui::Render();
 		g_pSwapChain->Present(0, 0);
 	}
+
+	SAFE_DELETE(directoryManager);
 
 	ImGui_ImplDX11_Shutdown();
 	CleanupDeviceD3D();

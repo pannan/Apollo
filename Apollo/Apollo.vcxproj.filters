@@ -31,6 +31,9 @@
     <Filter Include="Windows\Event">
       <UniqueIdentifier>{1ed0805c-cd5f-456b-9875-368d91b79f64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{bc4d1640-c387-49e1-8f24-147b3522fe53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -159,6 +162,12 @@
     <ClInclude Include="Windows\AssetsDirectoryManager.h">
       <Filter>Windows</Filter>
     </ClInclude>
+    <ClInclude Include="UI\AssetsDirectoryViewUI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\UIRoot.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -265,6 +274,12 @@
     </ClCompile>
     <ClCompile Include="Windows\AssetsDirectoryManager.cpp">
       <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\AssetsDirectoryViewUI.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\UIRoot.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
