@@ -3,6 +3,8 @@
 namespace Apollo
 {
 	class DirectoryNode;
+	class DirectoryBaseNode;
+
 	class AssetsDirectoryViewUI
 	{
 	public:
@@ -18,6 +20,6 @@ namespace Apollo
 
 	private:
 
-		DirectoryNode*		m_selectNode;
+			DirectoryBaseNode*		m_selectNode;
 	};
 }

@@ -6,15 +6,38 @@
 using namespace std;
 using namespace Apollo;
 
-size_t DirectoryNode::s_nodeID = 0;
+size_t DirectoryBaseNode::s_nodeID = 0;
 
-DirectoryNode::DirectoryNode(const std::string& path) : m_path(path)
+DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path)
 {
 	m_id = s_nodeID++;
+
+	int pos = m_path.find_last_of("\\");
+	if (pos != std::string::npos)
+	{
+		m_name = m_path.substr(pos + 1, m_path.length() - pos);
+	}
+	else
+		m_name = m_path;
+}
+
+FileNode::FileNode(const std::string& path) : DirectoryBaseNode(path)
+{
+
+}
+
+DirectoryNode::DirectoryNode(const std::string& path) : DirectoryBaseNode(path)
+{
 }
 
 DirectoryNode::~DirectoryNode()
 {
+	for each (FileNode* var in m_fileList)
+	{
+		if (var)
+			delete var;
+	}
+
 	for each (DirectoryNode* var in m_subDirectoryList)
 	{
 		if (var)
@@ -24,7 +47,8 @@ DirectoryNode::~DirectoryNode()
 
 void DirectoryNode::addFile(const std::string& filePath)
 {
-	m_fileList.push_back(filePath);
+	FileNode* node = new FileNode(filePath);
+	m_fileList.push_back(node);
 }
 
 DirectoryNode* DirectoryNode::addDirectory(const std::string& filePath)

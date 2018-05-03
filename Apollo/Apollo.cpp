@@ -106,10 +106,10 @@ void CleanupDeviceD3D()
 	if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = NULL; }
 }
 
-extern LRESULT ImGui_ImplDX11_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (ImGui_ImplDX11_WndProcHandler(hWnd, msg, wParam, lParam))
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
 
 	switch (msg)
@@ -155,15 +155,19 @@ int main(int, char**)
 	UpdateWindow(hwnd);
 
 	// Setup ImGui binding
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	// Setup ImGui binding
 	ImGui_ImplDX11_Init(hwnd, g_pd3dDevice, g_pd3dDeviceContext);
 
+	// Setup style
+	ImGui::StyleColorsDark();
 	// Load Fonts
 	// (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-	ImGuiIO& io = ImGui::GetIO();
 	//     io.Fonts->AddFontDefault();
 	     //io.Fonts->AddFontFromFileTTF("../bin/Assets/extra_fonts/Cousine-Regular.ttf", 15.0f);
 	//     io.Fonts->AddFontFromFileTTF("../../extra_fonts/DroidSans.ttf", 16.0f);
-	io.Fonts->AddFontFromFileTTF("../bin/Assets/extra_fonts/segoeui.ttf", 16.0f);
+	io.Fonts->AddFontFromFileTTF("../bin/Assets/extra_fonts/segoeui.ttf", 18);
 	//     io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
 	//io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
 	//     io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
@@ -215,7 +219,7 @@ int main(int, char**)
 		//if (show_test_window)
 		//{
 		//	ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-		//	ImGui::ShowTestWindow(&show_test_window);
+		//	ImGui::ShowTestWindow();
 		//}
 
 		uiRoot.render(g_windowsWidth,g_windowsHeight);
@@ -223,6 +227,7 @@ int main(int, char**)
 		// Rendering
 		g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, (float*)&clear_col);
 		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		g_pSwapChain->Present(0, 0);
 	}
 

@@ -157,7 +157,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
-    <ClInclude Include="ImGui\imgui_freetype.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
     <ClInclude Include="ImGui\stb_rect_pack.h" />
     <ClInclude Include="ImGui\stb_textedit.h" />
@@ -203,7 +202,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
-    <ClCompile Include="ImGui\imgui_freetype.cpp" />
     <ClCompile Include="Math\Matrix3f.cpp" />
     <ClCompile Include="Math\Matrix4f.cpp" />
     <ClCompile Include="Math\Vector2f.cpp" />

@@ -4,7 +4,25 @@
 
 namespace Apollo
 {
-	class DirectoryNode
+	class DirectoryBaseNode
+	{
+	public:
+
+		DirectoryBaseNode(const std::string& path);
+		size_t			m_id;
+		std::string		m_name;
+		std::string m_path;
+
+		static size_t	s_nodeID;
+	};
+
+	class FileNode : public DirectoryBaseNode
+	{
+	public:
+		FileNode(const std::string& path);
+	};
+
+	class DirectoryNode : public DirectoryBaseNode
 	{
 	public:
 		friend class AssetsDirectoryViewUI;
@@ -18,12 +36,8 @@ namespace Apollo
 
 	protected:
 
-		std::list<std::string>			m_fileList;
-		std::list<DirectoryNode*>	m_subDirectoryList;
-		std::string		m_path;
-		size_t			m_id;
-
-		static size_t	s_nodeID;
+		std::list<FileNode*>			m_fileList;
+		std::list<DirectoryNode*>	m_subDirectoryList;		
 	};
 
 //	typedef std::shared_ptr<DirectoryNode*> DirectoryNodePtr;
