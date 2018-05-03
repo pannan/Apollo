@@ -67,7 +67,7 @@ Vector3f Vector3f::Perpendicular( )
     float xAbs = fabs( x );
     float yAbs = fabs( y );
     float zAbs = fabs( z );
-    float minVal = min( min( xAbs, yAbs ), zAbs );
+    float minVal = _min(_min( xAbs, yAbs ), zAbs );
 
     if ( xAbs == minVal )
         return Cross( Vector3f( 1.0f, 0.0f, 0.0f ) );

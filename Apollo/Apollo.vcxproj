@@ -86,14 +86,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;.\ImGui;.\Math;.\Windows;.\Lib\freetype\include;.\UI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;.\ImGui;.\Math;.\Windows;.\Lib\freetype\include;.\UI;.\third_party;.\third_party\boost_context\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)Lib\freetype\lib\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;freetype263MTd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)Lib\freetype\lib\x32;.\third_party\boost_context\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;freetype263MTd.lib;boost_context.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMTD.lib</IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
@@ -168,6 +168,14 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Vector4f.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="third_party\ftl\atomic_counter.h" />
+    <ClInclude Include="third_party\ftl\config.h" />
+    <ClInclude Include="third_party\ftl\fiber.h" />
+    <ClInclude Include="third_party\ftl\task.h" />
+    <ClInclude Include="third_party\ftl\task_scheduler.h" />
+    <ClInclude Include="third_party\ftl\thread_abstraction.h" />
+    <ClInclude Include="third_party\ftl\typedefs.h" />
+    <ClInclude Include="third_party\ftl\wait_free_queue.h" />
     <ClInclude Include="UI\AssetsDirectoryViewUI.h" />
     <ClInclude Include="UI\UIRoot.h" />
     <ClInclude Include="Windows\AssetsDirectoryManager.h" />
@@ -186,6 +194,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Windows\EvtMouseWheel.h" />
     <ClInclude Include="Windows\EvtWindowMsg.h" />
     <ClInclude Include="Windows\EvtWindowResize.h" />
+    <ClInclude Include="Windows\FileSystemWatcher.h" />
     <ClInclude Include="Windows\IEvent.h" />
     <ClInclude Include="Windows\IEventListener.h" />
     <ClInclude Include="Windows\IWindowProc.h" />
@@ -213,6 +222,8 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="third_party\ftl\atomic_counter.cpp" />
+    <ClCompile Include="third_party\ftl\task_scheduler.cpp" />
     <ClCompile Include="UI\AssetsDirectoryViewUI.cpp" />
     <ClCompile Include="UI\UIRoot.cpp" />
     <ClCompile Include="Windows\AssetsDirectoryManager.cpp" />
@@ -231,6 +242,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Windows\EvtMouseWheel.cpp" />
     <ClCompile Include="Windows\EvtWindowMsg.cpp" />
     <ClCompile Include="Windows\EvtWindowResize.cpp" />
+    <ClCompile Include="Windows\FileSystemWatcher.cpp" />
     <ClCompile Include="Windows\IEventListener.cpp" />
     <ClCompile Include="Windows\RenderWindow.cpp" />
     <ClCompile Include="Windows\Win32RenderWindow.cpp" />

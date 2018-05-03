@@ -53,7 +53,7 @@ Temporary Items
 # 编译文件
 *.pdb
 *.exe
-*.lib
+//*.lib
 *.dll
 *.pch
 

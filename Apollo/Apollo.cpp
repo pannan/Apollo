@@ -10,6 +10,7 @@
 #include <tchar.h>
 #include "AssetsDirectoryManager.h"
 #include "UIRoot.h"
+#include "FileSystemWatcher.h"
 
 using namespace Apollo;
 
@@ -135,6 +136,35 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
+void __stdcall MyDeal(FileSystemWatcher::ACTION act, LPCWSTR filename, LPVOID lParam)
+{
+	static FileSystemWatcher::ACTION pre = FileSystemWatcher::ACTION_ERRSTOP;
+	switch (act)
+	{
+	case FileSystemWatcher::ACTION_ADDED:
+		wprintf_s(L"Added     - %s\n", filename);
+		break;
+	case FileSystemWatcher::ACTION_REMOVED:
+		wprintf_s(L"Removed   - %s\n", filename);
+		break;
+	case FileSystemWatcher::ACTION_MODIFIED:
+		wprintf_s(L"Modified  - %s\n", filename);
+		break;
+	case FileSystemWatcher::ACTION_RENAMED_OLD:
+		wprintf_s(L"Rename(O) - %s\n", filename);
+		break;
+	case FileSystemWatcher::ACTION_RENAMED_NEW:
+		assert(pre == FileSystemWatcher::ACTION_RENAMED_OLD);
+		wprintf_s(L"Rename(N) - %s\n", filename);
+		break;
+	case FileSystemWatcher::ACTION_ERRSTOP:
+	default:
+		wprintf_s(L"---ERROR---%s\n", filename);
+		break;
+	}
+	pre = act;
+}
+
 int main(int, char**)
 {
 	// Create application window
@@ -180,6 +210,13 @@ int main(int, char**)
 	directoryManager->init("..\\bin\\Assets");
 
 	UIRoot uiRoot;
+
+	LPCTSTR sDir = TEXT("F:\\GitHub\\Apollo\\bin\\Assets");
+	DWORD dwNotifyFilter = FileSystemWatcher::FILTER_FILE_NAME | FileSystemWatcher::FILTER_DIR_NAME | FileSystemWatcher::FILTER_LAST_WRITE_NAME | 
+		FileSystemWatcher::FILTER_LAST_ACCESS_NAME;
+
+	FileSystemWatcher fsw;
+	bool r = fsw.Run(sDir, true, dwNotifyFilter, &MyDeal, 0);
 
 	// Main loop
 	MSG msg;
@@ -233,6 +270,7 @@ int main(int, char**)
 
 	SAFE_DELETE(directoryManager);
 
+	fsw.Close(1000);
 	ImGui_ImplDX11_Shutdown();
 	CleanupDeviceD3D();
 	UnregisterClass(_T("ImGui Example"), wc.hInstance);

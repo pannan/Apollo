@@ -19,12 +19,21 @@
 #include <string>
 #include <assert.h>
 #include <memory>
+#include <limits>
 
 #include "imgui.h"
 
 #define GLYPH_PI 3.14159265f
 
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}
+
+#ifndef _max
+#define _max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef _min
+#define _min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
 
 
 // TODO:  在此处引用程序需要的其他头文件

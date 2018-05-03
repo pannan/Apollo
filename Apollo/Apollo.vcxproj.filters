@@ -34,6 +34,9 @@
     <Filter Include="UI">
       <UniqueIdentifier>{bc4d1640-c387-49e1-8f24-147b3522fe53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FTL">
+      <UniqueIdentifier>{346ee3ea-bc3d-453c-8958-8b8fe61c6e1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -165,6 +168,33 @@
     <ClInclude Include="UI\UIRoot.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="third_party\ftl\atomic_counter.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\ftl\config.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\ftl\fiber.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\ftl\task.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\ftl\task_scheduler.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\ftl\thread_abstraction.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\ftl\typedefs.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="third_party\ftl\wait_free_queue.h">
+      <Filter>FTL</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\FileSystemWatcher.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -274,6 +304,15 @@
     </ClCompile>
     <ClCompile Include="UI\UIRoot.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\ftl\atomic_counter.cpp">
+      <Filter>FTL</Filter>
+    </ClCompile>
+    <ClCompile Include="third_party\ftl\task_scheduler.cpp">
+      <Filter>FTL</Filter>
+    </ClCompile>
+    <ClCompile Include="Windows\FileSystemWatcher.cpp">
+      <Filter>Windows</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
