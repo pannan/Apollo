@@ -151,10 +151,14 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="base\Camera.h" />
+    <ClInclude Include="Base\LogManager.h" />
+    <ClInclude Include="Base\Material.h" />
+    <ClInclude Include="Base\MaterialParse.h" />
     <ClInclude Include="Base\miniz.h" />
     <ClInclude Include="Base\ofbx.h" />
     <ClInclude Include="Base\Singleton.h" />
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
+    <ClInclude Include="DX11\IResourceDX11.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
@@ -177,6 +181,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="third_party\ftl\typedefs.h" />
     <ClInclude Include="third_party\ftl\wait_free_queue.h" />
     <ClInclude Include="UI\AssetsDirectoryViewUI.h" />
+    <ClInclude Include="UI\LogUI.h" />
     <ClInclude Include="UI\UIRoot.h" />
     <ClInclude Include="Windows\AssetsDirectoryManager.h" />
     <ClInclude Include="Windows\EventManager.h" />
@@ -205,6 +210,8 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Apollo.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="base\Camera.cpp" />
+    <ClCompile Include="Base\LogManager.cpp" />
+    <ClCompile Include="Base\MaterialParse.cpp" />
     <ClCompile Include="Base\miniz.cpp" />
     <ClCompile Include="Base\ofbx.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
@@ -225,6 +232,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="third_party\ftl\atomic_counter.cpp" />
     <ClCompile Include="third_party\ftl\task_scheduler.cpp" />
     <ClCompile Include="UI\AssetsDirectoryViewUI.cpp" />
+    <ClCompile Include="UI\LogUI.cpp" />
     <ClCompile Include="UI\UIRoot.cpp" />
     <ClCompile Include="Windows\AssetsDirectoryManager.cpp" />
     <ClCompile Include="Windows\EventManager.cpp" />

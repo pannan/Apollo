@@ -10,9 +10,9 @@ namespace Apollo
 
 		DirectoryBaseNode(const std::string& path);
 		size_t			m_id;
-		std::string		m_name;
-		std::string m_path;
-
+		std::string		m_name;		//文件名，包含后缀
+		std::string		m_path;		//文件相对assets目录的路径
+		std::string		m_suffix;		//文件后缀
 		static size_t	s_nodeID;
 	};
 

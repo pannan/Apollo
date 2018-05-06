@@ -57,7 +57,7 @@ void AssetsDirectoryViewUI::render(int w, int h)
 	ImGuiWindowFlags window_flags = 0;
 	window_flags |= ImGuiWindowFlags_NoResize;
 	window_flags |= ImGuiWindowFlags_NoMove;
-	window_flags |= ImGuiWindowFlags_NoScrollbar;
+	//window_flags |= ImGuiWindowFlags_NoScrollbar;
 	static bool s_open = true;
 	ImGui::Begin("Assets", &s_open, window_flags);
 

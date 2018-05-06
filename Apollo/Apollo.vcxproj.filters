@@ -37,6 +37,9 @@
     <Filter Include="FTL">
       <UniqueIdentifier>{346ee3ea-bc3d-453c-8958-8b8fe61c6e1f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Base\Material">
+      <UniqueIdentifier>{bbba217c-0ab6-4d1a-9495-cd8976090686}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -195,6 +198,21 @@
     <ClInclude Include="Windows\FileSystemWatcher.h">
       <Filter>Windows</Filter>
     </ClInclude>
+    <ClInclude Include="Base\LogManager.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\LogUI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\IResourceDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\MaterialParse.h">
+      <Filter>Base\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Material.h">
+      <Filter>Base\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -313,6 +331,15 @@
     </ClCompile>
     <ClCompile Include="Windows\FileSystemWatcher.cpp">
       <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\LogManager.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\LogUI.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\MaterialParse.cpp">
+      <Filter>Base\Material</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,7 +2,8 @@
 #include <io.h>
 #include <iostream>
 #include "AssetsDirectoryManager.h"
-
+#include "LogManager.h"
+#include "MaterialParse.h"
 using namespace std;
 using namespace Apollo;
 
@@ -19,6 +20,23 @@ DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path)
 	}
 	else
 		m_name = m_path;
+
+	m_suffix = "";
+	if (m_name.empty())
+		return;
+	
+	pos = m_name.find_last_of(".");
+	if (pos != std::string::npos)
+	{
+		m_suffix = m_name.substr(pos + 1, m_name.length() - pos);
+		//LogManager::getInstance().log("Load file:" + m_name);
+
+		if (m_suffix == "material")
+		{
+			MaterialParse::getInstance().parse(path, m_name);
+		}
+	}
+
 }
 
 FileNode::FileNode(const std::string& path) : DirectoryBaseNode(path)

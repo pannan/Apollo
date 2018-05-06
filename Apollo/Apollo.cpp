@@ -11,9 +11,13 @@
 #include "AssetsDirectoryManager.h"
 #include "UIRoot.h"
 #include "FileSystemWatcher.h"
+#include "LogManager.h"
+#include "LogUI.h"
+#include "MaterialParse.h"
 
 using namespace Apollo;
-
+LogManager logManager;
+MaterialParse materialParse;
 // Data
 static ID3D11Device*            g_pd3dDevice = NULL;
 static ID3D11DeviceContext*     g_pd3dDeviceContext = NULL;
@@ -205,7 +209,7 @@ int main(int, char**)
 	bool show_test_window = true;
 	bool show_another_window = false;
 	ImVec4 clear_col = ImColor(114, 144, 154);
-
+	
 	AssetsDirectoryManager* directoryManager = new AssetsDirectoryManager;
 	directoryManager->init("..\\bin\\Assets");
 
@@ -217,6 +221,9 @@ int main(int, char**)
 
 	FileSystemWatcher fsw;
 	bool r = fsw.Run(sDir, true, dwNotifyFilter, &MyDeal, 0);
+
+	
+	LogUI logUI;
 
 	// Main loop
 	MSG msg;
@@ -260,6 +267,7 @@ int main(int, char**)
 		//}
 
 		uiRoot.render(g_windowsWidth,g_windowsHeight);
+		logUI.render();
 
 		// Rendering
 		g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, (float*)&clear_col);
