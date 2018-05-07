@@ -31,7 +31,7 @@ Parse_Result	MaterialParse::parse(std::string path,std::string name)
 	m_endPos = allBuffer.size();
 	m_readPos = 0;
 	m_ptr = (char*)allBuffer.c_str();
-	m_chunkList.clear();
+	MaterialChunk materialChunk;
 
 	while (!isEnd())
 	{
@@ -46,7 +46,7 @@ Parse_Result	MaterialParse::parse(std::string path,std::string name)
 		
 		parseChunk(chunkData);
 
-		m_chunkList.push_back(chunkData);
+		materialChunk.m_chunkList.push_back(chunkData);
 	}
 
 	return PR_OK;

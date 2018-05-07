@@ -20,8 +20,16 @@
 #include <assert.h>
 #include <memory>
 #include <limits>
+//#include <unordered_map>
+#include <hash_map>
+
+
 
 #include "imgui.h"
+
+#ifdef uint32
+#define typedef std::uint32_t uint32;
+#endif
 
 #define GLYPH_PI 3.14159265f
 

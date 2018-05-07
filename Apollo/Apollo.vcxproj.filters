@@ -210,8 +210,32 @@
     <ClInclude Include="Base\MaterialParse.h">
       <Filter>Base\Material</Filter>
     </ClInclude>
-    <ClInclude Include="Base\Material.h">
-      <Filter>Base\Material</Filter>
+    <ClInclude Include="Base\Resource.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\HLSLResource.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\ResourceManager.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\IResourceFactory.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\HLSLResourceFactory.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\MaterialResource.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\MaterialResourceFactory.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\TextureResource.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\TextureResourceFactory.h">
+      <Filter>Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +364,18 @@
     </ClCompile>
     <ClCompile Include="Base\MaterialParse.cpp">
       <Filter>Base\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\ResourceManager.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\HLSLResourceFactory.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\MaterialResourceFactory.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\TextureResourceFactory.cpp">
+      <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

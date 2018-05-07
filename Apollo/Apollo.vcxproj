@@ -86,7 +86,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NOMINMAX;_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;.\ImGui;.\Math;.\Windows;.\Lib\freetype\include;.\UI;.\third_party;.\third_party\boost_context\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -151,12 +151,20 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="base\Camera.h" />
+    <ClInclude Include="Base\HLSLResource.h" />
+    <ClInclude Include="Base\HLSLResourceFactory.h" />
+    <ClInclude Include="Base\IResourceFactory.h" />
     <ClInclude Include="Base\LogManager.h" />
-    <ClInclude Include="Base\Material.h" />
     <ClInclude Include="Base\MaterialParse.h" />
+    <ClInclude Include="Base\MaterialResource.h" />
+    <ClInclude Include="Base\MaterialResourceFactory.h" />
     <ClInclude Include="Base\miniz.h" />
     <ClInclude Include="Base\ofbx.h" />
+    <ClInclude Include="Base\Resource.h" />
+    <ClInclude Include="Base\ResourceManager.h" />
     <ClInclude Include="Base\Singleton.h" />
+    <ClInclude Include="Base\TextureResource.h" />
+    <ClInclude Include="Base\TextureResourceFactory.h" />
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
     <ClInclude Include="DX11\IResourceDX11.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -210,10 +218,14 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Apollo.cpp" />
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="base\Camera.cpp" />
+    <ClCompile Include="Base\HLSLResourceFactory.cpp" />
     <ClCompile Include="Base\LogManager.cpp" />
     <ClCompile Include="Base\MaterialParse.cpp" />
+    <ClCompile Include="Base\MaterialResourceFactory.cpp" />
     <ClCompile Include="Base\miniz.cpp" />
     <ClCompile Include="Base\ofbx.cpp" />
+    <ClCompile Include="Base\ResourceManager.cpp" />
+    <ClCompile Include="Base\TextureResourceFactory.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />

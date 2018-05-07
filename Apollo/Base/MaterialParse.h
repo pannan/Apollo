@@ -25,9 +25,9 @@ namespace Apollo
 
 	struct MaterialChunk
 	{
-	public:
-		ShaderChunk		m_vs;
-		ShaderChunk		m_ps;		
+		/*ShaderChunk		m_vs;
+		ShaderChunk		m_ps;		*/
+		std::vector<ChunkData>		m_chunkList;
 	};
 
 	enum Parse_Result
@@ -69,6 +69,6 @@ namespace Apollo
 		size_t			m_readPos;
 		char*			m_ptr;
 
-		std::vector<ChunkData>	m_chunkList;
+		std::vector<MaterialChunk>	m_materialList;
 	};
 }

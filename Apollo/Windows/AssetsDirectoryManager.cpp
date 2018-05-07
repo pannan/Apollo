@@ -4,6 +4,7 @@
 #include "AssetsDirectoryManager.h"
 #include "LogManager.h"
 #include "MaterialParse.h"
+#include "ResourceManager.h"
 using namespace std;
 using namespace Apollo;
 
@@ -13,6 +14,7 @@ DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path)
 {
 	m_id = s_nodeID++;
 
+	//找到文件名
 	int pos = m_path.find_last_of("\\");
 	if (pos != std::string::npos)
 	{
@@ -25,6 +27,7 @@ DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path)
 	if (m_name.empty())
 		return;
 	
+	//找后缀名
 	pos = m_name.find_last_of(".");
 	if (pos != std::string::npos)
 	{
@@ -35,6 +38,9 @@ DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path)
 		{
 			MaterialParse::getInstance().parse(path, m_name);
 		}
+
+		//统一到assets目录分析完再创建
+//		ResourceManager::getInstance().createResource(path, m_name, m_suffix);
 	}
 
 }
