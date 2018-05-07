@@ -237,6 +237,15 @@
     <ClInclude Include="Base\TextureResourceFactory.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="UI\AssetsPropertyPanelUI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\ISelectPropertyUI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="UI\TextureSelectIPropertyUI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

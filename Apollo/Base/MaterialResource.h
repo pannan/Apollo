@@ -13,7 +13,7 @@ namespace Apollo
 
 		}
 
-		~MaterialResource();
+		~MaterialResource(){}
 
 	protected:
 	private:

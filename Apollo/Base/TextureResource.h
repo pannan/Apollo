@@ -13,7 +13,7 @@ namespace Apollo
 
 		}
 
-		~TextureResource();
+		~TextureResource(){}
 
 	protected:
 	private:

@@ -13,7 +13,7 @@ namespace Apollo
 
 		}
 
-		~HLSLResource();
+		~HLSLResource(){}
 
 	protected:
 	private:

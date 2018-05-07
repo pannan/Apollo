@@ -6,7 +6,7 @@ namespace Apollo
 	{
 	public:
 
-		virtual ~IResourceFactory() = 0;
+		virtual ~IResourceFactory() {}
 
 		virtual uint32_t	createResource(const std::string& path, const std::string& name, const std::string& type) = 0;
 

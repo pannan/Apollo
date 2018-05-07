@@ -189,7 +189,10 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="third_party\ftl\typedefs.h" />
     <ClInclude Include="third_party\ftl\wait_free_queue.h" />
     <ClInclude Include="UI\AssetsDirectoryViewUI.h" />
+    <ClInclude Include="UI\AssetsPropertyPanelUI.h" />
+    <ClInclude Include="UI\ISelectPropertyUI.h" />
     <ClInclude Include="UI\LogUI.h" />
+    <ClInclude Include="UI\TextureSelectIPropertyUI.h" />
     <ClInclude Include="UI\UIRoot.h" />
     <ClInclude Include="Windows\AssetsDirectoryManager.h" />
     <ClInclude Include="Windows\EventManager.h" />
