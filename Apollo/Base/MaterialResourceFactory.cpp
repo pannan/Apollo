@@ -32,6 +32,38 @@ uint32_t MaterialResourceFactory::createResource(const std::string& path, const 
 
 	const MaterialChunk& materialChunk = MaterialParse::getInstance().getLastParseMaterial();
 
+	for each (ChunkData chunk in materialChunk.m_chunkList)
+	{
+		if (chunk.name == "vs_shader")
+		{
+			for each (KeyValueChunk var in chunk.elementList)
+			{
+				if (var.key == "source")
+				{
+					materialRes->m_vs.shaderHandle = ResourceManager::getInstance().getResource(var.value);
+				}
+				else if (var.key == "entry")
+				{
+					materialRes->m_vs.entryFunc = var.value;
+				}
+			}
+		}
+		else if (chunk.name == "ps_shader")
+		{
+			for each (KeyValueChunk var in chunk.elementList)
+			{
+				if (var.key == "source")
+				{
+					materialRes->m_ps.shaderHandle = ResourceManager::getInstance().getResource(var.value);
+				}
+				else if (var.key == "entry")
+				{
+					materialRes->m_ps.entryFunc = var.value;
+				}
+			}
+		}
+	}	
+
 	m_materialResourceList.push_back(materialRes);
 
 	return handle;

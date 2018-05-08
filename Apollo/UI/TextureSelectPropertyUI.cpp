@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "TextureSelectPropertyUI.h"
 #include "AssetsPropertyPanelUI.h"
+#include "AssetsDirectoryViewUI.h"
+#include "AssetsDirectoryManager.h"
+#include "ResourceManager.h"
+
 using namespace Apollo;
 
 TextureSelectPropertyUI::TextureSelectPropertyUI()
@@ -19,5 +23,15 @@ TextureSelectPropertyUI::~TextureSelectPropertyUI()
 
 void TextureSelectPropertyUI::render()
 {
+	DirectoryBaseNode* selectNode = AssetsDirectoryViewUI::getInstance().getSelectNode();
 
+	if (selectNode == nullptr)
+		return;
+
+	uint32_t& handle = selectNode->m_handle;
+
+	if (handle == 0)
+	{
+		handle = ResourceManager::getInstance().getResource(selectNode->m_name);
+	}
 }

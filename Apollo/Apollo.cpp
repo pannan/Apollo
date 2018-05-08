@@ -14,6 +14,10 @@
 #include "LogManager.h"
 #include "LogUI.h"
 #include "MaterialParse.h"
+#include "ResourceManager.h"
+#include "MaterialResourceFactory.h"
+#include "HLSLResourceFactory.h"
+#include "TextureResourceFactory.h"
 
 using namespace Apollo;
 LogManager logManager;
@@ -209,6 +213,11 @@ int main(int, char**)
 	bool show_test_window = true;
 	bool show_another_window = false;
 	ImVec4 clear_col = ImColor(114, 144, 154);
+
+	ResourceManager resManager;
+	MaterialResourceFactory materialFactory;
+	HLSLResourceFactory hlslFactory;
+	TextureResourceFactory textureFactroy;
 	
 	AssetsDirectoryManager* directoryManager = new AssetsDirectoryManager;
 	directoryManager->init("..\\bin\\Assets");

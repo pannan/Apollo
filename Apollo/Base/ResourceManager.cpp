@@ -11,7 +11,7 @@ void ResourceManager::registerResourceFactory(const std::string& type, IResource
 {
 	if (m_factoryHashMap.find(type) != m_factoryHashMap.end())
 	{
-		LogManager::getInstance().log("[registerResourceFactory] Resource Tpye:" + type + "already register!");
+		LogManager::getInstance().log("[registerResourceFactory] Resource Tpye:" + type + " already register!");
 		return;
 	}
 
@@ -22,7 +22,7 @@ void ResourceManager::unRegisterResourceFactory(const std::string& type, IResour
 {
 	if (m_factoryHashMap.find(type) == m_factoryHashMap.end())
 	{
-		LogManager::getInstance().log("[unRegisterResourceFactory] Resource Tpye:" + type + "not register!");
+		LogManager::getInstance().log("[unRegisterResourceFactory] Resource Tpye:" + type + " not register!");
 		return;
 	}
 
@@ -40,7 +40,7 @@ uint32_t ResourceManager::createResource(const std::string& path, const std::str
 {
 	if (m_factoryHashMap.find(type) == m_factoryHashMap.end())
 	{
-		LogManager::getInstance().log("[createResource] Resource type:" + type + "no registerResourceFactory!");
+		LogManager::getInstance().log("[ResourceManager::createResource] Resource type:" + type + " no registerResourceFactory!");
 		return 0;
 	}
 
@@ -48,11 +48,29 @@ uint32_t ResourceManager::createResource(const std::string& path, const std::str
 
 	if (m_handleHashMap.find(name) != m_handleHashMap.end())
 	{
-		LogManager::getInstance().log("[ResourceManager::createResource] resource:" + path + "have other same name!");
+		LogManager::getInstance().log("[ResourceManager::createResource] resource:" + path + " have other same name!");
 		return 0;
 	}
 
 	m_handleHashMap[name] = handle;
 
 	return handle;
+}
+
+uint32_t ResourceManager::getResource(const std::string& name)
+{
+	if (m_handleHashMap.find(name) == m_handleHashMap.end())
+	{
+		LogManager::getInstance().log("[ResourceManager::getResource] resource:" + name + " not exit!");
+		return 0;
+	}
+
+	uint32_t handle = m_handleHashMap[name];
+
+	if (handle == 0)
+	{
+		//可能还没加载，尝试加载
+		handle = createResource()
+	}
+	return ;
 }

@@ -31,8 +31,8 @@ uint32_t TextureResourceFactory::createResource(const std::string& path, const s
 	uint32_t handle = RT_MATERIAL;
 	handle |= (index << 8);
 
-	TextureResource* materialRes = new TextureResource(path, handle);
-	m_textureResourceList.push_back(materialRes);
+	TextureResource* textureRes = new TextureResource(path, handle);
+	m_textureResourceList.push_back(textureRes);
 
 	return handle;
 }
