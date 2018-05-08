@@ -18,18 +18,18 @@ void ResourceManager::registerResourceFactory(const std::string& type, IResource
 	m_factoryHashMap[type] = creator;
 }
 
-void ResourceManager::unregisterResourceFactory(const std::string& type, IResourceFactory* creator)
+void ResourceManager::unRegisterResourceFactory(const std::string& type, IResourceFactory* creator)
 {
 	if (m_factoryHashMap.find(type) == m_factoryHashMap.end())
 	{
-		LogManager::getInstance().log("[unregisterResourceFactory] Resource Tpye:" + type + "not register!");
+		LogManager::getInstance().log("[unRegisterResourceFactory] Resource Tpye:" + type + "not register!");
 		return;
 	}
 
 	FactoryHashMap::iterator it = m_factoryHashMap.find(type);
 	if (it->second != creator)
 	{
-		LogManager::getInstance().log("[unregisterResourceFactory] Resource Tpye:" + type + ",it->second != creator");
+		LogManager::getInstance().log("[unRegisterResourceFactory] Resource Tpye:" + type + ",it->second != creator");
 		return;
 	}
 

@@ -49,6 +49,8 @@ Parse_Result	MaterialParse::parse(std::string path,std::string name)
 		materialChunk.m_chunkList.push_back(chunkData);
 	}
 
+	m_lastParseMaterial = materialChunk;
+
 	return PR_OK;
 }
 

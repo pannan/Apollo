@@ -44,6 +44,8 @@ namespace Apollo
 
 		Parse_Result				parse(std::string path,std::string name);
 
+		const MaterialChunk&	getLastParseMaterial() { return m_lastParseMaterial; }
+
 	protected:
 
 		//跳过空白
@@ -61,7 +63,7 @@ namespace Apollo
 		char		getChar() { return m_ptr[m_readPos]; }
 
 		//移动readpos
-		void		moveNext() { ++m_readPos; }
+		void		moveNext() { ++m_readPos; }		
 
 	private:
 
@@ -69,6 +71,7 @@ namespace Apollo
 		size_t			m_readPos;
 		char*			m_ptr;
 
-		std::vector<MaterialChunk>	m_materialList;
+		MaterialChunk		m_lastParseMaterial;//上一次解析的材质信息
+		//std::vector<MaterialChunk>	m_materialList;
 	};
 }

@@ -13,6 +13,7 @@ namespace Apollo
 		std::string		m_name;		//文件名，包含后缀
 		std::string		m_path;		//文件相对assets目录的路径
 		std::string		m_suffix;		//文件后缀
+		uint32_t		m_handle;	//如果文件是一个资源，这里保存期资源id
 		static size_t	s_nodeID;
 	};
 

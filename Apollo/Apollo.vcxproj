@@ -192,7 +192,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="UI\AssetsPropertyPanelUI.h" />
     <ClInclude Include="UI\ISelectPropertyUI.h" />
     <ClInclude Include="UI\LogUI.h" />
-    <ClInclude Include="UI\TextureSelectIPropertyUI.h" />
+    <ClInclude Include="UI\TextureSelectPropertyUI.h" />
     <ClInclude Include="UI\UIRoot.h" />
     <ClInclude Include="Windows\AssetsDirectoryManager.h" />
     <ClInclude Include="Windows\EventManager.h" />
@@ -247,7 +247,9 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="third_party\ftl\atomic_counter.cpp" />
     <ClCompile Include="third_party\ftl\task_scheduler.cpp" />
     <ClCompile Include="UI\AssetsDirectoryViewUI.cpp" />
+    <ClCompile Include="UI\AssetsPropertyPanelUI.cpp" />
     <ClCompile Include="UI\LogUI.cpp" />
+    <ClCompile Include="UI\TextureSelectPropertyUI.cpp" />
     <ClCompile Include="UI\UIRoot.cpp" />
     <ClCompile Include="Windows\AssetsDirectoryManager.cpp" />
     <ClCompile Include="Windows\EventManager.cpp" />

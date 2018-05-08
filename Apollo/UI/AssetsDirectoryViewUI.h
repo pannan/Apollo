@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Singleton.h"
+
 namespace Apollo
 {
 	class DirectoryNode;
 	class DirectoryBaseNode;
 
-	class AssetsDirectoryViewUI
+	class AssetsDirectoryViewUI : public SingletonEx<AssetsDirectoryViewUI>
 	{
 	public:
 
@@ -13,6 +15,8 @@ namespace Apollo
 		~AssetsDirectoryViewUI();
 
 		void			render(int w,int h);
+
+		DirectoryBaseNode*		getSelectNode() { return m_selectNode; }
 
 	protected:
 

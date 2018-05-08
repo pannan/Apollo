@@ -5,8 +5,8 @@ namespace Apollo
 
 	enum RESOURCE_TYPE
 	{
-		//RT_NONE,//
-		RT_HLSL, // = 0
+		RT_NONE,//handle初始值为0，有效id从1开始是为了让handle=0无效
+		RT_HLSL, // = 1
 		RT_MATERIAL,
 		RT_TEXTURE
 	};

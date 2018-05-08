@@ -10,7 +10,7 @@ using namespace Apollo;
 
 size_t DirectoryBaseNode::s_nodeID = 0;
 
-DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path)
+DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path),m_handle(0)
 {
 	m_id = s_nodeID++;
 
@@ -38,9 +38,11 @@ DirectoryBaseNode::DirectoryBaseNode(const std::string& path) : m_path(path)
 		{
 			MaterialParse::getInstance().parse(path, m_name);
 		}
-
-		//统一到assets目录分析完再创建
-//		ResourceManager::getInstance().createResource(path, m_name, m_suffix);
+		
+		//如果找到一个资源就马上调用createResource，会存在一个问题，比如：
+		//一个材质里引用了一个hlsl文件，由于材质只保存hlsl的handle，但是这是可能
+		//这个hlsl还没有
+		ResourceManager::getInstance().createResource(path, m_name, m_suffix);
 	}
 
 }

@@ -15,9 +15,9 @@ TextureResourceFactory::TextureResourceFactory()
 
 TextureResourceFactory::~TextureResourceFactory()
 {
-	ResourceManager::getInstance().unregisterResourceFactory("dds", this);
-	ResourceManager::getInstance().unregisterResourceFactory("tga", this);
-	ResourceManager::getInstance().unregisterResourceFactory("exr", this);
+	ResourceManager::getInstance().unRegisterResourceFactory("dds", this);
+	ResourceManager::getInstance().unRegisterResourceFactory("tga", this);
+	ResourceManager::getInstance().unRegisterResourceFactory("exr", this);
 
 	for each (TextureResource* var in m_textureResourceList)
 	{

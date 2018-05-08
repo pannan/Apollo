@@ -14,7 +14,7 @@ namespace Apollo
 
 		void			registerResourceFactory(const std::string& type, IResourceFactory* creator);
 
-		void			unregisterResourceFactory(const std::string& type, IResourceFactory* creator);
+		void			unRegisterResourceFactory(const std::string& type, IResourceFactory* creator);
 
 	protected:
 

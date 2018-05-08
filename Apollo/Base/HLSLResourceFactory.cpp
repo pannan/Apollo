@@ -13,7 +13,7 @@ HLSLResourceFactory::HLSLResourceFactory()
 
 HLSLResourceFactory::~HLSLResourceFactory()
 {
-	ResourceManager::getInstance().unregisterResourceFactory("hlsl", this);
+	ResourceManager::getInstance().unRegisterResourceFactory("hlsl", this);
 
 	for each (HLSLResource* var in m_hlslResourceList)
 	{

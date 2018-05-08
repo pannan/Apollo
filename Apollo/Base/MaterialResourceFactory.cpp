@@ -2,6 +2,7 @@
 #include "MaterialResourceFactory.h"
 #include "ResourceManager.h"
 #include "MaterialResource.h"
+#include "MaterialParse.h"
 
 using namespace Apollo;
 using namespace std;
@@ -13,7 +14,7 @@ MaterialResourceFactory::MaterialResourceFactory()
 
 MaterialResourceFactory::~MaterialResourceFactory()
 {
-	ResourceManager::getInstance().unregisterResourceFactory("material", this);
+	ResourceManager::getInstance().unRegisterResourceFactory("material", this);
 
 	for each (MaterialResource* var in m_materialResourceList)
 	{
@@ -28,6 +29,9 @@ uint32_t MaterialResourceFactory::createResource(const std::string& path, const 
 	handle |= (index << 8);
 
 	MaterialResource* materialRes = new MaterialResource(path, handle);
+
+	const MaterialChunk& materialChunk = MaterialParse::getInstance().getLastParseMaterial();
+
 	m_materialResourceList.push_back(materialRes);
 
 	return handle;
