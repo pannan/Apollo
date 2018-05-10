@@ -246,6 +246,15 @@
     <ClInclude Include="UI\TextureSelectPropertyUI.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="DX11\TextureDX11ResourceFactory.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\TextureDX11Resource.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\CharacterTools.h">
+      <Filter>Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -391,6 +400,9 @@
     </ClCompile>
     <ClCompile Include="UI\TextureSelectPropertyUI.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\CharacterTools.cpp">
+      <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

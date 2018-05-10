@@ -6,6 +6,13 @@ namespace Apollo
 {
 	class IResourceFactory;
 
+	struct ResourceChunk 
+	{
+		std::string		path;
+		std::string		name;
+		std::string		type;
+	};
+
 	class ResourceManager : public SingletonEx<ResourceManager>
 	{
 	public:
@@ -26,9 +33,11 @@ namespace Apollo
 
 		typedef stdext::hash_map<std::string, IResourceFactory*>	FactoryHashMap;
 		typedef stdext::hash_map<std::string, uint32_t>					ResourceHandleHashMap;
+		typedef stdext::hash_map<std::string, ResourceChunk>		ResourceChunkMap;
 
 		FactoryHashMap							m_factoryHashMap;
 		ResourceHandleHashMap			m_handleHashMap;
+		ResourceChunkMap					m_resourceChunkMap;
 
 	private:
 	};

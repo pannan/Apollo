@@ -52,6 +52,12 @@ uint32_t ResourceManager::createResource(const std::string& path, const std::str
 		return 0;
 	}
 
+	ResourceChunk resChunk;
+	resChunk.path = path;
+	resChunk.name = name;
+	resChunk.type = type;
+	m_resourceChunkMap[name] = resChunk;
+
 	m_handleHashMap[name] = handle;
 
 	return handle;
@@ -69,8 +75,15 @@ uint32_t ResourceManager::getResource(const std::string& name)
 
 	if (handle == 0)
 	{
+		if (m_resourceChunkMap.find(name) == m_resourceChunkMap.end())
+		{
+			LogManager::getInstance().log("[ResourceManager::getResource] resource:" + name + " resource chunk not exit!");
+			return 0;
+		}
+
+		const ResourceChunk& resChunk = m_resourceChunkMap[name];
 		//可能还没加载，尝试加载
-		handle = createResource()
+		return createResource(resChunk.path, resChunk.name, resChunk.type);
 	}
-	return ;
+	return handle;
 }

@@ -4,6 +4,7 @@
 #include "AssetsDirectoryViewUI.h"
 #include "AssetsDirectoryManager.h"
 #include "ResourceManager.h"
+#include "CharacterTools.h"
 
 using namespace Apollo;
 
@@ -33,5 +34,9 @@ void TextureSelectPropertyUI::render()
 	if (handle == 0)
 	{
 		handle = ResourceManager::getInstance().getResource(selectNode->m_name);
+	}
+	else
+	{
+
 	}
 }
