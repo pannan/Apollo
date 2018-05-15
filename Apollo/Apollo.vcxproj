@@ -166,9 +166,10 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\Singleton.h" />
     <ClInclude Include="Base\TextureResource.h" />
     <ClInclude Include="Base\TextureResourceFactory.h" />
+    <ClInclude Include="DX11\DX11Renderer.h" />
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
     <ClInclude Include="DX11\IResourceDX11.h" />
-    <ClInclude Include="DX11\TextureDX11Resource.h" />
+    <ClInclude Include="DX11\Texture2dDX11.h" />
     <ClInclude Include="DX11\TextureDX11ResourceFactory.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -233,7 +234,10 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Base\ofbx.cpp" />
     <ClCompile Include="Base\ResourceManager.cpp" />
     <ClCompile Include="Base\TextureResourceFactory.cpp" />
+    <ClCompile Include="DX11\DX11Renderer.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
+    <ClCompile Include="DX11\Texture2dDX11.cpp" />
+    <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />

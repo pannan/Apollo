@@ -35,6 +35,8 @@
 
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}
 
+#define SAFE_RELEASE(x) { if (x) x->Release(); x = NULL; }
+
 #ifndef _max
 #define _max(a,b)            (((a) > (b)) ? (a) : (b))
 #endif
@@ -42,6 +44,16 @@
 #ifndef _min
 #define _min(a,b)            (((a) < (b)) ? (a) : (b))
 #endif
+
+typedef Microsoft::WRL::ComPtr<ID3D11Buffer> BufferComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11Texture1D> Texture1DComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11Texture2D> Texture2DComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11Texture3D> Texture3DComPtr;
+
+typedef Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ShaderResourceViewComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilViewComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetViewComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> UnorderedAccessViewComPtr;
 
 
 // TODO:  在此处引用程序需要的其他头文件
