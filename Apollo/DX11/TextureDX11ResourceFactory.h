@@ -19,7 +19,7 @@ namespace Apollo
 
 	protected:
 
-		void		loadDDS(const std::string& path);
+		TextureResource*		loadDDS(const std::string& path, uint32_t handle);
 
 	protected:
 

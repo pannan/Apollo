@@ -6,6 +6,7 @@
 #include "DirectXTex.h"
 #include "CharacterTools.h"
 #include "DX11Renderer.h"
+#include "Texture2dDX11.h"
 
 using namespace Apollo;
 using namespace std;
@@ -30,7 +31,7 @@ TextureDX11ResourceFactory::~TextureDX11ResourceFactory()
 	}
 }
 
-void TextureDX11ResourceFactory::loadDDS(const std::string& path)
+TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, uint32_t handle)
 {
 	TexMetadata mdata;
 
@@ -40,7 +41,7 @@ void TextureDX11ResourceFactory::loadDDS(const std::string& path)
 	if (hr != S_OK)
 	{
 		LogManager::getInstance().log("[TextureDX11ResourceFactory::loadDDS] GetMetadataFromDDSFile error! file:" + path);
-		return;
+		return nullptr;
 	}
 
 	ScratchImage image;
@@ -48,7 +49,7 @@ void TextureDX11ResourceFactory::loadDDS(const std::string& path)
 	if (FAILED(hr))
 	{
 		LogManager::getInstance().log("[TextureDX11ResourceFactory::loadDDS] LoadFromDDSFile error! file:" + path);
-		return;
+		return nullptr;
 	}
 
 	// Special case to make sure Texture cubes remain arrays
@@ -63,15 +64,37 @@ void TextureDX11ResourceFactory::loadDDS(const std::string& path)
 	if (hr != S_OK)
 	{
 		LogManager::getInstance().log("[TextureDX11ResourceFactory::loadDDS] LoadFromDDSFile error! file:" + path);
-		return;
+		return nullptr;
 	}
 	
+	if (mdata.IsCubemap())
+	{
+		return nullptr;
+	}
+	else
+	{
+		if (mdata.dimension == TEX_DIMENSION_TEXTURE1D)
+		{
+			return nullptr;
+		}
+		else if (mdata.dimension == TEX_DIMENSION_TEXTURE2D)
+		{
+			Texture2dDX11* tex2d = new Texture2dDX11(path, handle, srv);
+			return tex2d;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+	
+	return nullptr;
 }
 
 uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, const std::string& name, const std::string& type)
 {
 	uint32_t index = m_textureResourceList.size();
-	uint32_t handle = RT_MATERIAL;
+	uint32_t handle = RT_TEXTURE;
 	handle |= (index << 8);
 
 	//ÅÐ¶Ïºó×ºÃû
@@ -84,13 +107,14 @@ uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, con
 	
 	string suffixName = name.substr(pos + 1, name.size() - pos);
 
+	TextureResource* tex = nullptr;
 	if (suffixName == "dds")
 	{
-
+		tex = loadDDS(path, handle);
 	}
 
-	//TextureResource* textureRes = new TextureResource(path, handle);
-	//m_textureResourceList.push_back(textureRes);
+
+	m_textureResourceList.push_back(tex);
 
 	return handle;
 }
