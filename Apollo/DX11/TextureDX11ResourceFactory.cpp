@@ -118,3 +118,12 @@ uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, con
 
 	return handle;
 }
+
+Resource* TextureDX11ResourceFactory::getResource(uint32_t handle)
+{
+	uint32_t index = GET_RESOURCE_INDEX(handle);
+	if (m_textureResourceList.size() <= index)
+	{
+
+	}
+}

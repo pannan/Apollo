@@ -15,7 +15,11 @@ namespace Apollo
 
 		~TextureDX11ResourceFactory();
 
+		virtual	int			getResourceType() { return RT_TEXTURE; }
+
 		virtual uint32_t	createResource(const std::string& path, const std::string& name, const std::string& type);
+
+		virtual	Resource*	getResource(uint32_t handle);
 
 	protected:
 

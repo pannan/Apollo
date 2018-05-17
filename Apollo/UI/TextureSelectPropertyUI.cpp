@@ -33,7 +33,7 @@ void TextureSelectPropertyUI::render()
 
 	if (handle == 0)
 	{
-		handle = ResourceManager::getInstance().getResource(selectNode->m_name);
+		handle = ResourceManager::getInstance().getResourceHandle(selectNode->m_name);
 		return;
 	}
 	

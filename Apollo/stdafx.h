@@ -22,6 +22,9 @@
 #include <limits>
 //#include <unordered_map>
 #include <hash_map>
+#include <iostream>
+#include <strstream>
+#include <sstream>
 
 
 
@@ -36,6 +39,10 @@
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}
 
 #define SAFE_RELEASE(x) { if (x) x->Release(); x = NULL; }
+
+#define GET_RESOURCE_TYPE(handle) (handle & 0x000000ff);
+
+#define GET_RESOURCE_INDEX(handle) ((handle >> 8) & 0x00ffffff);
 
 #ifndef _max
 #define _max(a,b)            (((a) > (b)) ? (a) : (b))
