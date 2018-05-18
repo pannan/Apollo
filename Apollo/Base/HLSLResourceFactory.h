@@ -2,6 +2,7 @@
 
 #include "IResourceFactory.h"
 #include "Singleton.h"
+#include "Resource.h"
 
 namespace Apollo
 {
@@ -15,7 +16,11 @@ namespace Apollo
 
 		~HLSLResourceFactory();
 
+		virtual int				getResourceType() { return RT_HLSL; }
+
 		virtual uint32_t	createResource(const std::string& path, const std::string& name, const std::string& type);
+
+		virtual Resource*	getResource(uint32_t handle);
 
 	protected:
 

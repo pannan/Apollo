@@ -105,7 +105,7 @@ uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, con
 		return 0;
 	}
 	
-	string suffixName = name.substr(pos + 1, name.size() - pos);
+	string suffixName = type;// name.substr(pos + 1, name.size() - pos);
 
 	TextureResource* tex = nullptr;
 	if (suffixName == "dds")
@@ -124,6 +124,10 @@ Resource* TextureDX11ResourceFactory::getResource(uint32_t handle)
 	uint32_t index = GET_RESOURCE_INDEX(handle);
 	if (m_textureResourceList.size() <= index)
 	{
-
+		stringstream ss;
+		ss << "[TextureDX11ResourceFactory::getResource] Index:" << index << "Over Index!";
+		return nullptr;
 	}
+
+	return m_textureResourceList[index];
 }

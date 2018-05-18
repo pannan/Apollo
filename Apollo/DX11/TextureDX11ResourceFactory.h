@@ -2,7 +2,7 @@
 
 #include "IResourceFactory.h"
 #include "Singleton.h"
-
+#include "Resource.h"
 namespace Apollo
 {
 	class TextureResource;

@@ -108,7 +108,7 @@ IResourceFactory* ResourceManager::getResourceFactory(uint32_t handle)
 	if (m_factoryTypeHashMap.find(resourceType) == m_factoryTypeHashMap.end())
 	{
 		stringstream ss;
-		ss << "[ResourceManager::getResourceFactory] type:" + resourceType + "  not exit!";
+		ss << "[ResourceManager::getResourceFactory] type:" << resourceType << "  not exit!";
 		LogManager::getInstance().log(ss.str());
 		return 0;
 	}

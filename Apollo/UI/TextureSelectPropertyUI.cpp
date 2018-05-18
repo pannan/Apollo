@@ -5,6 +5,8 @@
 #include "AssetsDirectoryManager.h"
 #include "ResourceManager.h"
 #include "CharacterTools.h"
+#include "TextureResource.h"
+#include "Texture2dDX11.h"
 
 using namespace Apollo;
 
@@ -37,5 +39,21 @@ void TextureSelectPropertyUI::render()
 		return;
 	}
 	
+	TextureResource* texResource = (TextureResource*)ResourceManager::getInstance().getResource(handle);
+	if (texResource == nullptr)
+		return;
+
+	ID3D11ShaderResourceView* srv = nullptr;
+	TEXTURE_TYPE type = texResource->getTextureType();
+	if (type == TextureType_2D)
+	{
+		Texture2dDX11* tex2d = (Texture2dDX11*)texResource;
+		srv = tex2d->getSRV();
+	}
+
+	if (srv == nullptr)
+		return;
+
+	ImGui::Image((void*)srv, ImVec2(300, 300));
 
 }

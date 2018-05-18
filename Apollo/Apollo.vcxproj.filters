@@ -34,9 +34,6 @@
     <Filter Include="UI">
       <UniqueIdentifier>{bc4d1640-c387-49e1-8f24-147b3522fe53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FTL">
-      <UniqueIdentifier>{346ee3ea-bc3d-453c-8958-8b8fe61c6e1f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Base\Material">
       <UniqueIdentifier>{bbba217c-0ab6-4d1a-9495-cd8976090686}</UniqueIdentifier>
     </Filter>
@@ -171,30 +168,6 @@
     <ClInclude Include="UI\UIRoot.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="third_party\ftl\atomic_counter.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\ftl\config.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\ftl\fiber.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\ftl\task.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\ftl\task_scheduler.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\ftl\thread_abstraction.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\ftl\typedefs.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
-    <ClInclude Include="third_party\ftl\wait_free_queue.h">
-      <Filter>FTL</Filter>
-    </ClInclude>
     <ClInclude Include="Windows\FileSystemWatcher.h">
       <Filter>Windows</Filter>
     </ClInclude>
@@ -232,9 +205,6 @@
       <Filter>Base</Filter>
     </ClInclude>
     <ClInclude Include="Base\TextureResource.h">
-      <Filter>Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Base\TextureResourceFactory.h">
       <Filter>Base</Filter>
     </ClInclude>
     <ClInclude Include="UI\AssetsPropertyPanelUI.h">
@@ -368,12 +338,6 @@
     <ClCompile Include="UI\UIRoot.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="third_party\ftl\atomic_counter.cpp">
-      <Filter>FTL</Filter>
-    </ClCompile>
-    <ClCompile Include="third_party\ftl\task_scheduler.cpp">
-      <Filter>FTL</Filter>
-    </ClCompile>
     <ClCompile Include="Windows\FileSystemWatcher.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
@@ -393,9 +357,6 @@
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="Base\MaterialResourceFactory.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Base\TextureResourceFactory.cpp">
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="UI\AssetsPropertyPanelUI.cpp">

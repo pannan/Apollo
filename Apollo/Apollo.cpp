@@ -17,7 +17,7 @@
 #include "ResourceManager.h"
 #include "MaterialResourceFactory.h"
 #include "HLSLResourceFactory.h"
-#include "TextureResourceFactory.h"
+#include "TextureDX11ResourceFactory.h"
 #include "DX11Renderer.h"
 
 using namespace Apollo;
@@ -221,7 +221,8 @@ int main(int, char**)
 	ResourceManager resManager;
 	MaterialResourceFactory materialFactory;
 	HLSLResourceFactory hlslFactory;
-	TextureResourceFactory textureFactroy;
+//	TextureResourceFactory textureFactroy;
+	TextureDX11ResourceFactory textureFactroy;
 	
 	AssetsDirectoryManager* directoryManager = new AssetsDirectoryManager;
 	directoryManager->init("..\\bin\\Assets");

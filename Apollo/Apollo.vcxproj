@@ -172,7 +172,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\ResourceManager.h" />
     <ClInclude Include="Base\Singleton.h" />
     <ClInclude Include="Base\TextureResource.h" />
-    <ClInclude Include="Base\TextureResourceFactory.h" />
     <ClInclude Include="DX11\DX11Renderer.h" />
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
     <ClInclude Include="DX11\IResourceDX11.h" />
@@ -191,14 +190,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Vector4f.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="third_party\ftl\atomic_counter.h" />
-    <ClInclude Include="third_party\ftl\config.h" />
-    <ClInclude Include="third_party\ftl\fiber.h" />
-    <ClInclude Include="third_party\ftl\task.h" />
-    <ClInclude Include="third_party\ftl\task_scheduler.h" />
-    <ClInclude Include="third_party\ftl\thread_abstraction.h" />
-    <ClInclude Include="third_party\ftl\typedefs.h" />
-    <ClInclude Include="third_party\ftl\wait_free_queue.h" />
     <ClInclude Include="UI\AssetsDirectoryViewUI.h" />
     <ClInclude Include="UI\AssetsPropertyPanelUI.h" />
     <ClInclude Include="UI\ISelectPropertyUI.h" />
@@ -240,7 +231,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Base\miniz.cpp" />
     <ClCompile Include="Base\ofbx.cpp" />
     <ClCompile Include="Base\ResourceManager.cpp" />
-    <ClCompile Include="Base\TextureResourceFactory.cpp" />
     <ClCompile Include="DX11\DX11Renderer.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
     <ClCompile Include="DX11\Texture2dDX11.cpp" />
@@ -259,8 +249,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="third_party\ftl\atomic_counter.cpp" />
-    <ClCompile Include="third_party\ftl\task_scheduler.cpp" />
     <ClCompile Include="UI\AssetsDirectoryViewUI.cpp" />
     <ClCompile Include="UI\AssetsPropertyPanelUI.cpp" />
     <ClCompile Include="UI\LogUI.cpp" />

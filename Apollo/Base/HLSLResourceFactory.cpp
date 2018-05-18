@@ -32,3 +32,8 @@ uint32_t HLSLResourceFactory::createResource(const std::string& path, const std:
 
 	return handle;
 }
+
+Resource* HLSLResourceFactory::getResource(uint32_t handle)
+{
+	return nullptr;
+}
