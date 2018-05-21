@@ -57,6 +57,7 @@ namespace Apollo
 	protected:
 
 		void getDirectoryInfo(const std::string& path, DirectoryNode* node);
+		void getDirectoryInfo2(const std::wstring& path, DirectoryNode* node);
 
 	protected:
 

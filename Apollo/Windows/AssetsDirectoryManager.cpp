@@ -5,6 +5,7 @@
 #include "LogManager.h"
 #include "MaterialParse.h"
 #include "ResourceManager.h"
+#include "CharacterTools.h"
 using namespace std;
 using namespace Apollo;
 
@@ -126,6 +127,43 @@ void AssetsDirectoryManager::getDirectoryInfo(const std::string& path, Directory
 	}
 }
 
+void AssetsDirectoryManager::getDirectoryInfo2(const std::wstring& path, DirectoryNode* node)
+{
+	std::wstring pattern(path);
+	pattern.append(L"\\*");
+	WIN32_FIND_DATA data;
+	HANDLE hFind;
+	int h = 0;
+	wstring p;
+	if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
+		do {
+			//v.push_back(data.cFileName);
+			if (data.dwFileAttributes &  _A_SUBDIR)
+			{
+				if (wcscmp(data.cFileName, L".") != 0 && wcscmp(data.cFileName, L"..") != 0)
+				{
+					wstring pathName = p.assign(path).append(L"\\").append(data.cFileName);
+
+					string name;
+					WStringToString(pathName, name);
+					DirectoryNode* subNode = node->addDirectory(name);
+					getDirectoryInfo2(pathName, subNode);
+				}
+					
+			}
+			else
+			{
+				wstring filePath = p.assign(path).append(L"\\").append(data.cFileName);
+				string name;
+				WStringToString(filePath, name);
+				node->addFile(name);
+			}
+			h = FindNextFile(hFind, &data);
+		} while (h != 0);
+		FindClose(hFind);
+	}
+}
+
 void AssetsDirectoryManager::init(const std::string& path)
 {
 	if (m_directoryRootNode == nullptr)
@@ -138,5 +176,8 @@ void AssetsDirectoryManager::init(const std::string& path)
 		m_directoryRootNode = new DirectoryNode(path);
 	}
 	
-	getDirectoryInfo(path,m_directoryRootNode);
+	wstring wpath;
+	StringToWString(path, wpath);
+	getDirectoryInfo2(wpath, m_directoryRootNode);
+	//getDirectoryInfo(path,m_directoryRootNode);
 }
