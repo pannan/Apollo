@@ -7,6 +7,7 @@
 #include "CharacterTools.h"
 #include "TextureResource.h"
 #include "Texture2dDX11.h"
+#include "TextureCubeMapDX11.h"
 
 using namespace Apollo;
 
@@ -50,10 +51,20 @@ void TextureSelectPropertyUI::render()
 		Texture2dDX11* tex2d = (Texture2dDX11*)texResource;
 		srv = tex2d->getSRV();
 	}
+	else if (type == TextureType_CubeTex)
+	{
+		TextureCubeMapDX11* tex = (TextureCubeMapDX11*)texResource;
+		srv = tex->getSRV();
+	}
 
 	if (srv == nullptr)
 		return;
 
 	ImGui::Image((void*)srv, ImVec2(300, 300));
+
+}
+
+void TextureSelectPropertyUI::renderCubeTexture(TextureCubeMapDX11* cubeMap)
+{
 
 }

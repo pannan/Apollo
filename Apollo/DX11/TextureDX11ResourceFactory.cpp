@@ -7,6 +7,7 @@
 #include "CharacterTools.h"
 #include "DX11Renderer.h"
 #include "Texture2dDX11.h"
+#include "TextureCubeMapDX11.h"
 
 using namespace Apollo;
 using namespace std;
@@ -69,7 +70,8 @@ TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, ui
 	
 	if (mdata.IsCubemap())
 	{
-		return nullptr;
+		TextureCubeMapDX11* texCubeMap = new TextureCubeMapDX11(path, handle, srv);
+		return texCubeMap;
 	}
 	else
 	{

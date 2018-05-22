@@ -175,8 +175,15 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\DX11Renderer.h" />
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
     <ClInclude Include="DX11\IResourceDX11.h" />
+    <ClInclude Include="DX11\Texture2dConfigDX11.h" />
     <ClInclude Include="DX11\Texture2dDX11.h" />
+    <ClInclude Include="DX11\TextureCubeMapDX11.h" />
     <ClInclude Include="DX11\TextureDX11ResourceFactory.h" />
+    <ClInclude Include="Graphics\Camera.h" />
+    <ClInclude Include="Graphics\IRenderable.h" />
+    <ClInclude Include="Graphics\IScene.h" />
+    <ClInclude Include="Graphics\RenderPass.h" />
+    <ClInclude Include="Graphics\Task.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
@@ -233,7 +240,9 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Base\ResourceManager.cpp" />
     <ClCompile Include="DX11\DX11Renderer.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
+    <ClCompile Include="DX11\Texture2dConfigDX11.cpp" />
     <ClCompile Include="DX11\Texture2dDX11.cpp" />
+    <ClCompile Include="DX11\TextureCubeMapDX11.cpp" />
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />

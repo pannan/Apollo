@@ -15,6 +15,8 @@ namespace Apollo
 		virtual void render();
 
 	protected:
+
+		void			renderCubeTexture(TextureCubeMapDX11* cubeMap);
 	private:
 	};
 }
