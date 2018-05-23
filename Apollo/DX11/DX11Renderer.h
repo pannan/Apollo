@@ -29,11 +29,11 @@ namespace Apollo
 
 	protected:
 
-		HWND										m_hWnd;
+		HWND									m_hWnd;
 		ID3D11Device*						m_pd3dDevice;
 		ID3D11DeviceContext*			m_pd3dDeviceContext;
 		IDXGISwapChain*					m_pSwapChain;
-		ID3D11RenderTargetView*		m_mainRenderTargetView;
+		ID3D11RenderTargetView*	m_mainRenderTargetView;
 
 	private:
 	};

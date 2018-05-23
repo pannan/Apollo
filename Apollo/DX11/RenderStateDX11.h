@@ -21,7 +21,7 @@ namespace Apollo
 		UINT									m_sampleMask;
 		UINT									m_stencilRef;
 		ID3D11DepthStencilState*			m_depthStencilState;
-		ID3D11ShaderResourceView*		m_shaderResourceView;
+		//ID3D11ShaderResourceView*		m_shaderResourceView;
 		ID3D11SamplerState*					m_samplerState;
 		ID3D11PixelShader*					m_ps;
 		ID3D11VertexShader*					m_vs;
