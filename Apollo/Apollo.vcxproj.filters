@@ -252,6 +252,9 @@
     <ClInclude Include="Graphics\Task.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="DX11\RenderStateDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -405,6 +408,9 @@
       <Filter>Dx11</Filter>
     </ClCompile>
     <ClCompile Include="DX11\Texture2dConfigDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\RenderStateDX11.cpp">
       <Filter>Dx11</Filter>
     </ClCompile>
   </ItemGroup>
