@@ -19,6 +19,7 @@
 #include "HLSLResourceFactory.h"
 #include "TextureDX11ResourceFactory.h"
 #include "DX11Renderer.h"
+#include "RenderStateDX11.h"
 
 using namespace Apollo;
 LogManager logManager;
@@ -223,6 +224,8 @@ int main(int, char**)
 	HLSLResourceFactory hlslFactory;
 //	TextureResourceFactory textureFactroy;
 	TextureDX11ResourceFactory textureFactroy;
+
+	RenderStateDX11	renderStateDX11;
 	
 	AssetsDirectoryManager* directoryManager = new AssetsDirectoryManager;
 	directoryManager->init("..\\bin\\Assets");

@@ -5,6 +5,8 @@
 
 namespace Apollo
 {
+	class TextureCubeMapDX11;
+
 	class TextureSelectPropertyUI : public ISelectPropertyUI,public SingletonEx<TextureSelectPropertyUI>
 	{
 	public:

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RenderStateDX11.h"
-#include "RendererDX11.h"
+#include "DX11Renderer.h"
 using namespace Apollo;
 
 RenderStateDX11::RenderStateDX11()
@@ -8,7 +8,7 @@ RenderStateDX11::RenderStateDX11()
 	m_scissorRects.left = 0.0f;
 	m_scissorRects.top = 0.0f;
 	m_scissorRects.bottom = 1.0f;
-	m_scissorRects.top = 1.0f;
+	m_scissorRects.right = 1.0f;
 
 	m_viewports.Width = 1.0f;
 	m_viewports.Height = 1.0f;
@@ -29,7 +29,7 @@ RenderStateDX11::RenderStateDX11()
 	rasterizerDesc.ScissorEnable = true;
 	rasterizerDesc.MultisampleEnable = false;
 	rasterizerDesc.AntialiasedLineEnable = false;
-	RendererDX11::getInstance().GetDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
+	DX11Renderer::getInstance().getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
 
 	//create BlendState
 	D3D11_BLEND_DESC blendDesc;
@@ -44,7 +44,7 @@ RenderStateDX11::RenderStateDX11()
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	RendererDX11::getInstance().GetDevice()->CreateBlendState(&blendDesc, &m_blendState);
+	DX11Renderer::getInstance().getDevice()->CreateBlendState(&blendDesc, &m_blendState);
 	
 	m_blendFactor[0] = m_blendFactor[1] = m_blendFactor[2] = m_blendFactor[3] = 1.0f;
 	m_sampleMask = 0xffffffff;
@@ -66,7 +66,7 @@ RenderStateDX11::RenderStateDX11()
 	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	RendererDX11::getInstance().GetDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
+	DX11Renderer::getInstance().getDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
 
 	//create 
 	D3D11_SAMPLER_DESC sampleDesc;
@@ -80,7 +80,7 @@ RenderStateDX11::RenderStateDX11()
 	sampleDesc.BorderColor[0] = sampleDesc.BorderColor[1] = sampleDesc.BorderColor[2] = sampleDesc.BorderColor[3] = 0.0f;
 	sampleDesc.MinLOD = 0.0f;
 	sampleDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	RendererDX11::getInstance().GetDevice()->CreateSamplerState(&sampleDesc, &m_samplerState);
+	DX11Renderer::getInstance().getDevice()->CreateSamplerState(&sampleDesc, &m_samplerState);
 
 	
 	m_ps = nullptr;
@@ -88,12 +88,42 @@ RenderStateDX11::RenderStateDX11()
 	//UINT											PSInstancesCount, VSInstancesCount;
 	//ID3D11ClassInstance*        PSInstances[256], *VSInstances[256];   // 256 is max according to PSSetShader documentation
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	ID3D11Buffer*								m_indexBuffer;
-	ID3D11Buffer*								m_vertexBuffer;
-	ID3D11Buffer*								m_vsConstantBuffer;
-	UINT											m_indexBufferOffset;
-	UINT											m_vertexBufferStride;
-	UINT											m_vertexBufferOffset;
-	DXGI_FORMAT							m_indexBufferFormat;
-	ID3D11InputLayout*					m_inputLayout;
+	m_indexBuffer = nullptr;
+	m_vertexBuffer = nullptr;
+	m_vsConstantBuffer = nullptr;
+	m_indexBufferOffset = 0;
+	m_vertexBufferStride = 0;
+	m_vertexBufferOffset = 0;
+	m_indexBufferFormat = DXGI_FORMAT_R16_UINT;
+	m_inputLayout = nullptr;
+}
+
+RenderStateDX11::~RenderStateDX11()
+{
+	SAFE_RELEASE(m_rasterizerState);
+	SAFE_RELEASE(m_blendState);
+	SAFE_RELEASE(m_depthStencilState);
+	SAFE_RELEASE(m_samplerState);
+}
+
+void RenderStateDX11::setDefaultRenderState(ID3D11DeviceContext* dc)
+{
+	dc->RSSetScissorRects(1, &m_scissorRects);
+	dc->RSSetViewports(1, &m_viewports);
+	dc->RSSetState(m_rasterizerState);
+	SAFE_RELEASE(m_rasterizerState);
+	dc->OMSetBlendState(m_blendState, m_blendFactor, m_sampleMask);
+	SAFE_RELEASE(m_blendState);
+	dc->OMSetDepthStencilState(m_depthStencilState, m_stencilRef); 
+	SAFE_RELEASE(m_depthStencilState);
+	//dc->PSSetShaderResources(0, 1, nullptr);
+	dc->PSSetSamplers(0, 1, &m_samplerState);
+	SAFE_RELEASE(m_samplerState);
+	//dc->PSSetShader(m_ps,nullptr,0);
+	//dc->VSSetShader(m_vs,nullptr,0);
+	//dc->VSSetConstantBuffers(0, 1, &m_vsConstantBuffer); if (old.VSConstantBuffer) old.VSConstantBuffer->Release();	
+	dc->IASetPrimitiveTopology(m_primitiveTopology);
+	//dc->IASetIndexBuffer(old.IndexBuffer, old.IndexBufferFormat, old.IndexBufferOffset); if (old.IndexBuffer) old.IndexBuffer->Release();
+	//ctx->IASetVertexBuffers(0, 1, &old.VertexBuffer, &old.VertexBufferStride, &old.VertexBufferOffset); if (old.VertexBuffer) old.VertexBuffer->Release();
+	//ctx->IASetInputLayout(old.InputLayout); if (old.InputLayout) old.InputLayout->Release();
 }

@@ -41,7 +41,7 @@ HRESULT DX11Renderer::init(HWND hWnd)
 	}
 
 	UINT createDeviceFlags = 0;
-	//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 	D3D_FEATURE_LEVEL featureLevel;
 	const D3D_FEATURE_LEVEL featureLevelArray[1] = { D3D_FEATURE_LEVEL_11_0, };
 	if (D3D11CreateDeviceAndSwapChain(	NULL, 
@@ -106,5 +106,16 @@ void DX11Renderer::release()
 	SAFE_RELEASE(m_mainRenderTargetView);
 	SAFE_RELEASE(m_pSwapChain);
 	SAFE_RELEASE(m_pd3dDeviceContext);
+
+#if defined(DEBUG) || defined(_DEBUG)  
+	ID3D11Debug *d3dDebug;
+	HRESULT hr = m_pd3dDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
+	if (SUCCEEDED(hr))
+	{
+		hr = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	}
+	SAFE_RELEASE(d3dDebug);
+#endif  
+	
 	SAFE_RELEASE(m_pd3dDevice);
 }

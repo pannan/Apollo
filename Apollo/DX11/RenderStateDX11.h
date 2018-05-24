@@ -11,6 +11,8 @@ namespace Apollo
 
 		~RenderStateDX11();
 
+		void		setDefaultRenderState(ID3D11DeviceContext* dc);
+
 	private:
 
 		D3D11_RECT						m_scissorRects;
