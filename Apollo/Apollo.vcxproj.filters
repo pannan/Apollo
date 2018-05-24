@@ -237,9 +237,6 @@
     <ClInclude Include="DX11\Texture2dConfigDX11.h">
       <Filter>Dx11</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\RenderPass.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\IRenderable.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -254,6 +251,12 @@
     </ClInclude>
     <ClInclude Include="DX11\RenderStateDX11.h">
       <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\ScreenSpaceRenderPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\MaterialDX11.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +415,9 @@
     </ClCompile>
     <ClCompile Include="DX11\RenderStateDX11.cpp">
       <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

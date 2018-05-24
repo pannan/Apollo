@@ -6,6 +6,10 @@ namespace Apollo
 	{
 	public:
 
+		IRenderable();
+
+		virtual ~IRenderable();
+
 
 
 	protected:

@@ -10,8 +10,10 @@ namespace Apollo
 
 		virtual void update(float fTime) = 0;
 
-		virtual void executeTask() = 0;
+		virtual void execute() = 0;
 
 		virtual std::string getName() = 0;
+
+		virtual void setName(std::string name) = 0;
 	};
 }
