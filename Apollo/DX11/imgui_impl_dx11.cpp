@@ -33,6 +33,7 @@
 #include <dinput.h>
 
 #include "RenderStateDX11.h"
+#include "ResourceManager.h"
 
 using namespace Apollo;
 
@@ -417,6 +418,25 @@ static void ImGui_ImplDX11_CreateFontsTexture()
         desc.MaxLOD = 0.f;
         g_pd3dDevice->CreateSamplerState(&desc, &g_pFontSampler);
     }
+}
+
+static uint32_t imguiMatHandle = 0;
+
+bool ImGui_ImplDX11_CreateDeviceObjects2()
+{
+	if (!g_pd3dDevice)
+		return false;
+	if (g_pFontSampler)
+		ImGui_ImplDX11_InvalidateDeviceObjects();
+
+	if (imguiMatHandle == 0)
+	{
+		imguiMatHandle = ResourceManager::getInstance().getResourceHandle("imgui.material");
+		return false;
+	}
+
+	 ResourceManager::getInstance().getResource(imguiMatHandle);
+		
 }
 
 bool    ImGui_ImplDX11_CreateDeviceObjects()

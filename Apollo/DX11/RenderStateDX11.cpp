@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RenderStateDX11.h"
-#include "DX11Renderer.h"
+#include "RendererDX11.h"
 using namespace Apollo;
 
 RenderStateDX11::RenderStateDX11()
@@ -29,7 +29,7 @@ RenderStateDX11::RenderStateDX11()
 	rasterizerDesc.ScissorEnable = true;
 	rasterizerDesc.MultisampleEnable = false;
 	rasterizerDesc.AntialiasedLineEnable = false;
-	DX11Renderer::getInstance().getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
+	RendererDX11::getInstance().getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
 
 	//create BlendState
 	D3D11_BLEND_DESC blendDesc;
@@ -44,7 +44,7 @@ RenderStateDX11::RenderStateDX11()
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	DX11Renderer::getInstance().getDevice()->CreateBlendState(&blendDesc, &m_blendState);
+	RendererDX11::getInstance().getDevice()->CreateBlendState(&blendDesc, &m_blendState);
 	
 	m_blendFactor[0] = m_blendFactor[1] = m_blendFactor[2] = m_blendFactor[3] = 1.0f;
 	m_sampleMask = 0xffffffff;
@@ -66,7 +66,7 @@ RenderStateDX11::RenderStateDX11()
 	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	DX11Renderer::getInstance().getDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
+	RendererDX11::getInstance().getDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
 
 	//create 
 	D3D11_SAMPLER_DESC sampleDesc;
@@ -80,7 +80,7 @@ RenderStateDX11::RenderStateDX11()
 	sampleDesc.BorderColor[0] = sampleDesc.BorderColor[1] = sampleDesc.BorderColor[2] = sampleDesc.BorderColor[3] = 0.0f;
 	sampleDesc.MinLOD = 0.0f;
 	sampleDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	DX11Renderer::getInstance().getDevice()->CreateSamplerState(&sampleDesc, &m_samplerState);
+	RendererDX11::getInstance().getDevice()->CreateSamplerState(&sampleDesc, &m_samplerState);
 
 	
 	m_ps = nullptr;

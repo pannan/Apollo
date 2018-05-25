@@ -5,8 +5,8 @@ namespace Apollo
 	class Task
 	{
 	public:
-		Task();
-		virtual ~Task();
+		Task(){}
+		virtual ~Task(){}
 
 		virtual void update(float fTime) = 0;
 

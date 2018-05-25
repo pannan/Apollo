@@ -40,6 +40,7 @@ uint32_t MaterialResourceFactory::createResource(const std::string& path, const 
 			{
 				if (var.key == "source")
 				{
+					materialRes->m_vs.shaderFile = var.value;
 					materialRes->m_vs.shaderHandle = ResourceManager::getInstance().getResourceHandle(var.value);
 				}
 				else if (var.key == "entry")
@@ -54,6 +55,7 @@ uint32_t MaterialResourceFactory::createResource(const std::string& path, const 
 			{
 				if (var.key == "source")
 				{
+					materialRes->m_ps.shaderFile = var.value;
 					materialRes->m_ps.shaderHandle = ResourceManager::getInstance().getResourceHandle(var.value);
 				}
 				else if (var.key == "entry")

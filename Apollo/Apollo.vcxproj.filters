@@ -225,9 +225,6 @@
     <ClInclude Include="Base\CharacterTools.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="DX11\DX11Renderer.h">
-      <Filter>Dx11</Filter>
-    </ClInclude>
     <ClInclude Include="DX11\Texture2dDX11.h">
       <Filter>Dx11</Filter>
     </ClInclude>
@@ -256,6 +253,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DX11\MaterialDX11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\GeometryDX11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\BufferManagerDX11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\RendererDX11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VertexFormat.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -398,9 +407,6 @@
     <ClCompile Include="Base\CharacterTools.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="DX11\DX11Renderer.cpp">
-      <Filter>Dx11</Filter>
-    </ClCompile>
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp">
       <Filter>Dx11</Filter>
     </ClCompile>
@@ -417,6 +423,15 @@
       <Filter>Dx11</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\BufferManagerDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\RendererDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\GeometryDX11.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

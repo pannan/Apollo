@@ -1,5 +1,7 @@
 #pragma once
 
+#include "MaterialDX11.h"
+
 namespace Apollo
 {
 	class IRenderable
@@ -11,6 +13,7 @@ namespace Apollo
 		virtual ~IRenderable();
 
 
+		MaterialDX11Ptr		m_mat;
 
 	protected:
 	private:

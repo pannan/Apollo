@@ -6,16 +6,20 @@ namespace Apollo
 {
 	struct VS_Shader
 	{
-		VS_Shader() : shaderHandle(0),entryFunc(""){}
+		VS_Shader() : shaderHandle(0), shaderFile(""),entryFunc(""){}
 		uint32_t	shaderHandle;
-		std::string	entryFunc;
+
+		std::string		shaderFile;
+		std::string		entryFunc;
 	};
 
 	struct PS_Shader
 	{
-		PS_Shader() : shaderHandle(0), entryFunc("") {}
+		PS_Shader() : shaderHandle(0), shaderFile(""), entryFunc("") {}
 		uint32_t	shaderHandle;
-		std::string	entryFunc;
+
+		std::string		shaderFile;
+		std::string		entryFunc;
 	};
 
 	class MaterialResource : public Resource
@@ -30,7 +34,7 @@ namespace Apollo
 
 //	protected:
 
-		VS_Shader		m_vs;
+		VS_Shader			m_vs;
 		PS_Shader			m_ps;
 
 	private:

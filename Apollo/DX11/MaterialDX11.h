@@ -17,4 +17,6 @@ namespace Apollo
 
 	private:
 	};
+
+	typedef std::shared_ptr<MaterialDX11> MaterialDX11Ptr;
 }

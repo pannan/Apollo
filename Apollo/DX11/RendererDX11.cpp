@@ -1,219 +1,121 @@
 #include "stdafx.h"
 #include "RendererDX11.h"
-#include "DXGIAdapter.h"
-#include "DXGIOutput.h"
-#include "SwapChainConfigDX11.h"
-#include "Texture2dDX11.h"
-#include "Texture2dConfigDX11.h"
-#include "SwapChainDX11.h"
-//#include "BufferConfigDX11.h"
-//#include "IndexBufferDX11.h"
-//#include "StructuredBufferDX11.h"
-//#include "ByteAddressBufferDX11.h"
-//#include "IndirectArgsBufferDX11.h"
 
-#pragma comment( lib, "d3d11.lib" )
-#pragma comment( lib, "DXGI.lib" )
-
-using Microsoft::WRL::ComPtr;
 using namespace Apollo;
+using namespace std;
 
-bool RendererDX11::Initialize(D3D_DRIVER_TYPE DriverType, D3D_FEATURE_LEVEL FeatureLevel)
+RendererDX11::RendererDX11()
 {
-
-	HRESULT hr = S_OK;
-
-	// 创建一个factory来枚举系统支持的硬件
-	ComPtr<IDXGIFactory1> pFactory;
-	hr = CreateDXGIFactory1(__uuidof(IDXGIFactory), reinterpret_cast<void**>(pFactory.GetAddressOf()));
-
-
-	// 枚举所有显卡，甚至不支持dx11的
-	ComPtr<IDXGIAdapter1> pCurrentAdapter;
-	std::vector<DXGIAdapter> vAdapters;
-
-	while (pFactory->EnumAdapters1(static_cast<UINT>(vAdapters.size()), pCurrentAdapter.ReleaseAndGetAddressOf()) != DXGI_ERROR_NOT_FOUND)
-	{
-		vAdapters.push_back(pCurrentAdapter);
-
-		DXGI_ADAPTER_DESC1 desc;
-		pCurrentAdapter->GetDesc1(&desc);
-
-	//	Log::Get().Write(desc.Description);
-	}
-
-	// Specify debug
-	UINT CreateDeviceFlags = 0;
-#ifdef _DEBUG
-	CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-	DeviceContextComPtr pContext;
-
-	D3D_FEATURE_LEVEL level[] = { FeatureLevel };
-	D3D_FEATURE_LEVEL CreatedLevel;
-
-	// 遍历所有显卡找到适合的硬件
-	if (DriverType == D3D_DRIVER_TYPE_HARDWARE)
-	{
-		for (auto pAdapter : vAdapters)
-		{
-			hr = D3D11CreateDevice(
-				pAdapter.m_pAdapter.Get(),
-				D3D_DRIVER_TYPE_UNKNOWN,
-				nullptr,
-				CreateDeviceFlags,
-				level,
-				1,
-				D3D11_SDK_VERSION,
-				m_pDevice.GetAddressOf(),
-				&CreatedLevel,
-				pContext.GetAddressOf());
-
-			if (hr == S_OK)
-				break;
-		}
-	}
-	else
-	{
-		hr = D3D11CreateDevice(
-			nullptr,
-			DriverType,
-			nullptr,
-			CreateDeviceFlags,
-			level,
-			1,
-			D3D11_SDK_VERSION,
-			m_pDevice.GetAddressOf(),
-			&CreatedLevel,
-			pContext.GetAddressOf());
-	}
-
-	if (FAILED(hr))
-		return false;
-
-	// Get the debugger interface from the device.
-
-	hr = m_pDevice.CopyTo(m_pDebugger.GetAddressOf());
-
-	if (FAILED(hr))
-	{
-		//Log::Get().Write(L"Unable to acquire the ID3D11Debug interface from the device!");
-	}
-
-	return(true);
+	m_hWnd = nullptr;
+	m_pd3dDevice = nullptr;
+	m_pd3dDeviceContext = nullptr;
+	m_pSwapChain = nullptr;
+	m_mainRenderTargetView = nullptr;
 }
 
-int	RendererDX11::GetUnusedResourceIndex()
+RendererDX11::~RendererDX11()
 {
-	// Initialize return index to -1.
-	int index = -1;
-
-	// Search for a NULL index location.
-	for (unsigned int i = 0; i < m_vResources.size(); i++) {
-		if (m_vResources[i] == NULL) {
-			index = i;
-			break;
-		}
-	}
-
-	// Return either an empty location, or -1 if none exist.
-	return(index);
+	release();
 }
 
-int	RendererDX11::StoreNewResource(ResourceDX11* pResource)
+HRESULT RendererDX11::init(HWND hWnd)
 {
-	// This method either finds an empty spot in the list, or just appends the
-	// resource to the end of it if none are available.
-
-	int index = GetUnusedResourceIndex();
-
-	if (index == -1) {
-		m_vResources.push_back(pResource);
-		index = m_vResources.size() - 1;
-	}
-	else {
-		m_vResources[index] = pResource;
-	}
-
-	// Shift the inner ID to the upper 16 bits.
-	int innerID = (int)pResource->GetInnerID() << 16;
-	index = index + innerID;
-
-	return(index);
-}
-
-int RendererDX11::CreateSwapChain(SwapChainConfigDX11* pConfig)
-{
-	// Attempt to create the DXGI Factory.
-
-	ComPtr<IDXGIDevice> pDXGIDevice;
-	HRESULT hr = m_pDevice.CopyTo(pDXGIDevice.GetAddressOf());
-
-	ComPtr<IDXGIAdapter> pDXGIAdapter;
-	hr = pDXGIDevice->GetParent(__uuidof(IDXGIAdapter), reinterpret_cast<void **>(pDXGIAdapter.GetAddressOf()));
-
-	ComPtr<IDXGIFactory> pFactory;
-	pDXGIAdapter->GetParent(__uuidof(IDXGIFactory), reinterpret_cast<void **>(pFactory.GetAddressOf()));
-
-
-	// Attempt to create the swap chain.
-
-	ComPtr<IDXGISwapChain> pSwapChain;
-	hr = pFactory->CreateSwapChain(m_pDevice.Get(), &pConfig->m_State, pSwapChain.GetAddressOf());
-
-
-	// Release the factory regardless of pass or fail.
-
-	if (FAILED(hr))
+	m_hWnd = hWnd;
+	// Setup swap chain
+	DXGI_SWAP_CHAIN_DESC sd;
 	{
-		//Log::Get().Write(L"Failed to create swap chain!");
-		return(-1);
+		ZeroMemory(&sd, sizeof(sd));
+		sd.BufferCount = 2;
+		sd.BufferDesc.Width = 0;
+		sd.BufferDesc.Height = 0;
+		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		sd.BufferDesc.RefreshRate.Numerator = 60;
+		sd.BufferDesc.RefreshRate.Denominator = 1;
+		sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		sd.OutputWindow = hWnd;
+		sd.SampleDesc.Count = 1;
+		sd.SampleDesc.Quality = 0;
+		sd.Windowed = TRUE;
+		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	}
 
+	UINT createDeviceFlags = 0;
+	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	D3D_FEATURE_LEVEL featureLevel;
+	const D3D_FEATURE_LEVEL featureLevelArray[1] = { D3D_FEATURE_LEVEL_11_0, };
+	if (D3D11CreateDeviceAndSwapChain(	NULL, 
+																	D3D_DRIVER_TYPE_HARDWARE, 
+																	NULL,
+																	createDeviceFlags,
+																	featureLevelArray, 
+																	1, 
+																	D3D11_SDK_VERSION, 
+																	&sd,
+																	&m_pSwapChain, 
+																	&m_pd3dDevice, 
+																	&featureLevel, 
+																	&m_pd3dDeviceContext) != S_OK)
+		return E_FAIL;
 
-	// Acquire the texture interface from the swap chain.
-
-	Texture2DComPtr pSwapChainBuffer;
-	hr = pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(pSwapChainBuffer.GetAddressOf()));
-
-	if (FAILED(hr))
+	// Setup rasterizer
 	{
-	//	Log::Get().Write(L"Failed to get swap chain texture resource!");
-		return(-1);
+		D3D11_RASTERIZER_DESC RSDesc;
+		memset(&RSDesc, 0, sizeof(D3D11_RASTERIZER_DESC));
+		RSDesc.FillMode = D3D11_FILL_SOLID;
+		RSDesc.CullMode = D3D11_CULL_NONE;
+		RSDesc.FrontCounterClockwise = FALSE;
+		RSDesc.DepthBias = 0;
+		RSDesc.SlopeScaledDepthBias = 0.0f;
+		RSDesc.DepthBiasClamp = 0;
+		RSDesc.DepthClipEnable = TRUE;
+		RSDesc.ScissorEnable = TRUE;
+		RSDesc.AntialiasedLineEnable = FALSE;
+		RSDesc.MultisampleEnable = (sd.SampleDesc.Count > 1) ? TRUE : FALSE;
+
+		ID3D11RasterizerState* pRState = NULL;
+		m_pd3dDevice->CreateRasterizerState(&RSDesc, &pRState);
+		m_pd3dDeviceContext->RSSetState(pRState);
+		pRState->Release();
 	}
 
+	createMainRTT();
 
-	// Add the swap chain's back buffer texture and render target views to the internal data
-	// structures to allow setting them later on.
-
-	int ResourceID = StoreNewResource(new Texture2dDX11(pSwapChainBuffer));
-
-
-	// If we get here, then we succeeded in creating our swap chain and it's constituent parts.
-	// Now we create the wrapper object and store the result in our container.
-
-	Texture2dConfigDX11 TextureConfig;
-	pSwapChainBuffer->GetDesc(&TextureConfig.m_State);
-
-	ResourcePtr Proxy(new ResourceProxyDX11(ResourceID, &TextureConfig, this));
-	// With the resource proxy created, create the swap chain wrapper and store it.
-	// The resource proxy can then be used later on by the application to get the
-	// RTV or texture ID if needed.
-
-	m_vSwapChains.push_back(new SwapChainDX11(pSwapChain, Proxy));
-
-	return(m_vSwapChains.size() - 1);
+	return S_OK;
 }
 
-ResourcePtr RendererDX11::GetSwapChainResource(int ID)
+void RendererDX11::createMainRTT()
 {
-	unsigned int index = static_cast<unsigned int>(ID);
+	//create main rtt
+	DXGI_SWAP_CHAIN_DESC sd;
+	m_pSwapChain->GetDesc(&sd);
+	// Create the render target
+	ID3D11Texture2D* pBackBuffer;
+	D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc;
+	ZeroMemory(&render_target_view_desc, sizeof(render_target_view_desc));
+	render_target_view_desc.Format = sd.BufferDesc.Format;
+	render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+	m_pd3dDevice->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &m_mainRenderTargetView);
+	m_pd3dDeviceContext->OMSetRenderTargets(1, &m_mainRenderTargetView, NULL);
+	pBackBuffer->Release();
+}
 
-	if (index < m_vSwapChains.size())
-		return(m_vSwapChains[index]->m_Resource);
+void RendererDX11::release()
+{
+	SAFE_RELEASE(m_mainRenderTargetView);
+	SAFE_RELEASE(m_pSwapChain);
+	SAFE_RELEASE(m_pd3dDeviceContext);
 
-	//Log::Get().Write(L"Tried to get an invalid swap buffer index texture ID!");
-
-	return(ResourcePtr(new ResourceProxyDX11()));
+#if defined(DEBUG) || defined(_DEBUG)  
+	ID3D11Debug *d3dDebug;
+	HRESULT hr = m_pd3dDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
+	if (SUCCEEDED(hr))
+	{
+		hr = d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	}
+	SAFE_RELEASE(d3dDebug);
+#endif  
+	
+	SAFE_RELEASE(m_pd3dDevice);
 }

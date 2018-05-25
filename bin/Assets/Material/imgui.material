@@ -1,0 +1,9 @@
+"vs_shader" : {
+"source" : "imgui.hlsl",
+"entry" : "vs_main"
+}
+
+"ps_shader" : {
+"source" : "imgui.hlsl",
+"entry" : "ps_main"
+}

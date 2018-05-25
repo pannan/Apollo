@@ -1,9 +1,0 @@
-"vs_shader" : {
-"source" : "pbr.hlsl",
-"entry" : "vs_main"
-}
-
-"ps_shader" : {
-"source" : "pbr.hlsl",
-"entry" : "ps_main"
-}

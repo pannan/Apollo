@@ -18,7 +18,7 @@
 #include "MaterialResourceFactory.h"
 #include "HLSLResourceFactory.h"
 #include "TextureDX11ResourceFactory.h"
-#include "DX11Renderer.h"
+#include "RendererDX11.h"
 #include "RenderStateDX11.h"
 
 using namespace Apollo;
@@ -126,14 +126,14 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_SIZE:
-		if (DX11Renderer::getInstance().getDevice() != NULL && wParam != SIZE_MINIMIZED)
+		if (RendererDX11::getInstance().getDevice() != NULL && wParam != SIZE_MINIMIZED)
 		{
 			ImGui_ImplDX11_InvalidateDeviceObjects();
 			//CleanupRenderTarget();
-			DX11Renderer::getInstance().releaseMainRTT();
-			DX11Renderer::getInstance().getSwapChain()->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
+			RendererDX11::getInstance().releaseMainRTT();
+			RendererDX11::getInstance().getSwapChain()->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
 			//CreateRenderTarget();
-			DX11Renderer::getInstance().createMainRTT();
+			RendererDX11::getInstance().createMainRTT();
 			ImGui_ImplDX11_CreateDeviceObjects();
 		}
 		return 0;
@@ -184,7 +184,7 @@ int main(int, char**)
 	RegisterClassEx(&wc);
 	HWND hwnd = CreateWindow(_T("ImGui Example"), _T("ImGui DirectX11 Example"), WS_OVERLAPPEDWINDOW, 100, 100, g_windowsWidth, g_windowsHeight, NULL, NULL, wc.hInstance, NULL);
 
-	DX11Renderer dx11Renderer;
+	RendererDX11 dx11Renderer;
 	// Initialize Direct3D
 	if (dx11Renderer.init(hwnd) != S_OK)
 	{

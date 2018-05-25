@@ -12,9 +12,9 @@ namespace Apollo
 
 		~ScreenSpaceRenderPass();
 
-		virtual void update(float fTime);
+		virtual void update(float fTime){}
 
-		virtual void execute();
+		virtual void execute(){}
 
 		virtual std::string getName() { return m_name; }
 

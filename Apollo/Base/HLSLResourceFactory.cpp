@@ -35,5 +35,13 @@ uint32_t HLSLResourceFactory::createResource(const std::string& path, const std:
 
 Resource* HLSLResourceFactory::getResource(uint32_t handle)
 {
-	return nullptr;
+	uint32_t index = GET_RESOURCE_INDEX(handle);
+	if (m_hlslResourceList.size() <= index)
+	{
+		stringstream ss;
+		ss << "[HLSLResourceFactory::getResource] Index:" << index << "Over Index!";
+		return nullptr;
+	}
+
+	return m_hlslResourceList[index];
 }

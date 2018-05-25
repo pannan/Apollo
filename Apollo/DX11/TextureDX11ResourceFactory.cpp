@@ -5,7 +5,7 @@
 #include "LogManager.h"
 #include "DirectXTex.h"
 #include "CharacterTools.h"
-#include "DX11Renderer.h"
+#include "RendererDX11.h"
 #include "Texture2dDX11.h"
 #include "TextureCubeMapDX11.h"
 
@@ -56,7 +56,7 @@ TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, ui
 	// Special case to make sure Texture cubes remain arrays
 	//mdata.miscFlags &= ~TEX_MISC_TEXTURECUBE;
 	ID3D11ShaderResourceView* srv = nullptr;
-	hr = CreateShaderResourceView(	DX11Renderer::getInstance().getDevice(), 
+	hr = CreateShaderResourceView(	RendererDX11::getInstance().getDevice(), 
 															image.GetImages(), 
 															image.GetImageCount(), 
 															mdata, 
