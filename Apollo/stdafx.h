@@ -26,7 +26,9 @@
 #include <strstream>
 #include <sstream>
 #include <memory>
-
+#include <map>
+#include <fstream>
+#include <d3dcompiler.h>
 
 #include "imgui.h"
 
@@ -65,6 +67,28 @@ typedef Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ShaderResourceViewComPt
 typedef Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilViewComPtr;
 typedef Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetViewComPtr;
 typedef Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> UnorderedAccessViewComPtr;
+
+typedef Microsoft::WRL::ComPtr<ID3D11VertexShader> VSComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11HullShader> HSComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11DomainShader> DSComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11GeometryShader> GSComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11PixelShader> PSComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11ComputeShader> CSComPtr;
+typedef Microsoft::WRL::ComPtr<ID3DBlob> BlobComPtr;
+typedef Microsoft::WRL::ComPtr<ID3D11InputLayout> InputLayoutComPtr;
+
+typedef std::map< std::string, std::string > ShaderMacros;
+
+enum ShaderType
+{
+	UnknownShaderType = 0,
+	VertexShader,
+	TessellationControlShader,      // Hull Shader in DirectX
+	TessellationEvaluationShader,   // Domain Shader in DirectX
+	GeometryShader,
+	PixelShader,
+	ComputeShader,
+};
 
 
 // TODO:  在此处引用程序需要的其他头文件

@@ -35,6 +35,8 @@ namespace Apollo
 
 		BufferComPtr		createIndirectArgsBuffer(UINT size, D3D11_SUBRESOURCE_DATA* pData);
 
+	
+
 	protected:
 
 		HWND									m_hWnd;

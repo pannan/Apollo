@@ -75,4 +75,6 @@ void GPUParticleSample::init()
 	initData.SysMemPitch = 0;
 	initData.SysMemSlicePitch = 0;
 	m_particleIndirectArgsBuffer = RendererDX11::getInstance().createIndirectArgsBuffer(sizeof(uint32_t),&initData);
+
+	//´´½¨shader
 }
