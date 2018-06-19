@@ -40,9 +40,13 @@
 
 #define SAFE_RELEASE(x) { if (x) x->Release(); x = NULL; }
 
+#define SAFE_DELETE_ARRAY(x) {if(x) delete [] x; x = NULL;}
+
 #define GET_RESOURCE_TYPE(handle) (handle & 0x000000ff);
 
 #define GET_RESOURCE_INDEX(handle) ((handle >> 8) & 0x00ffffff);
+
+
 
 #ifndef _max
 #define _max(a,b)            (((a) > (b)) ? (a) : (b))

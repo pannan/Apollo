@@ -27,6 +27,14 @@ namespace Apollo
 
 		inline ID3D11RenderTargetView*	getMainRTT() { return m_mainRenderTargetView; }
 
+		BufferComPtr		createConstantBuffer(UINT size,bool dynamic,bool CPUupdates, D3D11_SUBRESOURCE_DATA* pData);
+
+		BufferComPtr		createStructuredBuffer(UINT count,UINT structsize,bool CPUWritable,bool GPUWritable, D3D11_SUBRESOURCE_DATA* pData);
+
+		BufferComPtr		createAppendConsumeBuffer(UINT count,UINT structsize, D3D11_SUBRESOURCE_DATA* pData);
+
+		BufferComPtr		createIndirectArgsBuffer(UINT size, D3D11_SUBRESOURCE_DATA* pData);
+
 	protected:
 
 		HWND									m_hWnd;
