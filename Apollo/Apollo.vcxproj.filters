@@ -273,6 +273,12 @@
     <ClInclude Include="DX11\ShaderDX11.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DX11\ShaderParameterDX11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Timer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -444,6 +450,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DX11\ShaderDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\ShaderParameterDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Timer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,9 +2,102 @@
 #include "ShaderDX11.h"
 #include "LogManager.h"
 #include "RendererDX11.h"
+#include "ShaderParameterDX11.h"
 
 using namespace Apollo;
 using namespace std;
+
+// Inspired by: http://takinginitiative.net/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
+DXGI_FORMAT GetDXGIFormat(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc)
+{
+	DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+	if (paramDesc.Mask == 1) // 1 component
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32_FLOAT;
+		}
+		break;
+		}
+	}
+	else if (paramDesc.Mask <= 3) // 2 components
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32G32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32G32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32G32_FLOAT;
+		}
+		break;
+		}
+	}
+	else if (paramDesc.Mask <= 7) // 3 components
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32G32B32_FLOAT;
+		}
+		break;
+		}
+	}
+	else if (paramDesc.Mask <= 15) // 4 components
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32A32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32A32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		}
+		break;
+		}
+	}
+
+	return format;
+}
 
 std::string ShaderDX11::getLatestProfile(ShaderType type)
 {
@@ -110,6 +203,17 @@ std::string ShaderDX11::getLatestProfile(ShaderType type)
 	return "";
 }
 
+void ShaderDX11::release()
+{
+	m_pixelShader.Reset();
+	m_domainShader.Reset();
+	m_hullShader.Reset();
+	m_geometrySHader.Reset();
+	m_vertexShader.Reset();
+	m_computeShader.Reset();
+	m_inputLayoutPtr.Reset();
+}
+
 bool ShaderDX11::loadShaderFromString(	ShaderType shaderType, 
 																const std::string& source, 
 																const std::string& fileName,
@@ -118,7 +222,7 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 																const std::string& profile)
 {
 	HRESULT hr;
-	const std::string pathName = "Assets\\Shader\\" + fileName;
+	const std::string pathName = /*"../bin/Assets/Shader/" +*/ fileName;
 	{
 		Microsoft::WRL::ComPtr<ID3DBlob> pShaderBlob;
 		Microsoft::WRL::ComPtr<ID3DBlob> pErrorBlob;
@@ -195,52 +299,54 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 	}
 
 	// After the shader recompiles, try to restore the shader parameters.
-	ParameterMap shaderParameters = m_ShaderParameters;
+	//ParameterMap shaderParameters = m_ShaderParameters;
 
 	// Destroy the last shader as we are now loading a new one.
-	Destroy();
+	release();
 
-	m_ShaderType = shaderType;
+	m_shaderType = shaderType;
 
-	switch (m_ShaderType)
+	ID3D11Device* pdevice = RendererDX11::getInstance().getDevice();
+
+	switch (m_shaderType)
 	{
 	case VertexShader:
-		hr = m_pDevice->CreateVertexShader(m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), nullptr, &m_pVertexShader);
+		hr = pdevice->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
 		break;
 	case TessellationControlShader:
-		hr = m_pDevice->CreateHullShader(m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), nullptr, &m_pHullShader);
+		hr = pdevice->CreateHullShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_hullShader.GetAddressOf());
 		break;
 	case TessellationEvaluationShader:
-		hr = m_pDevice->CreateDomainShader(m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), nullptr, &m_pDomainShader);
+		hr = pdevice->CreateDomainShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_domainShader.GetAddressOf());
 		break;
 	case GeometryShader:
-		hr = m_pDevice->CreateGeometryShader(m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), nullptr, &m_pGeometryShader);
+		hr = pdevice->CreateGeometryShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_geometrySHader.GetAddressOf());
 		break;
 	case PixelShader:
-		hr = m_pDevice->CreatePixelShader(m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), nullptr, &m_pPixelShader);
+		hr = pdevice->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
 		break;
 	case ComputeShader:
-		hr = m_pDevice->CreateComputeShader(m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), nullptr, &m_pComputeShader);
+		hr = pdevice->CreateComputeShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_computeShader.GetAddressOf());
 		break;
 	default:
-		ReportError("Invalid shader type.");
+		LogManager::getInstance().log("Error Shader Type!");
 		break;
 	}
 
 	if (FAILED(hr))
 	{
-		ReportError("Failed to create shader.");
+		LogManager::getInstance().log("Failed to create shader.");
 		return false;
 	}
 
 	// Reflect the parameters from the shader.
 	// Inspired by: http://members.gamedev.net/JasonZ/Heiroglyph/D3D11ShaderReflection.pdf
 	Microsoft::WRL::ComPtr<ID3D11ShaderReflection> pReflector;
-	hr = D3DReflect(m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, &pReflector);
+	hr = D3DReflect(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, &pReflector);
 
 	if (FAILED(hr))
 	{
-		ReportError("Failed to reflect shader.");
+		LogManager::getInstance().log("Failed to reflect shader.");
 		return false;
 	}
 
@@ -250,11 +356,11 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 	if (FAILED(hr))
 	{
-		ReportError("Failed to get shader description from shader reflector.");
+		LogManager::getInstance().log("Failed to get shader description from shader reflector.");
 		return false;
 	}
 
-	m_InputSemantics.clear();
+	//m_InputSemantics.clear();
 
 	UINT numInputParameters = shaderDescription.InputParameters;
 	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
@@ -277,15 +383,15 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 		inputElements.push_back(inputElement);
 
-		m_InputSemantics.insert(SemanticMap::value_type(BufferBinding(inputElement.SemanticName, inputElement.SemanticIndex), i));
+		//m_InputSemantics.insert(SemanticMap::value_type(BufferBinding(inputElement.SemanticName, inputElement.SemanticIndex), i));
 	}
 
 	if (inputElements.size() > 0)
 	{
-		hr = m_pDevice->CreateInputLayout(inputElements.data(), (UINT)inputElements.size(), m_pShaderBlob->GetBufferPointer(), m_pShaderBlob->GetBufferSize(), &m_pInputLayout);
+		hr = pdevice->CreateInputLayout(inputElements.data(), (UINT)inputElements.size(), m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), m_inputLayoutPtr.GetAddressOf());
 		if (FAILED(hr))
 		{
-			ReportError("Failed to create input layout.");
+			LogManager::getInstance().log("Failed to create input layout.");
 			return false;
 		}
 	}
@@ -297,43 +403,43 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 		pReflector->GetResourceBindingDesc(i, &bindDesc);
 		std::string resourceName = bindDesc.Name;
 
-		ShaderParameter::Type parameterType = ShaderParameter::Type::Invalid;
+		ShaderParameterDX11::Type parameterType = ShaderParameterDX11::Type::Invalid;
 
 		switch (bindDesc.Type)
 		{
 		case D3D_SIT_TEXTURE:
-			parameterType = ShaderParameter::Type::Texture;
+			parameterType = ShaderParameterDX11::Type::Texture;
 			break;
 		case D3D_SIT_SAMPLER:
-			parameterType = ShaderParameter::Type::Sampler;
+			parameterType = ShaderParameterDX11::Type::Sampler;
 			break;
 		case D3D_SIT_CBUFFER:
 		case D3D_SIT_STRUCTURED:
-			parameterType = ShaderParameter::Type::Buffer;
+			parameterType = ShaderParameterDX11::Type::Buffer;
 			break;
 		case D3D_SIT_UAV_RWSTRUCTURED:
-			parameterType = ShaderParameter::Type::RWBuffer;
+			parameterType = ShaderParameterDX11::Type::RWBuffer;
 			break;
 		case D3D_SIT_UAV_RWTYPED:
-			parameterType = ShaderParameter::Type::RWTexture;
+			parameterType = ShaderParameterDX11::Type::RWTexture;
 			break;
 		}
 
 		// Create an empty shader parameter that should be filled-in by the application.
 		std::shared_ptr<ShaderParameterDX11> shaderParameter = std::make_shared<ShaderParameterDX11>(resourceName, bindDesc.BindPoint, shaderType, parameterType);
-		m_ShaderParameters.insert(ParameterMap::value_type(resourceName, shaderParameter));
+		//m_ShaderParameters.insert(ParameterMap::value_type(resourceName, shaderParameter));
 
 	}
 
 	// Now try to restore the original shader parameters (if there were any)
-	for (auto shaderParameter : shaderParameters)
+	/*for (auto shaderParameter : shaderParameters)
 	{
 		ParameterMap::iterator iter = m_ShaderParameters.find(shaderParameter.first);
 		if (iter != m_ShaderParameters.end())
 		{
 			iter->second = shaderParameter.second;
 		}
-	}
+	}*/
 
 	return true;
 }
@@ -346,7 +452,7 @@ bool ShaderDX11::loadShaderFromFile(	ShaderType shaderType,
 {
 	bool result = false;
 
-	const std::string pathName = "Assets\\Shader\\" + fileName;
+	const std::string pathName = /*"../bin/Assets/Shader/" +*/ fileName;
 
 	std::ifstream inputFile(pathName);
 
@@ -366,8 +472,66 @@ bool ShaderDX11::loadShaderFromFile(	ShaderType shaderType,
 	std::string source((std::istreambuf_iterator<char>(inputFile)), std::istreambuf_iterator<char>());
 
 	result =loadShaderFromString(shaderType, source, fileName, shaderMacros, entryPoint, profile);
-	
-	
 
 	return result;
+}
+
+void ShaderDX11::bin()
+{
+	ID3D11DeviceContext* deviceContext = RendererDX11::getInstance().getDeviceContex();
+	if (m_vertexShader.Get())
+	{
+		deviceContext->IASetInputLayout(m_inputLayoutPtr.Get());
+		deviceContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+	}
+	else if (m_hullShader)
+	{
+		deviceContext->HSSetShader(m_hullShader.Get(), nullptr, 0);
+	}
+	else if (m_domainShader)
+	{
+		deviceContext->DSSetShader(m_domainShader.Get(), nullptr, 0);
+	}
+	else if (m_geometrySHader)
+	{
+		deviceContext->GSSetShader(m_geometrySHader.Get(), nullptr, 0);
+	}
+	else if (m_pixelShader)
+	{
+		deviceContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+	}
+	else if (m_computeShader)
+	{
+		deviceContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
+	}
+}
+
+void ShaderDX11::unBin()
+{
+	ID3D11DeviceContext* deviceContext = RendererDX11::getInstance().getDeviceContex();
+	if (m_vertexShader.Get())
+	{
+		deviceContext->IASetInputLayout(nullptr);
+		deviceContext->VSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_hullShader)
+	{
+		deviceContext->HSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_domainShader)
+	{
+		deviceContext->DSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_geometrySHader)
+	{
+		deviceContext->GSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_pixelShader)
+	{
+		deviceContext->PSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_computeShader)
+	{
+		deviceContext->CSSetShader(nullptr, nullptr, 0);
+	}
 }

@@ -29,8 +29,33 @@
 #include <map>
 #include <fstream>
 #include <d3dcompiler.h>
+#include <d3d11shader.h>
 
 #include "imgui.h"
+
+#if defined(_WIN32_WINNT_WIN10) 
+#   include <d3d12.h>
+#   include <dxgi1_4.h>
+#	include <d3d12sdklayers.h>
+#	include <d3d12shader.h>
+#	pragma comment(lib, "d3d12.lib")
+#else
+#   include <dxgi1_3.h>
+#endif
+
+#include <d3d11_2.h> // <d3d11_3.h> is only supported on Windows 10 (but then I'd rather use DX12!?)
+#include <d3dcompiler.h>
+#pragma warning( disable: 4838 )
+#include <DirectXMath.h>
+
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "dxguid.lib")
+
+#pragma comment(lib, "freetype263MTd.lib")
+#pragma comment(lib, "boost_context.lib")
+#pragma comment(lib, "DirectXTex.lib")
 
 #ifdef uint32
 #define typedef std::uint32_t uint32;

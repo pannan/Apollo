@@ -76,5 +76,49 @@ void GPUParticleSample::init()
 	initData.SysMemSlicePitch = 0;
 	m_particleIndirectArgsBuffer = RendererDX11::getInstance().createIndirectArgsBuffer(sizeof(uint32_t),&initData);
 
-	//创建shader
+	//创建insert shader
+	m_insertParticleCS = ShaderDX11Ptr(new ShaderDX11());
+	m_insertParticleCS->loadShaderFromFile(	ComputeShader,
+																		"../bin/Assets/Shader/ParticleSystemInsertCS.hlsl", 
+																		ShaderMacros(), 
+																		"CSMAIN", 
+																		"cs_5_0");
+	//update shader
+	m_updateParticleCS = ShaderDX11Ptr(new ShaderDX11());
+	m_updateParticleCS->loadShaderFromFile(	ComputeShader,
+																			"../bin/Assets/Shader/ParticleSystemUpdateCS.hlsl", 
+																			ShaderMacros(), 
+																			"CSMAIN", 
+																			"cs_5_0");
+	//render shader
+	m_renderParticleVS = ShaderDX11Ptr(new ShaderDX11());
+	m_renderParticleVS->loadShaderFromFile(	VertexShader, 
+																			"../bin/Assets/Shader/ParticleSystemRender.hlsl",
+																			ShaderMacros(),
+																			"VSMAIN",
+																			"vs_5_0");
+
+	m_renderParticleGS = ShaderDX11Ptr(new ShaderDX11());
+	m_renderParticleGS->loadShaderFromFile(	GeometryShader,
+																			"../bin/Assets/Shader/ParticleSystemRender.hlsl",
+																			ShaderMacros(),
+																			"GSMAIN",
+																			"gs_5_0");
+
+	m_renderParticlePS = ShaderDX11Ptr(new ShaderDX11());
+	m_renderParticlePS->loadShaderFromFile(	PixelShader,
+																			"../bin/Assets/Shader/ParticleSystemRender.hlsl",
+																			ShaderMacros(),
+																			"PSMAIN",
+																			"ps_5_0");
+}
+
+void GPUParticleSample::insertParticle()
+{
+	
+}
+
+void GPUParticleSample::updateParticle()
+{
+	//
 }

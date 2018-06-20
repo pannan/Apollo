@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector3f.h"
+#include "ShaderDX11.h"
 
 namespace Apollo
 {
@@ -31,10 +32,19 @@ namespace Apollo
 	public:
 
 		GPUParticleSample();
-		~GPUParticleSample();
+		~GPUParticleSample(){}
 
 		void init();
 
+		void render();
+
+	protected:
+
+		void	insertParticle();
+
+		void updateParticle();
+
+		void renderParticle();
 
 	protected:
 
@@ -51,6 +61,14 @@ namespace Apollo
 		BufferComPtr										m_currentParticleCountBuffer;
 
 		BufferComPtr										m_particleIndirectArgsBuffer;
+
+		ShaderDX11Ptr			m_insertParticleCS;
+		ShaderDX11Ptr			m_updateParticleCS;
+
+		ShaderDX11Ptr			m_renderParticleVS;
+		ShaderDX11Ptr			m_renderParticleGS;
+		ShaderDX11Ptr			m_renderParticlePS;
+
 	private:
 	};
 }

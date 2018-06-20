@@ -20,6 +20,8 @@
 #include "TextureDX11ResourceFactory.h"
 #include "RendererDX11.h"
 #include "RenderStateDX11.h"
+#include "Timer.h"
+#include "Sample/GPUParticleSample.h"
 
 using namespace Apollo;
 LogManager logManager;
@@ -232,6 +234,12 @@ int main(int, char**)
 
 	UIRoot uiRoot;
 
+	Timer timer;
+	timer.update();
+
+	GPUParticleSample	particleSample;
+	particleSample.init();
+
 	LPCTSTR sDir = TEXT("F:\\GitHub\\Apollo\\bin\\Assets");
 	DWORD dwNotifyFilter = FileSystemWatcher::FILTER_FILE_NAME | FileSystemWatcher::FILTER_DIR_NAME | FileSystemWatcher::FILTER_LAST_WRITE_NAME | 
 		FileSystemWatcher::FILTER_LAST_ACCESS_NAME;
@@ -282,7 +290,7 @@ int main(int, char**)
 		//	ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
 		//	ImGui::ShowTestWindow();
 		//}
-
+		timer.update();
 		uiRoot.render(g_windowsWidth,g_windowsHeight);
 		logUI.render();
 
