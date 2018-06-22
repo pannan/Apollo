@@ -1,5 +1,8 @@
 #pragma once
 
+#include "ConstantBufferDX11.h"
+#include "StructuredBufferDX11.h"
+
 namespace Apollo
 {
 	/*
@@ -30,12 +33,12 @@ namespace Apollo
 		void bind();
 		void unBind();
 
-	protected:
+//	protected:
 
-		/*void setConstantBuffer(std::shared_ptr<ConstantBuffer> buffer);
-		void setTexture(std::shared_ptr<Texture> texture);
-		void setSampler(std::shared_ptr<SamplerState> sampler);
-		void setStructuredBuffer(std::shared_ptr<StructuredBuffer> rwBuffer);*/
+		void setConstantBuffer(ConstantBufferDX11Ptr buffer) { m_constantBufferPtr = buffer; }
+	//	void setTexture(std::shared_ptr<Texture> texture);
+	//	void setSampler(std::shared_ptr<SamplerState> sampler);
+		void setStructuredBuffer(StructuredBufferDX11Ptr buffer) { m_structuredBufferPtr = buffer; }
 
 
 	protected:
@@ -55,7 +58,12 @@ namespace Apollo
 		ShaderResourceViewComPtr		m_srvPtr;
 		UnorderedAccessViewComPtr	m_uavPtr;
 
+		ConstantBufferDX11Ptr				m_constantBufferPtr;
+		StructuredBufferDX11Ptr			m_structuredBufferPtr;
+
 
 	private:
 	};
+
+	typedef std::shared_ptr<ShaderParameterDX11>	ShaderParameterPtr;
 }

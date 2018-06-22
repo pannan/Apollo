@@ -535,3 +535,31 @@ void ShaderDX11::unBin()
 		deviceContext->CSSetShader(nullptr, nullptr, 0);
 	}
 }
+
+ShaderParameterPtr	ShaderDX11::getShaderParameter(std::string name)
+{
+	ParameterMap::iterator it = m_shaderParameters.find(name);
+	if (it != m_shaderParameters.end())
+		return it->second;
+
+	LogManager::getInstance().log("ShaderParameter:" + name + "not find!");
+	return nullptr;
+}
+
+void ShaderDX11::setConstantBuffer(std::string name, ConstantBufferDX11Ptr buffer)
+{
+	ShaderParameterPtr parameter = getShaderParameter(name);
+	if (parameter)
+	{
+		parameter->setConstantBuffer(buffer);
+	}
+}
+
+void ShaderDX11::setStructuredBuffer(std::string name, StructuredBufferDX11Ptr buffer)
+{
+	ShaderParameterPtr parameter = getShaderParameter(name);
+	if (parameter)
+	{
+		parameter->setStructuredBuffer(buffer);
+	}
+}

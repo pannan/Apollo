@@ -27,4 +27,6 @@ namespace Apollo
 
 		BufferComPtr m_bufferComPtr;
 	};
+
+	typedef std::shared_ptr<ConstantBufferDX11> ConstantBufferDX11Ptr;
 }

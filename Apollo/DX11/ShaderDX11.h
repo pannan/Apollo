@@ -30,7 +30,13 @@ namespace Apollo
 		//void setSampler(std::shared_ptr<SamplerState> sampler);
 		//void setStructuredBuffer(std::shared_ptr<StructuredBuffer> rwBuffer);
 
+		void		setConstantBuffer(std::string name, ConstantBufferDX11Ptr buffer);
+
+		void		setStructuredBuffer(std::string name, StructuredBufferDX11Ptr buffer);
+
 	protected:
+
+		ShaderParameterPtr		getShaderParameter(std::string name);
 
 		std::string				getLatestProfile(ShaderType type);
 
@@ -56,7 +62,7 @@ namespace Apollo
 
 		BlobComPtr						m_shaderBlob;
 
-		typedef std::map<std::string, std::shared_ptr<ShaderParameterDX11> > ParameterMap;
+		typedef std::map<std::string, ShaderParameterPtr > ParameterMap;
 		ParameterMap m_shaderParameters;
 
 	private:
