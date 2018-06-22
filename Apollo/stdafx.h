@@ -115,5 +115,15 @@ enum ShaderType
 	ComputeShader,
 };
 
+enum class ShaderParameterType
+{
+	Invalid,    // Invalid parameter. Doesn't store a type.
+	Texture,    // Texture.
+	Sampler,    // Texture sampler.
+	Buffer,     // Buffers, ConstantBuffers, StructuredBuffers.
+	RWTexture,  // Texture that can be written to in a shader (using Store operations).
+	RWBuffer,   // Read/write structured buffers.
+};
+
 
 // TODO:  在此处引用程序需要的其他头文件

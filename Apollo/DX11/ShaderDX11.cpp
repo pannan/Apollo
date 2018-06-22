@@ -299,7 +299,7 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 	}
 
 	// After the shader recompiles, try to restore the shader parameters.
-	//ParameterMap shaderParameters = m_ShaderParameters;
+	ParameterMap shaderParameters = m_shaderParameters;
 
 	// Destroy the last shader as we are now loading a new one.
 	release();
@@ -427,19 +427,19 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 		// Create an empty shader parameter that should be filled-in by the application.
 		std::shared_ptr<ShaderParameterDX11> shaderParameter = std::make_shared<ShaderParameterDX11>(resourceName, bindDesc.BindPoint, shaderType, parameterType);
-		//m_ShaderParameters.insert(ParameterMap::value_type(resourceName, shaderParameter));
+		m_shaderParameters.insert(ParameterMap::value_type(resourceName, shaderParameter));
 
 	}
 
 	// Now try to restore the original shader parameters (if there were any)
-	/*for (auto shaderParameter : shaderParameters)
+	for (auto shaderParameter : shaderParameters)
 	{
-		ParameterMap::iterator iter = m_ShaderParameters.find(shaderParameter.first);
-		if (iter != m_ShaderParameters.end())
+		ParameterMap::iterator iter = m_shaderParameters.find(shaderParameter.first);
+		if (iter != m_shaderParameters.end())
 		{
 			iter->second = shaderParameter.second;
 		}
-	}*/
+	}
 
 	return true;
 }

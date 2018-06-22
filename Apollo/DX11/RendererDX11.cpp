@@ -198,23 +198,7 @@ BufferComPtr RendererDX11::createStructuredBuffer(UINT count, UINT structsize, b
 
 BufferComPtr RendererDX11::createAppendConsumeBuffer(UINT count, UINT structsize, D3D11_SUBRESOURCE_DATA* pData)
 {
-	D3D11_BUFFER_DESC desc;
-	desc.ByteWidth = count * structsize;
-	desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	desc.StructureByteStride = structsize;
-	// Selec t th e appropriat e usage and CPU access flags based on th e passed in flags
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.CPUAccessFlags = 0;
-	// Create the buffer with the specified configuration
-	ID3D11Buffer* pBuffer = 0;
-	HRESULT hr = m_pd3dDevice->CreateBuffer(&desc, pData, &pBuffer); 
-	if (FAILED(hr))
-	{
-		// Handle the error here...
-		return(0);
-	}
-	return(pBuffer);
+	return createStructuredBuffer(count, structsize, false, true, pData);
 }
 
 

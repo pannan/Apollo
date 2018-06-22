@@ -2,29 +2,29 @@
 
 namespace Apollo
 {
+	/*
+	constantbuffer:资源是位于显存的地址
+	调用ID3D11DeviceContext1::Map来从主内存把数据传输到显存
+	调用ID3D11DeviceContext1::xxSetConstantBuffers来把buffer在显存地址设置到指定寄存器，这样GPU可以访问这个地址的数据
+
+	structbuffer:
+	调用ID3D11DeviceContext1::Map来从主内存把数据传输到显存
+	调用ID3D11DeviceContext1::xxSetShaderResources或者
+												  xxSetUnorderedAccessViews来把buffer在显存地址设置到指定寄存器，这样GPU可以访问这个地址的数据
+	*/
 	class ShaderParameterDX11
 	{
 	public:
 
-		enum class Type
-		{
-			Invalid,    // Invalid parameter. Doesn't store a type.
-			Texture,    // Texture.
-			Sampler,    // Texture sampler.
-			Buffer,     // Buffers, ConstantBuffers, StructuredBuffers.
-			RWTexture,  // Texture that can be written to in a shader (using Store operations).
-			RWBuffer,   // Read/write structured buffers.
-		};
-
 		ShaderParameterDX11();
 
 		// Shader resource parameter.
-		ShaderParameterDX11(const std::string& name, UINT slotID, ShaderType shaderType, Type parameterType);
+		ShaderParameterDX11(const std::string& name, UINT slotID, ShaderType shaderType, ShaderParameterType parameterType);
 
 		bool isValid() const;
 
 		// Get the type of the stored parameter.
-		Type getType() const;
+		ShaderParameterType getType() const;
 
 		// Bind the shader parameter to a specific slot for the given shader type.
 		void bind();
@@ -37,6 +37,7 @@ namespace Apollo
 		void setSampler(std::shared_ptr<SamplerState> sampler);
 		void setStructuredBuffer(std::shared_ptr<StructuredBuffer> rwBuffer);*/
 
+
 	protected:
 
 		std::string m_Name;
@@ -45,7 +46,7 @@ namespace Apollo
 
 		ShaderType	m_shaderType;
 
-		Type				m_parameterType;
+		ShaderParameterType				m_parameterType;
 		// Shader parameter does not take ownership of these types.
 		/*std::weak_ptr<Texture> m_pTexture;
 		std::weak_ptr<SamplerState> m_pSamplerState;

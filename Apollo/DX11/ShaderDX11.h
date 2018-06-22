@@ -1,4 +1,5 @@
 #pragma once
+#include "ShaderParameterDX11.h"
 
 namespace Apollo
 {
@@ -24,6 +25,11 @@ namespace Apollo
 
 		void unBin();
 
+		//void setConstantBuffer(std::shared_ptr<ConstantBuffer> constantBuffer);
+		//void setTexture(std::shared_ptr<Texture> texture);
+		//void setSampler(std::shared_ptr<SamplerState> sampler);
+		//void setStructuredBuffer(std::shared_ptr<StructuredBuffer> rwBuffer);
+
 	protected:
 
 		std::string				getLatestProfile(ShaderType type);
@@ -48,7 +54,10 @@ namespace Apollo
 		std::string							m_profile;
 		std::string							m_shaderFileName;
 
-		BlobComPtr			m_shaderBlob;
+		BlobComPtr						m_shaderBlob;
+
+		typedef std::map<std::string, std::shared_ptr<ShaderParameterDX11> > ParameterMap;
+		ParameterMap m_shaderParameters;
 
 	private:
 	};
