@@ -5,12 +5,6 @@
 
 using namespace Apollo;
 
-__declspec(align(16)) struct ParticleInsertParameters
-{
-	Vector4f EmitterLocation;
-	Vector4f RandomVector;
-};
-
 GPUParticleSample::GPUParticleSample()
 {
 	m_particleCount = 100000;
@@ -26,11 +20,19 @@ void GPUParticleSample::init()
 		"CSMAIN",
 		"cs_5_0");
 
-	RendererDX11::getInstance().createConstantBuffer(sizeof();
-	m_insertParticleCS->setConstantBuffer("ParticleInsertParameters",).
+	//设置insert粒子位置，方向参数
+	m_particleInsertData.EmitterLocation = Vector4f(0, 0, 0, 1);
+	m_particleInsertData.RandomVector = Vector4f(1, 0, 0, 0);
+	D3D11_SUBRESOURCE_DATA InitialData;
+	InitialData.pSysMem = &m_particleInsertData;
+	InitialData.SysMemPitch = 0;
+	InitialData.SysMemSlicePitch = 0;
 
+	m_insertParticleBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(ParticleInsertParameters), true, true, &InitialData));
+	m_insertParticleCS->setConstantBuffer("ParticleInsertParameters", m_insertParticleBuffer);
+
+	//设置struct uav参数
 	Particle* pData = new Particle[m_particleCount];
-
 	for (int i = 0; i < m_particleCount; i++)
 	{
 		pData[i].position.MakeZero();
@@ -38,10 +40,82 @@ void GPUParticleSample::init()
 		pData[i].time = 0.0f;
 	}
 
-	D3D11_SUBRESOURCE_DATA InitialData;
 	InitialData.pSysMem = pData;
 	InitialData.SysMemPitch = 0;
 	InitialData.SysMemSlicePitch = 0;
+	m_currentParticelBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_particleCount, sizeof(Particle), false, false, &InitialData));
+	m_insertParticleCS->setStructuredBuffer("CurrentSimulationState", m_currentParticelBuffer);
+
+	//创建并初始化 particle update shader
+	m_updateParticleCS = ShaderDX11Ptr(new ShaderDX11());
+	m_updateParticleCS->loadShaderFromFile(ComputeShader,
+		"../bin/Assets/Shader/ParticleSystemUpdateCS.hlsl",
+		ShaderMacros(),
+		"CSMAIN",
+		"cs_5_0");
+
+	m_nextParticleBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_particleCount, sizeof(Particle), false, false, &InitialData));
+	m_insertParticleCS->setStructuredBuffer("CurrentSimulationState", m_currentParticelBuffer);
+	m_updateParticleCS->setStructuredBuffer("NewSimulationState", m_nextParticleBuffer);
+
+
+	m_updateParticleData.ConsumerLocation = Vector4f(5, 5, 0, 1);
+	m_updateParticleData.TimeFactors = Vector4f(0, 0, 0, 0);
+	D3D11_SUBRESOURCE_DATA InitialData;
+	InitialData.pSysMem = &m_updateParticleData;
+	InitialData.SysMemPitch = 0;
+	InitialData.SysMemSlicePitch = 0;
+
+	m_updateParticleBuffer =  ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(SimulationParameters), true, true, &InitialData));
+	m_updateParticleCS->setConstantBuffer("SimulationParameters", m_updateParticleBuffer);
+
+	D3D11_BUFFER_DESC desc;
+	desc.ByteWidth = 4 * sizeof(UINT);
+	desc.MiscFlags = D3D11_RESOURCE_MISC_DRAWINDIRECT_ARGS;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.StructureByteStride = 0;
+	desc.BindFlags = 0;
+	desc.CPUAccessFlags = 0;
+
+	UINT pInitArgs[4];
+
+	pInitArgs[0] = 0;
+	pInitArgs[1] = 0;
+	pInitArgs[2] = 0;
+	pInitArgs[3] = 0;
+
+	D3D11_SUBRESOURCE_DATA InitArgsData;
+	InitArgsData.pSysMem = pInitArgs;
+	InitArgsData.SysMemPitch = 0;
+	InitArgsData.SysMemSlicePitch = 0;
+	m_currentParticleBufferCount = ConstantBufferDX11Ptr(new ConstantBufferDX11(desc, &InitArgsData));
+	m_updateParticleCS->setConstantBuffer("ParticleCount", m_currentParticleBufferCount);
+
+	//创建并初始化粒子渲染shader
+	//VS
+	m_renderParticleVS = ShaderDX11Ptr(new ShaderDX11());
+	m_renderParticleVS->loadShaderFromFile(VertexShader,
+		"../bin/Assets/Shader/ParticleSystemRender.hlsl",
+		ShaderMacros(),
+		"VSMAIN",
+		"vs_5_0");
+
+	m_renderParticleVS->setStructuredBuffer("SimulationState", m_nextParticleBuffer);
+
+	//GS
+	m_renderParticleGS = ShaderDX11Ptr(new ShaderDX11());
+	m_renderParticleGS->loadShaderFromFile(GeometryShader,
+		"../bin/Assets/Shader/ParticleSystemRender.hlsl",
+		ShaderMacros(),
+		"GSMAIN",
+		"gs_5_0");
+
+	m_transformConstantBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(Transforms), true, true, nullptr));
+	m_renderParticleGS->setConstantBuffer("Transforms", m_transformConstantBuffer);
+
+	m_particleRenderParameter.ConsumerLocation = Vector4f(5, 0, 0, 0);
+
+	//////////////////////////////////////////////////////////////////////////
 
 	m_particleACBuffer0 = RendererDX11::getInstance().createAppendConsumeBuffer(m_particleCount, sizeof(Particle), &InitialData);
 	m_particleACBuffer1 = RendererDX11::getInstance().createAppendConsumeBuffer(m_particleCount, sizeof(Particle), &InitialData);
@@ -95,27 +169,10 @@ void GPUParticleSample::init()
 	m_particleIndirectArgsBuffer = RendererDX11::getInstance().createIndirectArgsBuffer(sizeof(uint32_t), &initData);
 
 	
-	//update shader
-	m_updateParticleCS = ShaderDX11Ptr(new ShaderDX11());
-	m_updateParticleCS->loadShaderFromFile(ComputeShader,
-		"../bin/Assets/Shader/ParticleSystemUpdateCS.hlsl",
-		ShaderMacros(),
-		"CSMAIN",
-		"cs_5_0");
-	//render shader
-	m_renderParticleVS = ShaderDX11Ptr(new ShaderDX11());
-	m_renderParticleVS->loadShaderFromFile(VertexShader,
-		"../bin/Assets/Shader/ParticleSystemRender.hlsl",
-		ShaderMacros(),
-		"VSMAIN",
-		"vs_5_0");
+	
+	
 
-	m_renderParticleGS = ShaderDX11Ptr(new ShaderDX11());
-	m_renderParticleGS->loadShaderFromFile(GeometryShader,
-		"../bin/Assets/Shader/ParticleSystemRender.hlsl",
-		ShaderMacros(),
-		"GSMAIN",
-		"gs_5_0");
+	
 
 	m_renderParticlePS = ShaderDX11Ptr(new ShaderDX11());
 	m_renderParticlePS->loadShaderFromFile(PixelShader,

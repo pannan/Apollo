@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Vector3f.h"
+#include "Vector4f.h"
+#include "Matrix4f.h"
 #include "ShaderDX11.h"
 
 namespace Apollo
@@ -27,6 +29,31 @@ namespace Apollo
 		float    time;
 	};
 
+	__declspec(align(16)) struct ParticleInsertParameters
+	{
+		Vector4f EmitterLocation;
+		Vector4f RandomVector;
+	};
+
+	__declspec(align(16)) struct SimulationParameters
+	{
+		Vector4f TimeFactors;
+		//float4 EmitterLocation;
+		Vector4f ConsumerLocation;
+	};
+
+	__declspec(align(16)) struct Transforms
+	{
+		Matrix4f WorldViewMatrix;
+		Matrix4f ProjMatrix;
+	};
+
+	struct ParticleRenderParameters
+	{
+		//float4 EmitterLocation;
+		Vector4f ConsumerLocation;
+	};
+
 	class GPUParticleSample
 	{
 	public:
@@ -50,8 +77,10 @@ namespace Apollo
 
 		size_t						m_particleCount;
 
-		BufferComPtr			m_particleACBuffer0;
-		BufferComPtr			m_particleACBuffer1;
+		//BufferComPtr			m_particleACBuffer0;
+		//BufferComPtr			m_particleACBuffer1;
+		StructuredBufferDX11Ptr		m_currentParticelBuffer;
+		StructuredBufferDX11Ptr		m_nextParticleBuffer;
 
 		UnorderedAccessViewComPtr			m_currentParticleUAVComPtr;
 		UnorderedAccessViewComPtr			m_updatedParticleUAVComPtr;
@@ -68,6 +97,23 @@ namespace Apollo
 		ShaderDX11Ptr			m_renderParticleVS;
 		ShaderDX11Ptr			m_renderParticleGS;
 		ShaderDX11Ptr			m_renderParticlePS;
+
+		//Insert 粒子的初始化数据
+		ParticleInsertParameters		m_particleInsertData;
+
+		//粒子更新时需要的数据
+		SimulationParameters			m_updateParticleData;
+
+		Transforms							m_cameraTransforms;
+
+		ParticleRenderParameters	m_particleRenderParameter;
+
+		ConstantBufferDX11Ptr		m_insertParticleBuffer;
+		ConstantBufferDX11Ptr		m_updateParticleBuffer;
+		ConstantBufferDX11Ptr		m_currentParticleBufferCount;
+		ConstantBufferDX11Ptr		m_afterUpdateParticleBufferCount;
+		ConstantBufferDX11Ptr		m_transformConstantBuffer;
+		ConstantBufferDX11Ptr		m_particleRenderBuffer;
 
 	private:
 	};

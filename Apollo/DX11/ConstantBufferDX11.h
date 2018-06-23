@@ -7,6 +7,8 @@ namespace Apollo
 	public:
 		ConstantBufferDX11(size_t size);
 
+		ConstantBufferDX11(const D3D11_BUFFER_DESC& bufferDesc, D3D11_SUBRESOURCE_DATA* pData);
+
 		ConstantBufferDX11(size_t size,bool dynamic, bool CPUupdates, D3D11_SUBRESOURCE_DATA* pData);
 
 		virtual ~ConstantBufferDX11();

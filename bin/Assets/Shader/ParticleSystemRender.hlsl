@@ -18,7 +18,7 @@ cbuffer Transforms
 
 cbuffer ParticleRenderParameters
 {
-	float4 EmitterLocation;
+	//float4 EmitterLocation;
 	float4 ConsumerLocation;
 };
 

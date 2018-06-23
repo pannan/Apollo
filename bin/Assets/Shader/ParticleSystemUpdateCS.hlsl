@@ -14,7 +14,7 @@ ConsumeStructuredBuffer<Particle>   CurrentSimulationState  : register( u1 );
 cbuffer SimulationParameters
 {
 	float4 TimeFactors;
-	float4 EmitterLocation;
+	//float4 EmitterLocation;
 	float4 ConsumerLocation;
 };
 

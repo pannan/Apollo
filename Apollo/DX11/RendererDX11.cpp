@@ -120,6 +120,16 @@ void RendererDX11::release()
 	SAFE_RELEASE(m_pd3dDevice);
 }
 
+BufferComPtr RendererDX11::createConstantBuffer(const D3D11_BUFFER_DESC& bufferDesc, D3D11_SUBRESOURCE_DATA* pData)
+{
+	ID3D11Buffer* pBuffer = 0;
+	HRESULT hr = m_pd3dDevice->CreateBuffer(&bufferDesc, pData, &pBuffer);
+	if (FAILED(hr))
+		return(0);
+
+	return(pBuffer);
+}
+
 BufferComPtr RendererDX11::createConstantBuffer(UINT size, bool dynamic, bool CPUupdates, D3D11_SUBRESOURCE_DATA* pData)
 {
 	D3D11_BUFFER_DESC desc;

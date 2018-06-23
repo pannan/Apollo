@@ -29,6 +29,8 @@ namespace Apollo
 
 		BufferComPtr		createConstantBuffer(UINT size,bool dynamic,bool CPUupdates, D3D11_SUBRESOURCE_DATA* pData);
 
+		BufferComPtr		createConstantBuffer(const D3D11_BUFFER_DESC& bufferDesc, D3D11_SUBRESOURCE_DATA* pData);
+
 		BufferComPtr		createStructuredBuffer(UINT count,UINT structsize,bool CPUWritable,bool GPUWritable, D3D11_SUBRESOURCE_DATA* pData);
 
 		BufferComPtr		createAppendConsumeBuffer(UINT count,UINT structsize, D3D11_SUBRESOURCE_DATA* pData);
