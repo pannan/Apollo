@@ -282,6 +282,9 @@
     <ClInclude Include="DX11\ConstantBufferDX11.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Sample\ComputerShaderProcessTexture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -465,6 +468,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DX11\StructuredBufferDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

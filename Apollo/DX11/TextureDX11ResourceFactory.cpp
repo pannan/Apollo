@@ -93,6 +93,34 @@ TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, ui
 	return nullptr;
 }
 
+uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, const std::string& name)
+{
+	uint32_t index = m_textureResourceList.size();
+	uint32_t handle = RT_TEXTURE;
+	handle |= (index << 8);
+
+	//ÅÐ¶Ïºó×ºÃû
+	int pos = name.find_last_not_of('.');
+	if (pos == std::string::npos)
+	{
+		LogManager::getInstance().log("[TextureDX11ResourceFactory::createResource] name error!");
+		return 0;
+	}
+
+	string suffixName = name.substr(pos + 1, name.size() - pos);
+
+	TextureResource* tex = nullptr;
+	if (suffixName == "dds")
+	{
+		tex = loadDDS(path, handle);
+	}
+
+
+	m_textureResourceList.push_back(tex);
+
+	return handle;
+}
+
 uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, const std::string& name, const std::string& type)
 {
 	uint32_t index = m_textureResourceList.size();

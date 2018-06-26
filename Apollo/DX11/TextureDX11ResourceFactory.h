@@ -21,6 +21,8 @@ namespace Apollo
 
 		virtual	Resource*	getResource(uint32_t handle);
 
+		uint32_t				createResource(const std::string& path, const std::string& name);
+
 	protected:
 
 		TextureResource*		loadDDS(const std::string& path, uint32_t handle);
