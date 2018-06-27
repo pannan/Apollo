@@ -16,5 +16,8 @@ namespace Apollo
 	protected:
 
 		ShaderResourceViewComPtr		m_textureSRVPtr;
+		DepthStencilViewComPtr			m_depthStencilViewPtr;;
+		RenderTargetViewComPtr			m_renderTargetViewPtr;;
+		UnorderedAccessViewComPtr	m_unorderedAccessViewPtr;
 	};
 }

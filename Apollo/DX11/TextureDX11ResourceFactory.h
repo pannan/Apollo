@@ -3,6 +3,8 @@
 #include "IResourceFactory.h"
 #include "Singleton.h"
 #include "Resource.h"
+#include "Texture2dConfigDX11.h"
+
 namespace Apollo
 {
 	class TextureResource;
@@ -21,7 +23,8 @@ namespace Apollo
 
 		virtual	Resource*	getResource(uint32_t handle);
 
-		uint32_t				createResource(const std::string& path, const std::string& name);
+		//创建一个空的纹理，没有初始化类容
+		uint32_t				createTexture2D(const std::string& name, Texture2dConfigDX11& config);
 
 	protected:
 

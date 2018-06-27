@@ -122,7 +122,7 @@ void GPUParticleSample::init()
 
 	SAFE_DELETE_ARRAY(pData);
 
-	ID3D11Device* device = RendererDX11::getInstance().getDevice();
+	ID3D11Device* device = RendererDX11::getInstance().getDevice(); 
 
 	//对两个struct buffer创建unoredered aeecss view，在insert和update阶段cs访问
 	D3D11_BUFFER_UAV uav;

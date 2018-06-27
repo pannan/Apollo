@@ -93,6 +93,7 @@ typedef Microsoft::WRL::ComPtr<ID3D11DepthStencilView> DepthStencilViewComPtr;
 typedef Microsoft::WRL::ComPtr<ID3D11RenderTargetView> RenderTargetViewComPtr;
 typedef Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> UnorderedAccessViewComPtr;
 
+
 typedef Microsoft::WRL::ComPtr<ID3D11VertexShader> VSComPtr;
 typedef Microsoft::WRL::ComPtr<ID3D11HullShader> HSComPtr;
 typedef Microsoft::WRL::ComPtr<ID3D11DomainShader> DSComPtr;

@@ -93,30 +93,188 @@ TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, ui
 	return nullptr;
 }
 
-uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, const std::string& name)
+uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Texture2dConfigDX11& config)
 {
 	uint32_t index = m_textureResourceList.size();
 	uint32_t handle = RT_TEXTURE;
 	handle |= (index << 8);
 
-	//ÅÐ¶Ïºó×ºÃû
-	int pos = name.find_last_not_of('.');
-	if (pos == std::string::npos)
+	ID3D11Texture2D * tex2d = nullptr;
+	HRESULT hr = RendererDX11::getInstance().getDevice()->CreateTexture2D(&config.GetTextureDesc(), nullptr, &tex2d);
+	if (hr != S_OK)
 	{
-		LogManager::getInstance().log("[TextureDX11ResourceFactory::createResource] name error!");
+		LogManager::getInstance().log(name + " create failed!");
 		return 0;
 	}
 
-	string suffixName = name.substr(pos + 1, name.size() - pos);
+	DepthStencilViewComPtr			depthStencilView;
+	ShaderResourceViewComPtr		shaderResourceView;
+	RenderTargetViewComPtr			renderTargetView;
+	UnorderedAccessViewComPtr	unorderedAccessView;
 
-	TextureResource* tex = nullptr;
-	if (suffixName == "dds")
-	{
-		tex = loadDDS(path, handle);
-	}
+	D3D11_TEXTURE2D_DESC& desc = config.GetTextureDesc();
+	 if ( (desc.BindFlags & D3D11_BIND_DEPTH_STENCIL ) != 0 )
+        {
+            // Create the depth/stencil view for the texture.
+            D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+			depthStencilViewDesc.Format = desc.Format;
+            depthStencilViewDesc.Flags = 0; 
 
+            if (desc.ArraySize > 1 )
+            {
+                if ( desc.SampleDesc.Count > 1 )
+                {
+                    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+                    depthStencilViewDesc.Texture2DMSArray.FirstArraySlice = 0;
+                    depthStencilViewDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
+                }
+                else
+                {
+                    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+                    depthStencilViewDesc.Texture2DArray.MipSlice = 0;
+                    depthStencilViewDesc.Texture2DArray.FirstArraySlice = 0;
+                    depthStencilViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+                }
+            }
+            else
+            {
+                if (desc.SampleDesc.Count > 1 )
+                {
+                    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+                }
+                else
+                {
+                    depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+                    depthStencilViewDesc.Texture2D.MipSlice = 0;
+                }
+            }
 
-	m_textureResourceList.push_back(tex);
+            if ( FAILED(RendererDX11::getInstance().getDevice()->CreateDepthStencilView(tex2d, &depthStencilViewDesc, depthStencilView.GetAddressOf()) ) )
+            {
+                LogManager::getInstance().log( "Failed to create depth/stencil view." );
+            }
+        }
+        
+        if ( ( desc.BindFlags & D3D11_BIND_SHADER_RESOURCE ) != 0 )
+        {
+            // Create a Shader resource view for the texture.
+            D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+            resourceViewDesc.Format = desc.Format;
+
+            if ( desc.ArraySize > 1 )
+            {
+                if ( desc.SampleDesc.Count > 1 )
+                {
+                    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
+                    resourceViewDesc.Texture2DMSArray.FirstArraySlice = 0;
+                    resourceViewDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
+                }
+                else
+                {
+                    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+                    resourceViewDesc.Texture2DArray.FirstArraySlice = 0;
+                    resourceViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+					resourceViewDesc.Texture2DArray.MipLevels = desc.MipLevels;
+                    resourceViewDesc.Texture2DArray.MostDetailedMip = 0;
+                }
+            }
+            else
+            {
+                if ( desc.SampleDesc.Count > 1 )
+                {
+                    resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+                }
+                else
+                {
+                    resourceViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2D;
+					resourceViewDesc.Texture2D.MipLevels = desc.MipLevels;
+                    resourceViewDesc.Texture2D.MostDetailedMip = 0;
+                }
+            }
+
+            if ( FAILED(RendererDX11::getInstance().getDevice()->CreateShaderResourceView(tex2d, &resourceViewDesc, shaderResourceView.GetAddressOf()) ) )
+            {
+                LogManager::getInstance().log( "Failed to create texture resource view." );
+            } 
+            else if ( desc.MipLevels == 0 )
+            {
+				RendererDX11::getInstance().getDeviceContex()->GenerateMips(shaderResourceView.Get() );
+            }
+        }
+
+        if ( ( desc.BindFlags & D3D11_BIND_RENDER_TARGET ) != 0 )
+        {
+            // Create the render target view for the texture.
+            D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+            renderTargetViewDesc.Format = desc.Format;
+
+            if ( desc.ArraySize > 1 )
+            {
+                if ( desc.SampleDesc.Count > 1 )
+                {
+                    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+                    renderTargetViewDesc.Texture2DArray.FirstArraySlice = 0;
+                    renderTargetViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+
+                }
+                else
+                {
+                    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+                    renderTargetViewDesc.Texture2DArray.MipSlice = 0;
+                    renderTargetViewDesc.Texture2DArray.FirstArraySlice = 0;
+                    renderTargetViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+                }
+            }
+            else
+            {
+                if ( desc.SampleDesc.Count > 1 )
+                {
+                    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+                }
+                else
+                {
+                    renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+                    renderTargetViewDesc.Texture2D.MipSlice = 0;
+                }
+            }
+
+            if ( FAILED(RendererDX11::getInstance().getDevice()->CreateRenderTargetView( tex2d, &renderTargetViewDesc, renderTargetView.GetAddressOf()) ) )
+            {
+                LogManager::getInstance().log( "Failed to create render target view." );
+            }
+        }
+
+        if ( ( desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS ) != 0 )
+        {
+            // UAVs cannot be multi sampled.
+            assert( desc.SampleDesc.Count == 1 );
+
+            // Create a Shader resource view for the texture.
+            D3D11_UNORDERED_ACCESS_VIEW_DESC unorderedAccessViewDesc;
+            unorderedAccessViewDesc.Format = desc.Format;
+
+            if ( desc.ArraySize > 1 )
+            {
+                unorderedAccessViewDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+                unorderedAccessViewDesc.Texture2DArray.MipSlice = 0;
+                unorderedAccessViewDesc.Texture2DArray.FirstArraySlice = 0;
+                unorderedAccessViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+            }
+            else
+            {
+                unorderedAccessViewDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+                unorderedAccessViewDesc.Texture2D.MipSlice = 0;
+            }
+
+            if ( FAILED(RendererDX11::getInstance().getDevice()->CreateUnorderedAccessView( tex2d, &unorderedAccessViewDesc, unorderedAccessView.GetAddressOf()) ) )
+            {
+                LogManager::getInstance().log( "Failed to create unordered access view." );
+            }
+        }
+
+	Texture2dDX11* tex2dDX11 = new Texture2dDX11(name, handle, srv);
+
+	m_textureResourceList.push_back(tex2dDX11);
 
 	return handle;
 }
