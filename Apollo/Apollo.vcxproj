@@ -179,6 +179,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
     <ClInclude Include="DX11\IResourceDX11.h" />
     <ClInclude Include="DX11\MaterialDX11.h" />
+    <ClInclude Include="DX11\MeshDX11.h" />
     <ClInclude Include="DX11\RendererDX11.h" />
     <ClInclude Include="DX11\RenderStateDX11.h" />
     <ClInclude Include="DX11\ShaderDX11.h" />

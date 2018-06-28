@@ -403,25 +403,25 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 		pReflector->GetResourceBindingDesc(i, &bindDesc);
 		std::string resourceName = bindDesc.Name;
 
-		ShaderParameterDX11::Type parameterType = ShaderParameterDX11::Type::Invalid;
+		ShaderParameterType parameterType = ShaderParameterType::Invalid;
 
 		switch (bindDesc.Type)
 		{
 		case D3D_SIT_TEXTURE:
-			parameterType = ShaderParameterDX11::Type::Texture;
+			parameterType = ShaderParameterType::Texture;
 			break;
 		case D3D_SIT_SAMPLER:
-			parameterType = ShaderParameterDX11::Type::Sampler;
+			parameterType = ShaderParameterType::Sampler;
 			break;
 		case D3D_SIT_CBUFFER:
 		case D3D_SIT_STRUCTURED:
-			parameterType = ShaderParameterDX11::Type::Buffer;
+			parameterType = ShaderParameterType::Buffer;
 			break;
 		case D3D_SIT_UAV_RWSTRUCTURED:
-			parameterType = ShaderParameterDX11::Type::RWBuffer;
+			parameterType = ShaderParameterType::RWBuffer;
 			break;
 		case D3D_SIT_UAV_RWTYPED:
-			parameterType = ShaderParameterDX11::Type::RWTexture;
+			parameterType = ShaderParameterType::RWTexture;
 			break;
 		}
 
@@ -561,5 +561,14 @@ void ShaderDX11::setStructuredBuffer(std::string name, StructuredBufferDX11Ptr b
 	if (parameter)
 	{
 		parameter->setStructuredBuffer(buffer);
+	}
+}
+
+void ShaderDX11::setTexture2d(std::string name, Texture2dDX11Ptr tex2dDX11)
+{
+	ShaderParameterPtr parameter = getShaderParameter(name);
+	if (parameter)
+	{
+		parameter->setTexture2d(tex2dDX11);
 	}
 }

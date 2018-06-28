@@ -1,5 +1,6 @@
 #pragma once
 #include "ShaderParameterDX11.h"
+#include "Texture2dDX11.h"
 
 namespace Apollo
 {
@@ -33,6 +34,8 @@ namespace Apollo
 		void		setConstantBuffer(std::string name, ConstantBufferDX11Ptr buffer);
 
 		void		setStructuredBuffer(std::string name, StructuredBufferDX11Ptr buffer);
+
+		void		setTexture2d(std::string name, Texture2dDX11Ptr tex2dDX11);
 
 	protected:
 

@@ -15,3 +15,10 @@ ShaderParameterDX11::ShaderParameterDX11(const std::string& name, UINT slotID, S
 	, m_shaderType(shaderType)
 	, m_parameterType(parameterType)
 {}
+
+void ShaderParameterDX11::bind()
+{
+	if (m_texture2dDX11Ptr.get())
+		m_texture2dDX11Ptr->bind(m_slotID,m_shaderType,m_parameterType);
+
+}

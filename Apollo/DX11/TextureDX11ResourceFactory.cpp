@@ -272,7 +272,7 @@ uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Te
             }
         }
 
-	Texture2dDX11* tex2dDX11 = new Texture2dDX11(name, handle, srv);
+	Texture2dDX11* tex2dDX11 = new Texture2dDX11(name, handle, shaderResourceView.Get(),depthStencilView,renderTargetView,unorderedAccessView);
 
 	m_textureResourceList.push_back(tex2dDX11);
 

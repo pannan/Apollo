@@ -2,6 +2,7 @@
 
 #include "ConstantBufferDX11.h"
 #include "StructuredBufferDX11.h"
+#include "Texture2dDX11.h"
 
 namespace Apollo
 {
@@ -40,6 +41,8 @@ namespace Apollo
 	//	void setSampler(std::shared_ptr<SamplerState> sampler);
 		void setStructuredBuffer(StructuredBufferDX11Ptr buffer) { m_structuredBufferPtr = buffer; }
 
+		void	setTexture2d(Texture2dDX11Ptr tex2d) { m_texture2dDX11Ptr = tex2d; }
+
 
 	protected:
 
@@ -55,11 +58,13 @@ namespace Apollo
 		std::weak_ptr<SamplerState> m_pSamplerState;
 		std::weak_ptr<ConstantBuffer> m_pConstantBuffer;
 		std::weak_ptr<StructuredBuffer> m_pStructuredBuffer;*/
-		ShaderResourceViewComPtr		m_srvPtr;
-		UnorderedAccessViewComPtr	m_uavPtr;
+		//ShaderResourceViewComPtr		m_srvPtr;
+		//UnorderedAccessViewComPtr	m_uavPtr;
 
 		ConstantBufferDX11Ptr				m_constantBufferPtr;
 		StructuredBufferDX11Ptr			m_structuredBufferPtr;
+
+		Texture2dDX11Ptr						m_texture2dDX11Ptr;
 
 
 	private:

@@ -22,6 +22,7 @@
 #include "RenderStateDX11.h"
 #include "Timer.h"
 #include "Sample/GPUParticleSample.h"
+#include "Sample/ComputerShaderProcessTexture.h"
 
 using namespace Apollo;
 LogManager logManager;
@@ -239,6 +240,9 @@ int main(int, char**)
 
 	GPUParticleSample	particleSample;
 	particleSample.init();
+
+	ComputerShaderProcessTexture cspt;
+	cspt.init();
 
 	LPCTSTR sDir = TEXT("F:\\GitHub\\Apollo\\bin\\Assets");
 	DWORD dwNotifyFilter = FileSystemWatcher::FILTER_FILE_NAME | FileSystemWatcher::FILTER_DIR_NAME | FileSystemWatcher::FILTER_LAST_WRITE_NAME | 

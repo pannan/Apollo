@@ -7,8 +7,8 @@ Texture2D<float4>		InputMap : register( t0 );
 RWTexture2D<float4>		OutputMap : register( u0 );
 
 // Group size
-#define size_x 20
-#define size_y 20
+#define size_x 16
+#define size_y 16
 
 // Declare one thread for each texel of the input texture.
 [numthreads(size_x, size_y, 1)]
