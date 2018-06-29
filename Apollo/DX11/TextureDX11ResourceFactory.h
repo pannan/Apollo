@@ -4,6 +4,7 @@
 #include "Singleton.h"
 #include "Resource.h"
 #include "Texture2dConfigDX11.h"
+#include "TextureResource.h"
 
 namespace Apollo
 {
@@ -32,7 +33,7 @@ namespace Apollo
 
 	protected:
 
-		std::vector<TextureResource*>		m_textureResourceList;
+		std::vector<TextureResourcePtr>		m_textureResourceList;
 
 	private:
 	};

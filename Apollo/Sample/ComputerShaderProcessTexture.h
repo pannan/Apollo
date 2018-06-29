@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ShaderDX11.h"
+#include "MeshDX11.h"
 
 namespace Apollo
 {
@@ -14,12 +15,18 @@ namespace Apollo
 
 	protected:
 
+		void	initQuadMesh();
+
+	protected:
+
 		uint32_t			m_srcTextureHandle;
 		uint32_t			m_uavTextureHandle;
 
 		ShaderDX11Ptr		m_csShader;
 		ShaderDX11Ptr		m_vsShader;
 		ShaderDX11Ptr		m_psShader;
+
+		MeshDX11Ptr		m_quadMesh;
 
 	private:
 	};

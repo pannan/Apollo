@@ -288,6 +288,9 @@
     <ClInclude Include="DX11\MeshDX11.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Base\VertexStruct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TextureDX11ResourceFactory.h"
 #include "ResourceManager.h"
-#include "TextureResource.h"
 #include "LogManager.h"
 #include "DirectXTex.h"
 #include "CharacterTools.h"
@@ -26,10 +25,10 @@ TextureDX11ResourceFactory::~TextureDX11ResourceFactory()
 	ResourceManager::getInstance().unRegisterResourceFactory("tga", this);
 	ResourceManager::getInstance().unRegisterResourceFactory("exr", this);
 
-	for each (TextureResource* var in m_textureResourceList)
-	{
-		SAFE_DELETE(var);
-	}
+	//for each (TextureResource* var in m_textureResourceList)
+	//{
+	//	SAFE_DELETE(var);
+	//}
 }
 
 TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, uint32_t handle)
@@ -272,7 +271,7 @@ uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Te
             }
         }
 
-	Texture2dDX11* tex2dDX11 = new Texture2dDX11(name, handle, shaderResourceView.Get(),depthStencilView,renderTargetView,unorderedAccessView);
+		TextureResourcePtr tex2dDX11 = TextureResourcePtr(new Texture2dDX11(name, handle, shaderResourceView.Get(),depthStencilView,renderTargetView,unorderedAccessView));
 
 	m_textureResourceList.push_back(tex2dDX11);
 
@@ -302,7 +301,7 @@ uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, con
 	}
 
 
-	m_textureResourceList.push_back(tex);
+	m_textureResourceList.push_back(TextureResourcePtr(tex));
 
 	return handle;
 }
@@ -317,5 +316,5 @@ Resource* TextureDX11ResourceFactory::getResource(uint32_t handle)
 		return nullptr;
 	}
 
-	return m_textureResourceList[index];
+	return m_textureResourceList[index].get();
 }

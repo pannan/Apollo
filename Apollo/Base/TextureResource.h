@@ -34,4 +34,6 @@ namespace Apollo
 
 		TextureResource();
 	};
+
+	typedef std::shared_ptr<TextureResource> TextureResourcePtr;
 }

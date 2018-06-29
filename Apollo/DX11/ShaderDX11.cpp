@@ -478,6 +478,11 @@ bool ShaderDX11::loadShaderFromFile(	ShaderType shaderType,
 
 void ShaderDX11::bin()
 {
+	for (ParameterMap::value_type value : m_shaderParameters)
+	{
+		value.second->bind();
+	}
+
 	ID3D11DeviceContext* deviceContext = RendererDX11::getInstance().getDeviceContex();
 	if (m_vertexShader.Get())
 	{
@@ -508,6 +513,11 @@ void ShaderDX11::bin()
 
 void ShaderDX11::unBin()
 {
+	for (ParameterMap::value_type value : m_shaderParameters)
+	{
+		value.second->unBind();
+	}
+
 	ID3D11DeviceContext* deviceContext = RendererDX11::getInstance().getDeviceContex();
 	if (m_vertexShader.Get())
 	{

@@ -173,6 +173,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\Singleton.h" />
     <ClInclude Include="Base\TextureResource.h" />
     <ClInclude Include="Base\Timer.h" />
+    <ClInclude Include="Base\VertexStruct.h" />
     <ClInclude Include="DX11\BufferManagerDX11.h" />
     <ClInclude Include="DX11\ConstantBufferDX11.h" />
     <ClInclude Include="DX11\GeometryDX11.h" />

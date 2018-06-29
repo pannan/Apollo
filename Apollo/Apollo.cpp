@@ -238,8 +238,8 @@ int main(int, char**)
 	Timer timer;
 	timer.update();
 
-	GPUParticleSample	particleSample;
-	particleSample.init();
+	//GPUParticleSample	particleSample;
+	//particleSample.init();
 
 	ComputerShaderProcessTexture cspt;
 	cspt.init();
@@ -302,6 +302,7 @@ int main(int, char**)
 		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTT(), (float*)&clear_col);
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		cspt.render();
 		dx11Renderer.getSwapChain()->Present(0, 0);
 	}
 
