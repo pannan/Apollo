@@ -255,6 +255,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\ConstantBufferDX11.cpp" />
     <ClCompile Include="DX11\GeometryDX11.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
+    <ClCompile Include="DX11\MeshDX11.cpp" />
     <ClCompile Include="DX11\RendererDX11.cpp" />
     <ClCompile Include="DX11\RenderStateDX11.cpp" />
     <ClCompile Include="DX11\ShaderDX11.cpp" />

@@ -476,5 +476,8 @@
     <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="DX11\MeshDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
