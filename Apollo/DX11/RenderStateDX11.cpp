@@ -7,11 +7,11 @@ RenderStateDX11::RenderStateDX11()
 {
 	m_scissorRects.left = 0.0f;
 	m_scissorRects.top = 0.0f;
-	m_scissorRects.bottom = 1.0f;
-	m_scissorRects.right = 1.0f;
+	m_scissorRects.bottom = 768;
+	m_scissorRects.right = 1024;
 
-	m_viewports.Width = 1.0f;
-	m_viewports.Height = 1.0f;
+	m_viewports.Width = 1024;
+	m_viewports.Height = 768;
 	m_viewports.TopLeftX = 0.0f;
 	m_viewports.TopLeftY = 0.0f;
 	m_viewports.MinDepth = 0.0f;
@@ -21,7 +21,7 @@ RenderStateDX11::RenderStateDX11()
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.FrontCounterClockwise = true;
+	rasterizerDesc.FrontCounterClockwise = false;
 	rasterizerDesc.DepthBias = 0.0f;
 	rasterizerDesc.DepthBiasClamp = 0.0f;
 	rasterizerDesc.SlopeScaledDepthBias = 0.0f;
@@ -111,14 +111,14 @@ void RenderStateDX11::setDefaultRenderState(ID3D11DeviceContext* dc)
 	dc->RSSetScissorRects(1, &m_scissorRects);
 	dc->RSSetViewports(1, &m_viewports);
 	dc->RSSetState(m_rasterizerState);
-	SAFE_RELEASE(m_rasterizerState);
+	//SAFE_RELEASE(m_rasterizerState);
 	dc->OMSetBlendState(m_blendState, m_blendFactor, m_sampleMask);
-	SAFE_RELEASE(m_blendState);
+	//SAFE_RELEASE(m_blendState);
 	dc->OMSetDepthStencilState(m_depthStencilState, m_stencilRef); 
-	SAFE_RELEASE(m_depthStencilState);
+	//SAFE_RELEASE(m_depthStencilState);
 	//dc->PSSetShaderResources(0, 1, nullptr);
 	dc->PSSetSamplers(0, 1, &m_samplerState);
-	SAFE_RELEASE(m_samplerState);
+	//SAFE_RELEASE(m_samplerState);
 	//dc->PSSetShader(m_ps,nullptr,0);
 	//dc->VSSetShader(m_vs,nullptr,0);
 	//dc->VSSetConstantBuffers(0, 1, &m_vsConstantBuffer); if (old.VSConstantBuffer) old.VSConstantBuffer->Release();	

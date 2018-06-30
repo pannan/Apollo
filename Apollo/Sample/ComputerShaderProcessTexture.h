@@ -9,6 +9,9 @@ namespace Apollo
 	{
 	public:
 
+		ComputerShaderProcessTexture();
+		~ComputerShaderProcessTexture();
+
 		void init();
 
 		void render();

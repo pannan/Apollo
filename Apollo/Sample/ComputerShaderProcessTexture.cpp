@@ -4,13 +4,26 @@
 #include "RendererDX11.h"
 #include "Texture2dDX11.h"
 #include "VertexStruct.h"
+#include "RenderStateDX11.h"
 
 using namespace Apollo;
 
 ID3D11BlendState* m_blendState = nullptr;
 
+ComputerShaderProcessTexture::ComputerShaderProcessTexture()
+{
+
+}
+
+ComputerShaderProcessTexture::~ComputerShaderProcessTexture()
+{
+
+}
+
 void ComputerShaderProcessTexture::init()
 {
+
+
 	m_srcTextureHandle = TextureDX11ResourceFactory::getInstance().createResource("..\\bin\\Assets\\Texture\\BRDF.dds", "BRDF.dds","dds");
 	Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_srcTextureHandle);
 	ID3D11Resource* dx11Resource = nullptr;
@@ -101,6 +114,7 @@ void ComputerShaderProcessTexture::render()
 	m_csShader->unBin();
 
 	//draw tex
+	RenderStateDX11::getInstance().setDefaultRenderState(RendererDX11::getInstance().getDeviceContex());
 	m_vsShader->bin();
 	m_psShader->bin();
 	float bf[4] = { 1,1,1,1 };

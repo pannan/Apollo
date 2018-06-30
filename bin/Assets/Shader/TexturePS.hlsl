@@ -7,7 +7,9 @@
 // Copyright (C) 2009 Jason Zink.  All rights reserved.
 //--------------------------------------------------------------------------------
 
-Texture2D       ColorMap00 : register( t0 );           
+Texture2D       ColorMap00 : register( t0 );         
+
+SamplerState	TexSampler : register(s0);
 
 struct VS_OUTPUT
 {
@@ -17,9 +19,10 @@ struct VS_OUTPUT
 float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 {
 	int3 screenspace = int3( input.position.x, input.position.y, 0 );
-
-	float4 vSample = ColorMap00.Load( screenspace );
-	
+	float2 uv = input.position.xy;
+	//float4 vSample = ColorMap00.Load( screenspace );
+	float4 vSample = ColorMap00.Sample(TexSampler, uv );
+	return float4(vSample.rgb, 1);
 	return( vSample );
 }
 

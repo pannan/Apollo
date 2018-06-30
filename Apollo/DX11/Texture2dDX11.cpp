@@ -30,7 +30,7 @@ Texture2dDX11::Texture2dDX11(const std::string& path,
 
 Texture2dDX11::~Texture2dDX11()
 {
-
+	int ii = 0;
 }
 
 void Texture2dDX11::bind(UINT slotID, ShaderType shaderType, ShaderParameterType parameterType)
