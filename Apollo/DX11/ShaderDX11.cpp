@@ -260,7 +260,7 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
 #if defined( _DEBUG )
-		flags |= D3DCOMPILE_DEBUG;
+		flags |= (D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION);
 #endif
 
 		
@@ -373,7 +373,7 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 		inputElement.SemanticName = parameterSignature.SemanticName;
 		inputElement.SemanticIndex = parameterSignature.SemanticIndex;
-		inputElement.InputSlot = i; // TODO: If using interleaved arrays, then the input slot should be 0.  If using packed arrays, the input slot will vary.
+		inputElement.InputSlot = 0;// i; // TODO: If using interleaved arrays, then the input slot should be 0.  If using packed arrays, the input slot will vary.
 		inputElement.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		inputElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA; // TODO: Figure out how to deal with per-instance data? .. Don't. Just use structured buffers to store per-instance data and use the SV_InstanceID as an index in the structured buffer.
 		inputElement.InstanceDataStepRate = 0;
@@ -574,7 +574,7 @@ void ShaderDX11::setStructuredBuffer(std::string name, StructuredBufferDX11Ptr b
 	}
 }
 
-void ShaderDX11::setTexture2d(std::string name, Texture2dDX11Ptr tex2dDX11)
+void ShaderDX11::setTexture2d(std::string name, Texture2dDX11* tex2dDX11)
 {
 	ShaderParameterPtr parameter = getShaderParameter(name);
 	if (parameter)

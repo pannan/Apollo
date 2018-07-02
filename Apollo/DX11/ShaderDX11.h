@@ -35,7 +35,9 @@ namespace Apollo
 
 		void		setStructuredBuffer(std::string name, StructuredBufferDX11Ptr buffer);
 
-		void		setTexture2d(std::string name, Texture2dDX11Ptr tex2dDX11);
+		void		setTexture2d(std::string name, Texture2dDX11* tex2dDX11);
+
+		ID3DBlob*		getBlob() { return m_shaderBlob.Get(); }
 
 	protected:
 

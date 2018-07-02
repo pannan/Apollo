@@ -61,12 +61,6 @@ void MeshDX11::createIndexBuffer(void* data, int vertexSize, uint32_t bufferSize
 
 void MeshDX11::draw()
 {
-	D3D11_RECT rect;
-	rect.left = 0;
-	rect.top = 0;
-	rect.right = 1024;
-	rect.bottom = 768;
-	RendererDX11::getInstance().getDeviceContex()->RSSetScissorRects(1, &rect);
 	RendererDX11::getInstance().getDeviceContex()->IASetVertexBuffers(0, 1, m_vertexBufferPtr.GetAddressOf(), &m_strideSize, &m_vertexBufferOffset);
 	RendererDX11::getInstance().getDeviceContex()->IASetIndexBuffer(m_indexBufferPtr.Get(), DXGI_FORMAT_R16_UINT, 0);
 	RendererDX11::getInstance().getDeviceContex()->IASetPrimitiveTopology(m_ePrimType);

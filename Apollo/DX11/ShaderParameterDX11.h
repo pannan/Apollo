@@ -41,7 +41,7 @@ namespace Apollo
 	//	void setSampler(std::shared_ptr<SamplerState> sampler);
 		void setStructuredBuffer(StructuredBufferDX11Ptr buffer) { m_structuredBufferPtr = buffer; }
 
-		void	setTexture2d(Texture2dDX11Ptr tex2d) { m_texture2dDX11Ptr = tex2d; }
+		void	setTexture2d(Texture2dDX11* tex2d) { m_texture2dDX11 = tex2d; }
 
 
 	protected:
@@ -64,7 +64,7 @@ namespace Apollo
 		ConstantBufferDX11Ptr				m_constantBufferPtr;
 		StructuredBufferDX11Ptr			m_structuredBufferPtr;
 
-		Texture2dDX11Ptr						m_texture2dDX11Ptr;
+		Texture2dDX11*							m_texture2dDX11;
 
 
 	private:

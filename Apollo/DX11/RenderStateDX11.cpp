@@ -7,11 +7,11 @@ RenderStateDX11::RenderStateDX11()
 {
 	m_scissorRects.left = 0.0f;
 	m_scissorRects.top = 0.0f;
-	m_scissorRects.bottom = 768;
-	m_scissorRects.right = 1024;
+	m_scissorRects.bottom = 762;
+	m_scissorRects.right = 1264;
 
-	m_viewports.Width = 1024;
-	m_viewports.Height = 768;
+	m_viewports.Width = 1264;
+	m_viewports.Height = 762;
 	m_viewports.TopLeftX = 0.0f;
 	m_viewports.TopLeftY = 0.0f;
 	m_viewports.MinDepth = 0.0f;
@@ -52,7 +52,7 @@ RenderStateDX11::RenderStateDX11()
 
 	//create DepthStencilState
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthEnable = false;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	depthStencilDesc.StencilEnable = false;
@@ -71,9 +71,9 @@ RenderStateDX11::RenderStateDX11()
 	//create 
 	D3D11_SAMPLER_DESC sampleDesc;
 	sampleDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
-	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampleDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampleDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	sampleDesc.MipLODBias = 0;
 	sampleDesc.MaxAnisotropy = 1;	//[1,16]
 	sampleDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;

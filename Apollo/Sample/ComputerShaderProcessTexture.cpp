@@ -8,8 +8,6 @@
 
 using namespace Apollo;
 
-ID3D11BlendState* m_blendState = nullptr;
-
 ComputerShaderProcessTexture::ComputerShaderProcessTexture()
 {
 
@@ -22,8 +20,6 @@ ComputerShaderProcessTexture::~ComputerShaderProcessTexture()
 
 void ComputerShaderProcessTexture::init()
 {
-
-
 	m_srcTextureHandle = TextureDX11ResourceFactory::getInstance().createResource("..\\bin\\Assets\\Texture\\BRDF.dds", "BRDF.dds","dds");
 	Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_srcTextureHandle);
 	ID3D11Resource* dx11Resource = nullptr;
@@ -41,8 +37,8 @@ void ComputerShaderProcessTexture::init()
 
 	Texture2dDX11* uavTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_uavTextureHandle);
 
-	Texture2dDX11Ptr uavTexPtr(uavTex);
-	Texture2dDX11Ptr srcTexPtr(srcTex2d);
+	//Texture2dDX11Ptr uavTexPtr(uavTex);
+	//Texture2dDX11Ptr srcTexPtr(srcTex2d);
 
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
 	m_vsShader->loadShaderFromFile(VertexShader,
@@ -58,7 +54,7 @@ void ComputerShaderProcessTexture::init()
 		"PSMAIN",
 		"ps_5_0");
 
-	m_psShader->setTexture2d("ColorMap00", uavTexPtr);
+	m_psShader->setTexture2d("ColorMap00", uavTex);
 
 	m_csShader = ShaderDX11Ptr(new ShaderDX11());
 	m_csShader->loadShaderFromFile(ComputeShader,
@@ -67,37 +63,27 @@ void ComputerShaderProcessTexture::init()
 		"CSMAIN",
 		"cs_5_0");
 
-	m_csShader->setTexture2d("InputMap", srcTexPtr);
-	m_csShader->setTexture2d("OutputMap", uavTexPtr);
+	m_csShader->setTexture2d("InputMap", srcTex2d);
+	m_csShader->setTexture2d("OutputMap", uavTex);
 
 	initQuadMesh();
-
-	D3D11_BLEND_DESC blendDesc;
-	ZeroMemory(&blendDesc, sizeof(blendDesc));
-	blendDesc.AlphaToCoverageEnable = false;
-	blendDesc.IndependentBlendEnable = false;
-	blendDesc.RenderTarget[0].BlendEnable = false;
-	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
-	blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	RendererDX11::getInstance().getDevice()->CreateBlendState(&blendDesc, &m_blendState);
 }
 
 void ComputerShaderProcessTexture::initQuadMesh()
 {
 	m_quadMesh = MeshDX11Ptr(new MeshDX11);
 
-	Vertex_Pos data[4];
-	data[0].pos = Vector4f(-1, 1, 0,0);
-	data[1].pos = Vector4f(1, 1, 0,0);
-	data[2].pos = Vector4f(1, -1, 0,0);
-	data[3].pos = Vector4f(-1, -1, 0,0);
+	Vertex_Pos_UV0 data[4];
+	data[0].pos = Vector4f(-1, 1, 0,1) ; 
+	data[0].uv0 = Vector2f(0, 0);
+	data[1].pos = Vector4f(1, 1, 0,1) ;
+	data[1].uv0 = Vector2f(1, 0);
+	data[2].pos = Vector4f(1, -1, 0,1) ;
+	data[2].uv0 = Vector2f(1, 1);
+	data[3].pos = Vector4f(-1, -1, 0,1) ;
+	data[3].uv0 = Vector2f(0, 1);
 
-	m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos), 4 * sizeof(Vertex_Pos));
+	m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0));
 
 	uint16_t index[6] = { 0,1,2,2,3,0 };
 	m_quadMesh->createIndexBuffer(index, sizeof(uint16_t), 6 * sizeof(uint16_t));
@@ -118,7 +104,8 @@ void ComputerShaderProcessTexture::render()
 	m_vsShader->bin();
 	m_psShader->bin();
 	float bf[4] = { 1,1,1,1 };
-	RendererDX11::getInstance().getDeviceContex()->OMSetBlendState(m_blendState, bf, 0xffffffff);
+	//RendererDX11::getInstance().getDeviceContex()->OMSetBlendState(m_blendState, bf, 0xffffffff);
+	//RendererDX11::getInstance().getDeviceContex()->IASetInputLayout(g_pInputLayout);
 	m_quadMesh->draw();
 
 	m_vsShader->unBin();
