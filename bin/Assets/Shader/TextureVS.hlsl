@@ -24,7 +24,7 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 {
 	VS_OUTPUT output;
 	
-	output.position = input.position;
+	output.position = float4(input.position.xyz,1);
 	output.uv0 = input.uv0;
 
 	return output;

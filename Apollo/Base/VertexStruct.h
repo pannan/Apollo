@@ -8,18 +8,18 @@ namespace Apollo
 {
 	struct  Vertex_Pos
 	{
-		Vector4f pos;
+		Vector3f pos;
 	};
 
 	struct  Vertex_Pos_UV0
 	{
-		Vector4f pos;
+		Vector3f pos;
 		Vector2f uv0;
 	};
 
 	struct  Vertex_Pos_UV0_Normal
 	{
-		Vector4f pos;
+		Vector3f pos;
 		Vector2f uv0;
 		Vector3f normal;
 	};

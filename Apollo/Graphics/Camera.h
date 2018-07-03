@@ -1,27 +1,91 @@
 #pragma once
 
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Matrix4f.h"
-#include "Matrix3f.h"
+#include "Vector3.h"
+
+#include "Matrix4x4.h"
 
 namespace Apollo
 {
+	class Quaternion;
 	class Camera
 	{
 	public:
 
 		Camera();
+		Camera(Vector3 pos,Vector3 lookAt,Vector3 upDir,float nearDis,float farDis,float xViewAngle);
 
-		void onMouseMoved(int screenX,int screenY);
+		void render();
 
-	protected:
+		void updateViewProjMatrix();
 
-		Vector3f projectOntoUnitSphere(Vector2f screenPos);
+		float getAspectRatio()
+		{
+			return (float)m_viewportWidth / m_viewportHeight;
+		}
+
+		void rotationViewDir(float angle);
+
+		void rotationQuaternion(const Quaternion& qua);
+
+		Vector4 transformToSceenPos(const Vector3& localPos);
+
+		void setViewportWidth(int width)
+		{
+			m_viewportWidth = width;
+		}
+
+		void setViewportHeight(int height)
+		{
+			m_viewportHeight = height;
+		}
+
+		const Matrix4x4&	getProjMat() const
+		{
+			return m_projectMatrix;
+		}
+
+		const Matrix4x4&	getViewProjMat() const
+		{
+			return m_viewProjMatrix;
+		}
+
+		const Matrix4x4&	getViewMat() const
+		{
+			return m_viewMatrix;
+		}
+
+		int		getViewportWidth()const{return m_viewportWidth;}
+
+		int		getViewportHeight()const{return m_viewportHeight;}
+
+		void	move(const Vector3& dir,float moveDis);
+
+		const Vector3&	getDirection(){return m_camLookDir;}
 
 	private:
 
-		float								m_pivotDistance;
-		D3D11_VIEWPORT		m_viewPort;
+		void init(Vector3 pos,Vector3 lookAt,Vector3 upDir,float nearDis,float farDis,int vpWidth,int vpHeight,float xViewAngle);
+
+		void updateViewMatrix();
+
+		void updateProjMatrix();
+
+	private:
+
+		Vector3	m_cameraPos;
+		Vector3	m_camLookDir;		
+		Vector3 m_upDir;
+
+		float  m_nearClipDis;
+		float  m_farClipDis;
+		float  m_xVIewAngle;
+
+
+		Matrix4x4	m_viewMatrix;
+		Matrix4x4	m_projectMatrix;
+		Matrix4x4	m_viewProjMatrix;
+
+		int			m_viewportWidth;
+		int			m_viewportHeight;
 	};
 }

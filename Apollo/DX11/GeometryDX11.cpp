@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "GeometryDX11.h"
-#include "Graphics/VertexFormat.h"
+#include "VertexStruct.h"
 
 using namespace Apollo;
 
@@ -10,12 +10,12 @@ void GeometryDX11::createFullSrceenQuad()
 	D3D11_BUFFER_DESC desc;
 	memset(&desc, 0, sizeof(D3D11_BUFFER_DESC));
 	desc.Usage = D3D11_USAGE_IMMUTABLE;
-	desc.ByteWidth = 4 * sizeof(Pos_UV0);
+	desc.ByteWidth = 4 * sizeof(Vertex_Pos_UV0);
 	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
 
-	Pos_UV0 data[4];
+	Vertex_Pos_UV0 data[4];
 	data[0].pos = Vector3f(-1.0f, 1.0f, 0.0f);
 	data[0].uv0 = Vector2f(0.0f, 1.0f);
 

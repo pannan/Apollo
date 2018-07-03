@@ -23,6 +23,7 @@
 #include "Timer.h"
 #include "Sample/GPUParticleSample.h"
 #include "Sample/ComputerShaderProcessTexture.h"
+#include "Sample/HeightMapTerrain.h"
 
 using namespace Apollo;
 LogManager logManager;
@@ -241,8 +242,10 @@ int main(int, char**)
 	//GPUParticleSample	particleSample;
 	//particleSample.init();
 
-	ComputerShaderProcessTexture cspt;
-	cspt.init();
+	//ComputerShaderProcessTexture cspt;
+	//cspt.init();
+	HeightMapTerrain terrain;
+	terrain.init();
 
 	LPCTSTR sDir = TEXT("F:\\GitHub\\Apollo\\bin\\Assets");
 	DWORD dwNotifyFilter = FileSystemWatcher::FILTER_FILE_NAME | FileSystemWatcher::FILTER_DIR_NAME | FileSystemWatcher::FILTER_LAST_WRITE_NAME | 
@@ -301,8 +304,12 @@ int main(int, char**)
 		// Rendering
 		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTT(), (float*)&clear_col);
 		ImGui::Render();
+
+		terrain.render();
+
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-		cspt.render();
+		//cspt.render();
+		
 		dx11Renderer.getSwapChain()->Present(0, 0);
 	}
 

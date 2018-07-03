@@ -99,9 +99,6 @@
     <ClInclude Include="Windows\Win32RenderWindow.h">
       <Filter>Windows</Filter>
     </ClInclude>
-    <ClInclude Include="base\Camera.h">
-      <Filter>Base</Filter>
-    </ClInclude>
     <ClInclude Include="Math\Matrix3f.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -240,9 +237,6 @@
     <ClInclude Include="Graphics\IScene.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Camera.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\Task.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -262,9 +256,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DX11\RendererDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\VertexFormat.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Sample\GPUParticleSample.h">
@@ -292,6 +283,27 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Sample\HeightMapTerrain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Quaternion.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix3x3.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix4x4.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector3.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -334,9 +346,6 @@
     </ClCompile>
     <ClCompile Include="Windows\Win32RenderWindow.cpp">
       <Filter>Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="base\Camera.cpp">
-      <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="Math\Matrix3f.cpp">
       <Filter>Math</Filter>
@@ -489,6 +498,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Quaternion.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix3x3.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix4x4.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector3.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

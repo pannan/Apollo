@@ -157,7 +157,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="base\Camera.h" />
     <ClInclude Include="Base\CharacterTools.h" />
     <ClInclude Include="Base\HLSLResource.h" />
     <ClInclude Include="Base\HLSLResourceFactory.h" />
@@ -192,9 +191,9 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Graphics\Camera.h" />
     <ClInclude Include="Graphics\IRenderable.h" />
     <ClInclude Include="Graphics\IScene.h" />
+    <ClInclude Include="Graphics\Quaternion.h" />
     <ClInclude Include="Graphics\ScreenSpaceRenderPass.h" />
     <ClInclude Include="Graphics\Task.h" />
-    <ClInclude Include="Graphics\VertexFormat.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_internal.h" />
@@ -202,9 +201,14 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="ImGui\stb_textedit.h" />
     <ClInclude Include="ImGui\stb_truetype.h" />
     <ClInclude Include="Math\Matrix3f.h" />
+    <ClInclude Include="Math\Matrix3x3.h" />
     <ClInclude Include="Math\Matrix4f.h" />
+    <ClInclude Include="Math\Matrix4x4.h" />
+    <ClInclude Include="Math\Vector2.h" />
     <ClInclude Include="Math\Vector2f.h" />
+    <ClInclude Include="Math\Vector3.h" />
     <ClInclude Include="Math\Vector3f.h" />
+    <ClInclude Include="Math\Vector4.h" />
     <ClInclude Include="Math\Vector4f.h" />
     <ClInclude Include="Sample\ComputerShaderProcessTexture.h" />
     <ClInclude Include="Sample\GPUParticleSample.h" />
@@ -243,7 +247,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   <ItemGroup>
     <ClCompile Include="Apollo.cpp" />
     <ClCompile Include="Application.cpp" />
-    <ClCompile Include="base\Camera.cpp" />
     <ClCompile Include="Base\CharacterTools.cpp" />
     <ClCompile Include="Base\HLSLResourceFactory.cpp" />
     <ClCompile Include="Base\LogManager.cpp" />
@@ -268,14 +271,19 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureCubeMapDX11.cpp" />
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
+    <ClCompile Include="Graphics\Quaternion.cpp" />
     <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="Math\Matrix3f.cpp" />
+    <ClCompile Include="Math\Matrix3x3.cpp" />
     <ClCompile Include="Math\Matrix4f.cpp" />
+    <ClCompile Include="Math\Matrix4x4.cpp" />
     <ClCompile Include="Math\Vector2f.cpp" />
+    <ClCompile Include="Math\Vector3.cpp" />
     <ClCompile Include="Math\Vector3f.cpp" />
+    <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Math\Vector4f.cpp" />
     <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp" />
     <ClCompile Include="Sample\GPUParticleSample.cpp" />

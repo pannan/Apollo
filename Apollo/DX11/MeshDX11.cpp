@@ -10,6 +10,8 @@ MeshDX11::MeshDX11()
 	m_strideSize = 0;
 	m_vertexBufferOffset = 0;
 	m_ePrimType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	m_vertexCount = m_indexCount = 0;
+	m_indexType = DXGI_FORMAT_R16_UINT;
 }
 
 MeshDX11::~MeshDX11()
@@ -17,11 +19,12 @@ MeshDX11::~MeshDX11()
 
 }
 
-void MeshDX11::createVertexBuffer(void* data, int vertexSize,uint32_t bufferSize)
+void MeshDX11::createVertexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t vertexCount)
 {
+	m_vertexCount = vertexCount;
 	m_strideSize = vertexSize;
 	D3D11_BUFFER_DESC desc;
-	desc.ByteWidth = bufferSize;
+	desc.ByteWidth = buffSize;
 	desc.Usage = D3D11_USAGE_IMMUTABLE;
 	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	desc.CPUAccessFlags = 0;// D3D11_CPU_ACCESS_WRITE;
@@ -39,10 +42,12 @@ void MeshDX11::createVertexBuffer(void* data, int vertexSize,uint32_t bufferSize
 	}
 }
 
-void MeshDX11::createIndexBuffer(void* data, int vertexSize, uint32_t bufferSize)
+void MeshDX11::createIndexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t indexCount, DXGI_FORMAT type)
 {
+	m_indexType = type;
+	m_indexCount = indexCount;
 	D3D11_BUFFER_DESC desc;
-	desc.ByteWidth = bufferSize;
+	desc.ByteWidth = buffSize;
 	desc.Usage = D3D11_USAGE_IMMUTABLE;
 	desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	desc.CPUAccessFlags = 0;// D3D11_CPU_ACCESS_WRITE;
@@ -62,7 +67,7 @@ void MeshDX11::createIndexBuffer(void* data, int vertexSize, uint32_t bufferSize
 void MeshDX11::draw()
 {
 	RendererDX11::getInstance().getDeviceContex()->IASetVertexBuffers(0, 1, m_vertexBufferPtr.GetAddressOf(), &m_strideSize, &m_vertexBufferOffset);
-	RendererDX11::getInstance().getDeviceContex()->IASetIndexBuffer(m_indexBufferPtr.Get(), DXGI_FORMAT_R16_UINT, 0);
+	RendererDX11::getInstance().getDeviceContex()->IASetIndexBuffer(m_indexBufferPtr.Get(), m_indexType, 0);
 	RendererDX11::getInstance().getDeviceContex()->IASetPrimitiveTopology(m_ePrimType);
-	RendererDX11::getInstance().getDeviceContex()->DrawIndexed(6, 0, 0);
+	RendererDX11::getInstance().getDeviceContex()->DrawIndexed(m_indexCount, 0, 0);
 }

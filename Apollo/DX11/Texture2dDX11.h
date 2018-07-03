@@ -18,6 +18,8 @@ namespace Apollo
 
 		ID3D11ShaderResourceView*		getSRV() { return m_shaderResourceViewPtr.Get(); }
 
+		ID3D11ShaderResourceView**	getSRVPtr() { return m_shaderResourceViewPtr.GetAddressOf(); }
+
 		ID3D11UnorderedAccessView*	getUAV() { return m_unorderedAccessViewPtr.Get(); }
 	
 		void	bind(UINT slotID,ShaderType shaderType, ShaderParameterType parameterType);

@@ -14,7 +14,7 @@ ConstantBufferDX11::ConstantBufferDX11(const D3D11_BUFFER_DESC& bufferDesc, D3D1
 	m_bufferComPtr = RendererDX11::getInstance().createConstantBuffer(bufferDesc, pData);
 }
 
-ConstantBufferDX11::ConstantBufferDX11(size_t size,bool dynamic, bool CPUupdates, D3D11_SUBRESOURCE_DATA* pData)
+ConstantBufferDX11::ConstantBufferDX11(size_t size,bool dynamic, bool CPUupdates, D3D11_SUBRESOURCE_DATA* pData) : m_bufferSize(size)
 {
 	m_bufferComPtr = RendererDX11::getInstance().createConstantBuffer(size, dynamic, CPUupdates, pData);
 }

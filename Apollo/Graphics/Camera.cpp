@@ -1,64 +1,214 @@
 #include "stdafx.h"
 #include "Camera.h"
-#include "math.h"
-using namespace Apollo;
+#include "Quaternion.h"
 
-Camera::Camera()
+namespace Apollo
 {
-	m_pivotDistance = 5;
-}
 
-Vector3f Camera::projectOntoUnitSphere(Vector2f screenPos)
-{
-	// Map the screen coordinates so that (0, 0) is the center of the viewport.
-	screenPos -= Vector2f(m_viewPort.Width,m_viewPort.Height) * 0.5f;
-
-	float x, y, z;
-	// The radius of the unit sphere is 1/2 of the shortest dimension of the viewport.
-	float radius = _min(m_viewPort.Width, m_viewPort.Height) * 0.5f;
-
-	// Now normalize the screen coordinates into the range [-1 .. 1].
-	x = screenPos.x / radius;
-	// The y-coordinate has to be inverted so that +1 is the top of the unit sphere
-	// and -1 is the bottom of the unit sphere.
-	y = -(screenPos.y / radius);
-
-	float length_sqr = (x * x) + (y * y);
-
-	// If the screen point is mapped outside of the unit sphere
-	if (length_sqr > 1.0f)
+	Camera::Camera()
 	{
-		float invLength = 1.0f / sqrt(length_sqr);
-
-		// Return the normalized point that is closest to the outside of the unit sphere.
-		x *= invLength;
-		y *= invLength;
-		z = 0.0f;
+		init(Vector3(0.0,0.0,-50.0),Vector3(0.0,0.0,0.0),Vector3(0.0,1.0,0.0),1.0,60.0,800,600,90.0f);
 	}
-	else
+
+	Camera::Camera(Vector3 pos,Vector3 lookAt,Vector3 upDir,float nearDis,float farDis,float xViewAngle)
 	{
-		// The point is on the inside of the unit sphere.
-		z = sqrt(1.0f - length_sqr);
-		// If we are "inside" the unit sphere, then 
-		// invert the z component.
-		// In a right-handed coordinate system, the "+z" axis of the unit
-		// sphere points towards the viewer. If we are in the Unit sphere, we
-		// want to project the point to the inside of the sphere and in this case
-		// the z-axis we want to project on points away from the viewer (-z).
-		if (m_pivotDistance <= 0.0f)
+		init(pos,lookAt,upDir,nearDis,farDis,800,600,xViewAngle);
+	}
+
+	void Camera::init(Vector3 pos,Vector3 lookAt,Vector3 upDir,float nearDis,float farDis,int vpWidth,int vpHeight,float xViewAngle)
+	{
+		m_viewportWidth = vpWidth;
+		m_viewportHeight = vpHeight;
+
+		m_cameraPos = pos;
+		m_camLookDir = (lookAt - pos);
+		m_camLookDir.normalize();
+
+		m_upDir = upDir;
+
+		m_nearClipDis = nearDis;
+		m_farClipDis = farDis;
+		m_xVIewAngle = xViewAngle;
+	}
+
+	void Camera::updateViewProjMatrix()
+	{
+		updateViewMatrix();
+		updateProjMatrix();
+
+		m_viewProjMatrix = m_viewMatrix * m_projectMatrix;
+	}
+
+
+	//viewmatrix两部分，一个是平移到视点位置，二是选择世界坐标和相机坐标系一致
+	void Camera::updateViewMatrix()
+	{
+		Matrix4x4 tranMat;
+		tranMat.makeTransformMatrix(Vector3(-m_cameraPos.m_x,-m_cameraPos.m_y,-m_cameraPos.m_z));
+		Matrix4x4 rotateMatrix;
+		
+		m_camLookDir.normalize();
+		m_upDir.normalize();
+		Vector3 leftDir = m_upDir.corss(m_camLookDir);
+		leftDir.normalize();
+		rotateMatrix.Identity();
+		rotateMatrix.m_matrix[0][0] = leftDir.m_x; rotateMatrix.m_matrix[0][1] = leftDir.m_y; rotateMatrix.m_matrix[0][2] = leftDir.m_z;
+		rotateMatrix.m_matrix[1][0] = m_upDir.m_x; rotateMatrix.m_matrix[1][1] = m_upDir.m_y; rotateMatrix.m_matrix[1][2] = m_upDir.m_z;
+		rotateMatrix.m_matrix[2][0] = m_camLookDir.m_x; rotateMatrix.m_matrix[2][1] = m_camLookDir.m_y; rotateMatrix.m_matrix[2][2] = m_camLookDir.m_z;
+
+		rotateMatrix.transposition();
+
+		m_viewMatrix = tranMat * rotateMatrix;
+	}
+
+	void Camera::updateProjMatrix()
+	{
+		/*
+		透视效果：根据等比三角形，在viewspace的点Pv(x,y,z,1)投影到画板上为Ps(x,y,d)(d为画板到camera的距离)->Psy / d = Pvy / Pvz -> Psy = Pvy * (d / Pvz);
+		所以最后在屏幕上的坐标为 Ps(Pvx * (d / Pvz),Pvy * (d / Pvz),d,1)。现在我的得到的是一个除以w的齐次坐标系，我们每个分量除以d/Pvz得到 (Pvx,Pvy,Pvz,Pvz/d)
+		因为齐次坐标(x,y,z,w)->(x/w,y/w,z/w,1),所以透视矩阵为
+		1 0 0 0
+		0 1 0 0
+		0 0 1 1/d
+		0 0 0 0				
+		
+		这里的d值可以取除0外的任意值。如果取负数，那么最后的图像最倒转，所以需要设置近裁剪面。为了方便，d一般取1。矩阵变成
+		1 0 0 0
+		0 1 0 0
+		0 0 1 1
+		0 0 0 0
+		*/
+
+		Matrix4x4 mat1;		
+		mat1.m_matrix[2][3] = 1.0f;
+
+		/*
+		考虑更通用的情况d的值。如果相机水平视角xAngle不为90度,设xAngle为a，那么再x为[-1,1]范围下，half_x = x * 0.5 = 1  ->half_x / d = tan(a * 0.5)
+		d = half_x / tan(a * 0.5) = 1.0f / tan(a * 0.5f)
+		*/
+		mat1.m_matrix[2][3] = 1.0f / tan(m_xVIewAngle * 0.5f);
+
+		/*
+		当视锥的视角为90度时（水平角度），那么x=z，所以x坐标被投影到[-1,+1],如果画板是正方形，那么y也被投影到[-1,+1]范围。
+		但是画板很可能不是正方形，那么设宽高比w/h=p ->1/h(这里x为1) = p ->h = 1/p，得到，宽高比为p的y投影范围是[-1/p,1/p]
+		由于我们希望透视变换后的坐标范围都在[-1,+1]，所以y坐标需要缩放p
+		1 0 0 0
+		0 p 0 0
+		0 0 1 0
+		0 0 0 1	
+		*/
+
+		Matrix4x4 mat2;
+		mat2.m_matrix[1][1] = getAspectRatio();		
+
+		/*
+		另外还需要把z值根据near far plane mapping到0,1.0  depth = (z - near) / (far - near) = z / (far - near) - near / (far - near) = z / L - near / L ,L = far - near
+		1 0 0		0
+		0 1 0		0
+		0 0 1/L		0
+		0 0 -near/L	1	
+		*/
+		Matrix4x4 zMapping;
+		const float zLenght = m_farClipDis - m_nearClipDis;
+		if(zLenght > 0.0f)
 		{
-			z = -z;
+			zMapping.m_matrix[2][2] = 1.0f / zLenght;
+			zMapping.m_matrix[3][2] = -m_nearClipDis / zLenght;
 		}
+
+		//上面的是在w=1时的情况， 但是在经过mat1 * mat2后w不为1,而是为mat1.m_matrix[2][3]，所以zMapping的m_matrix[3][2]= 1.0f / tan(m_xVIewAngle * 0.5f);
+		//需要乘以tan(m_xVIewAngle * 0.5f);
+		//zMapping.m_matrix[3][2] *= tan(m_xVIewAngle * 0.5f);
+
+		Matrix4x4 finalProject;
+		finalProject.m_matrix[2][3] = 1.0f / tan(m_xVIewAngle * 0.5f);
+		finalProject.m_matrix[1][1] = getAspectRatio();		
+		finalProject.m_matrix[2][2] = 1.0f / zLenght;
+		finalProject.m_matrix[3][2] = -m_nearClipDis / zLenght;
+
+		Matrix4x4 tempMaat = mat1 * mat2;
+		Vector4 vv(1,1,50,1);
+		Vector4 vvv = vv * tempMaat;
+		Vector4 v = vvv * zMapping;
+		v = vv * finalProject;
+
+		m_projectMatrix = finalProject;//tempMaat * zMapping;
 	}
 
-	return Vector3f(x, y, z);
-}
+	Vector4 Camera::transformToSceenPos(const Vector3& localPos)
+	{
+		updateViewProjMatrix();
 
-void Camera::onMouseMoved(int screenX, int screenY)
-{
-	Vector3f currentPoint = projectOntoUnitSphere(Vector2f(screenX,screenY));
+		//local pos to proj pos
+		Vector4 vec4(localPos.m_x,localPos.m_y,localPos.m_z,1.0f);
+		Vector4 pos1 = vec4 * m_viewMatrix;
+		Vector4 pos2 = pos1 * m_projectMatrix;
+		Vector4 hpos = pos2 / pos2.m_w;
 
-	AddRotation(glm::quat(currentPoint, m_PreviousPoint));
+		//现在proj space变成一个x,y轴在[-1,1.0]，z在(0,1.0]的长方体
 
-	m_PreviousPoint = currentPoint;
+		/*
+		现在x,y坐标都在[-1,+1]。需要把变换到屏幕坐标。
+		假设屏幕为w,h.首先要把[-1,+1]转换为[0,1],x = x * 0.5 + 0.5,y是从上往下，需要y = 1.0f - (y * 0.5 + 0.5) = 0.5 - y*0.5;
+		0.5 0    0  0
+		0   -0.5 0  0
+		0   0    0  0
+		0.5 0.5  0  0
+		*/
+		Matrix4x4 mat1;
+		mat1.m_matrix[0][0] = 0.5f;
+		mat1.m_matrix[1][1] = -0.5f;
+		mat1.m_matrix[2][2] = 0.0f;
+		mat1.m_matrix[3][3] = 0.0f;
+		mat1.m_matrix[3][0] = 0.5f;
+		mat1.m_matrix[3][1] = 0.5f;		
+
+		Vector4 pos3 = hpos * mat1;
+		/*
+		在乘w,h.
+		w 0 0 0
+		0 h 0 0
+		0 0 1 0
+		0 0 0 1	
+		*/
+		Matrix4x4 mat2;
+		mat2.m_matrix[0][0] = m_viewportWidth;
+		mat2.m_matrix[1][1] = m_viewportHeight;
+
+		Vector4 pos4 = pos3 * mat2;
+
+		return pos4;
+	}
+
+	void Camera::rotationQuaternion(const Quaternion& qua)
+	{
+		/*Quaternion qnorm = qua;
+		qnorm.normalize();
+		mOrientation = qnorm * mOrientation;*/
+	}
+
+	void Camera::rotationViewDir(float angle)
+	{
+		Quaternion rotQua;
+		rotQua.createFromAxisAngle(m_upDir.m_x,m_upDir.m_y,m_upDir.m_z,angle);
+		Quaternion viewDirQua;
+		viewDirQua.m_x = m_camLookDir.m_x;
+		viewDirQua.m_y = m_camLookDir.m_y;
+		viewDirQua.m_z = m_camLookDir.m_z;
+		viewDirQua.m_w = 0.0;
+
+		Quaternion rel = viewDirQua * rotQua;
+		m_camLookDir.m_x = rel.m_x;
+		m_camLookDir.m_y = rel.m_y;
+		m_camLookDir.m_z = rel.m_z;
+		m_camLookDir.normalize();
+
+		updateViewMatrix();
+	}
+
+	void Camera::move(const Vector3& dir,float moveDis)
+	{
+		m_cameraPos = m_cameraPos + dir * moveDis;
+	}
+
 }
