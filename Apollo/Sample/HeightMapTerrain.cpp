@@ -20,7 +20,7 @@ HeightMapTerrain::~HeightMapTerrain()
 
 void HeightMapTerrain::init()
 {
-	m_camera = new Camera(Vector3(0, 20, -50), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 90);
+	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 90);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
 	m_terrainSize = 129;
@@ -40,7 +40,7 @@ void HeightMapTerrain::createMesh()
 		for (int x = 0; x < m_terrainSize; ++x)
 		{
 			data[z * m_terrainSize + x].pos = Vector3f(x, 0, z);
-			data[z * m_terrainSize + x].uv0 = Vector2f(x / (m_terrainSize - 1), z / (m_terrainSize - 1));
+			data[z * m_terrainSize + x].uv0 = Vector2f(x / float(m_terrainSize - 1), z / float(m_terrainSize - 1));
 		}
 	}
 

@@ -25,7 +25,7 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 	VS_OUTPUT output;
 	
 	//float height = HeightMap.Sample(TexSampler, input.uv0).x;
-	float height = HeightMap.Load(float3(100,100,1)).x * 256;
+	float height = HeightMap.Load(float3(input.uv0.x * 500, input.uv0.y * 500,0)).x * 50;
 	float4 terrainLocalPos = float4(input.position.x, height, input.position.z, 1);
 	output.position = mul(MVPMatrix, terrainLocalPos);
 	output.uv0 = input.uv0;
@@ -34,7 +34,7 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 
 float4 PSMAIN(in VS_OUTPUT input) : SV_Target
 {
-	return float4(1,0,0,1);
+	return float4(input.uv0.xxx,1);
 	//return( vSample );
 }
 

@@ -111,19 +111,8 @@ void RenderStateDX11::setDefaultRenderState(ID3D11DeviceContext* dc)
 	dc->RSSetScissorRects(1, &m_scissorRects);
 	dc->RSSetViewports(1, &m_viewports);
 	dc->RSSetState(m_rasterizerState);
-	//SAFE_RELEASE(m_rasterizerState);
 	dc->OMSetBlendState(m_blendState, m_blendFactor, m_sampleMask);
-	//SAFE_RELEASE(m_blendState);
 	dc->OMSetDepthStencilState(m_depthStencilState, m_stencilRef); 
-	//SAFE_RELEASE(m_depthStencilState);
-	//dc->PSSetShaderResources(0, 1, nullptr);
 	dc->PSSetSamplers(0, 1, &m_samplerState);
-	//SAFE_RELEASE(m_samplerState);
-	//dc->PSSetShader(m_ps,nullptr,0);
-	//dc->VSSetShader(m_vs,nullptr,0);
-	//dc->VSSetConstantBuffers(0, 1, &m_vsConstantBuffer); if (old.VSConstantBuffer) old.VSConstantBuffer->Release();	
 	dc->IASetPrimitiveTopology(m_primitiveTopology);
-	//dc->IASetIndexBuffer(old.IndexBuffer, old.IndexBufferFormat, old.IndexBufferOffset); if (old.IndexBuffer) old.IndexBuffer->Release();
-	//ctx->IASetVertexBuffers(0, 1, &old.VertexBuffer, &old.VertexBufferStride, &old.VertexBufferOffset); if (old.VertexBuffer) old.VertexBuffer->Release();
-	//ctx->IASetInputLayout(old.InputLayout); if (old.InputLayout) old.InputLayout->Release();
 }
