@@ -20,7 +20,7 @@ namespace Apollo
 
 		Matrix3x3&		invert();
 
-		Matrix3x3&		transposition();
+		Matrix3x3&		transposition();	
 
 		float	m_matrix[3][3];	
 	};

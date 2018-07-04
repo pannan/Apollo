@@ -61,6 +61,8 @@ static ID3D11BlendState*        g_pBlendState = NULL;
 static ID3D11DepthStencilState* g_pDepthStencilState = NULL;
 static int                      g_VertexBufferSize = 5000, g_IndexBufferSize = 10000;
 
+RenderStateDX11		g_imguiRenderState;
+
 struct VERTEX_CONSTANT_BUFFER
 {
     float        mvp[4][4];
@@ -183,7 +185,7 @@ void ImGui_ImplDX11_RenderDrawData(ImDrawData* draw_data)
     //ctx->IAGetVertexBuffers(0, 1, &old.VertexBuffer, &old.VertexBufferStride, &old.VertexBufferOffset);
     //ctx->IAGetInputLayout(&old.InputLayout);
 
-	RenderStateDX11::getInstance().setDefaultRenderState(ctx);
+	g_imguiRenderState.setRenderState(ctx);
 
     // Setup viewport
     D3D11_VIEWPORT vp;
@@ -436,7 +438,7 @@ bool ImGui_ImplDX11_CreateDeviceObjects2()
 	}
 
 	 ResourceManager::getInstance().getResource(imguiMatHandle);
-		
+	 return true;
 }
 
 bool    ImGui_ImplDX11_CreateDeviceObjects()
@@ -576,6 +578,8 @@ bool    ImGui_ImplDX11_CreateDeviceObjects()
     }
 
     ImGui_ImplDX11_CreateFontsTexture();
+
+	g_imguiRenderState.createState();
 
     return true;
 }

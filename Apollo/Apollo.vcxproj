@@ -156,10 +156,11 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
     <ClInclude Include="Base\CharacterTools.h" />
+    <ClInclude Include="Base\EventManager.h" />
     <ClInclude Include="Base\HLSLResource.h" />
     <ClInclude Include="Base\HLSLResourceFactory.h" />
+    <ClInclude Include="Base\IEventListener.h" />
     <ClInclude Include="Base\IResourceFactory.h" />
     <ClInclude Include="Base\LogManager.h" />
     <ClInclude Include="Base\MaterialParse.h" />
@@ -222,32 +223,15 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="UI\TextureSelectPropertyUI.h" />
     <ClInclude Include="UI\UIRoot.h" />
     <ClInclude Include="Windows\AssetsDirectoryManager.h" />
-    <ClInclude Include="Windows\EventManager.h" />
-    <ClInclude Include="Windows\EvtKeyboardMsg.h" />
-    <ClInclude Include="Windows\EvtKeyDown.h" />
-    <ClInclude Include="Windows\EvtKeyUp.h" />
-    <ClInclude Include="Windows\EvtMouseLButtonDown.h" />
-    <ClInclude Include="Windows\EvtMouseLButtonUp.h" />
-    <ClInclude Include="Windows\EvtMouseMButtonDown.h" />
-    <ClInclude Include="Windows\EvtMouseMButtonUp.h" />
-    <ClInclude Include="Windows\EvtMouseMove.h" />
-    <ClInclude Include="Windows\EvtMouseMsg.h" />
-    <ClInclude Include="Windows\EvtMouseRButtonDown.h" />
-    <ClInclude Include="Windows\EvtMouseRButtonUp.h" />
-    <ClInclude Include="Windows\EvtMouseWheel.h" />
-    <ClInclude Include="Windows\EvtWindowMsg.h" />
-    <ClInclude Include="Windows\EvtWindowResize.h" />
     <ClInclude Include="Windows\FileSystemWatcher.h" />
-    <ClInclude Include="Windows\IEvent.h" />
-    <ClInclude Include="Windows\IEventListener.h" />
     <ClInclude Include="Windows\IWindowProc.h" />
     <ClInclude Include="Windows\RenderWindow.h" />
     <ClInclude Include="Windows\Win32RenderWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Apollo.cpp" />
-    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Base\CharacterTools.cpp" />
+    <ClCompile Include="Base\EventManager.cpp" />
     <ClCompile Include="Base\HLSLResourceFactory.cpp" />
     <ClCompile Include="Base\LogManager.cpp" />
     <ClCompile Include="Base\MaterialParse.cpp" />
@@ -300,23 +284,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="UI\TextureSelectPropertyUI.cpp" />
     <ClCompile Include="UI\UIRoot.cpp" />
     <ClCompile Include="Windows\AssetsDirectoryManager.cpp" />
-    <ClCompile Include="Windows\EventManager.cpp" />
-    <ClCompile Include="Windows\EvtKeyboardMsg.cpp" />
-    <ClCompile Include="Windows\EvtKeyDown.cpp" />
-    <ClCompile Include="Windows\EvtKeyUp.cpp" />
-    <ClCompile Include="Windows\EvtMouseLButtonDown.cpp" />
-    <ClCompile Include="Windows\EvtMouseLButtonUp.cpp" />
-    <ClCompile Include="Windows\EvtMouseMButtonDown.cpp" />
-    <ClCompile Include="Windows\EvtMouseMButtonUp.cpp" />
-    <ClCompile Include="Windows\EvtMouseMove.cpp" />
-    <ClCompile Include="Windows\EvtMouseMsg.cpp" />
-    <ClCompile Include="Windows\EvtMouseRButtonDown.cpp" />
-    <ClCompile Include="Windows\EvtMouseRButtonUp.cpp" />
-    <ClCompile Include="Windows\EvtMouseWheel.cpp" />
-    <ClCompile Include="Windows\EvtWindowMsg.cpp" />
-    <ClCompile Include="Windows\EvtWindowResize.cpp" />
     <ClCompile Include="Windows\FileSystemWatcher.cpp" />
-    <ClCompile Include="Windows\IEventListener.cpp" />
     <ClCompile Include="Windows\RenderWindow.cpp" />
     <ClCompile Include="Windows\Win32RenderWindow.cpp" />
   </ItemGroup>

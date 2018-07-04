@@ -362,40 +362,43 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 	//m_InputSemantics.clear();
 
-	UINT numInputParameters = shaderDescription.InputParameters;
-	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
-	for (UINT i = 0; i < numInputParameters; ++i)
+	if (m_shaderType == VertexShader)
 	{
-		D3D11_INPUT_ELEMENT_DESC inputElement;
-		D3D11_SIGNATURE_PARAMETER_DESC parameterSignature;
-
-		pReflector->GetInputParameterDesc(i, &parameterSignature);
-
-		inputElement.SemanticName = parameterSignature.SemanticName;
-		inputElement.SemanticIndex = parameterSignature.SemanticIndex;
-		inputElement.InputSlot = 0;// i; // TODO: If using interleaved arrays, then the input slot should be 0.  If using packed arrays, the input slot will vary.
-		inputElement.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-		inputElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA; // TODO: Figure out how to deal with per-instance data? .. Don't. Just use structured buffers to store per-instance data and use the SV_InstanceID as an index in the structured buffer.
-		inputElement.InstanceDataStepRate = 0;
-		inputElement.Format = GetDXGIFormat(parameterSignature);
-
-		assert(inputElement.Format != DXGI_FORMAT_UNKNOWN);
-
-		inputElements.push_back(inputElement);
-
-		//m_InputSemantics.insert(SemanticMap::value_type(BufferBinding(inputElement.SemanticName, inputElement.SemanticIndex), i));
-	}
-
-	if (inputElements.size() > 0)
-	{
-		hr = pdevice->CreateInputLayout(inputElements.data(), (UINT)inputElements.size(), m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), m_inputLayoutPtr.GetAddressOf());
-		if (FAILED(hr))
+		UINT numInputParameters = shaderDescription.InputParameters;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
+		for (UINT i = 0; i < numInputParameters; ++i)
 		{
-			LogManager::getInstance().log("Failed to create input layout.");
-			return false;
+			D3D11_INPUT_ELEMENT_DESC inputElement;
+			D3D11_SIGNATURE_PARAMETER_DESC parameterSignature;
+
+			pReflector->GetInputParameterDesc(i, &parameterSignature);
+
+			inputElement.SemanticName = parameterSignature.SemanticName;
+			inputElement.SemanticIndex = parameterSignature.SemanticIndex;
+			inputElement.InputSlot = 0;// i; // TODO: If using interleaved arrays, then the input slot should be 0.  If using packed arrays, the input slot will vary.
+			inputElement.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			inputElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA; // TODO: Figure out how to deal with per-instance data? .. Don't. Just use structured buffers to store per-instance data and use the SV_InstanceID as an index in the structured buffer.
+			inputElement.InstanceDataStepRate = 0;
+			inputElement.Format = GetDXGIFormat(parameterSignature);
+
+			assert(inputElement.Format != DXGI_FORMAT_UNKNOWN);
+
+			inputElements.push_back(inputElement);
+
+			//m_InputSemantics.insert(SemanticMap::value_type(BufferBinding(inputElement.SemanticName, inputElement.SemanticIndex), i));
+		}
+
+		if (inputElements.size() > 0)
+		{
+			hr = pdevice->CreateInputLayout(inputElements.data(), (UINT)inputElements.size(), m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), m_inputLayoutPtr.GetAddressOf());
+			if (FAILED(hr))
+			{
+				LogManager::getInstance().log("Failed to create input layout.");
+				return false;
+			}
 		}
 	}
-
+	
 	// Query Resources that are bound to the shader.
 	for (UINT i = 0; i < shaderDescription.BoundResources; ++i)
 	{

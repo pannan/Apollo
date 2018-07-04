@@ -17,85 +17,66 @@ RenderStateDX11::RenderStateDX11()
 	m_viewports.MinDepth = 0.0f;
 	m_viewports.MaxDepth = 1.0f;
 
-	//create rasterizerState
-	D3D11_RASTERIZER_DESC rasterizerDesc;
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
-	rasterizerDesc.FrontCounterClockwise = false;
-	rasterizerDesc.DepthBias = 0.0f;
-	rasterizerDesc.DepthBiasClamp = 0.0f;
-	rasterizerDesc.SlopeScaledDepthBias = 0.0f;
-	rasterizerDesc.DepthClipEnable = true;
-	rasterizerDesc.ScissorEnable = true;
-	rasterizerDesc.MultisampleEnable = false;
-	rasterizerDesc.AntialiasedLineEnable = false;
-	RendererDX11::getInstance().getDevice()->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState);
+	m_rasterizerState = nullptr;
 
 	//create BlendState
-	D3D11_BLEND_DESC blendDesc;
-	ZeroMemory(&blendDesc, sizeof(blendDesc));
-	blendDesc.AlphaToCoverageEnable = false;
-	blendDesc.IndependentBlendEnable = false;
-	blendDesc.RenderTarget[0].BlendEnable = false;
-	blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	blendDesc.RenderTarget[0].BlendOp  = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-	blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-	RendererDX11::getInstance().getDevice()->CreateBlendState(&blendDesc, &m_blendState);
+	ZeroMemory(&m_blendDesc, sizeof(m_blendDesc));
+	m_blendDesc.AlphaToCoverageEnable = false;
+	m_blendDesc.IndependentBlendEnable = false;
+	m_blendDesc.RenderTarget[0].BlendEnable = false;
+	m_blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	m_blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	m_blendDesc.RenderTarget[0].BlendOp  = D3D11_BLEND_OP_ADD;
+	m_blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+	m_blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	m_blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	m_blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	m_blendState = nullptr;
 	
 	m_blendFactor[0] = m_blendFactor[1] = m_blendFactor[2] = m_blendFactor[3] = 1.0f;
 	m_sampleMask = 0xffffffff;
 	m_stencilRef = 0;
 
 	//create DepthStencilState
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	depthStencilDesc.DepthEnable = false;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	depthStencilDesc.StencilEnable = false;
-	depthStencilDesc.StencilReadMask = 0;
-	depthStencilDesc.StencilWriteMask = 0;
-	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-	RendererDX11::getInstance().getDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
-
-	//create 
-	D3D11_SAMPLER_DESC sampleDesc;
-	sampleDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
-	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampleDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	sampleDesc.MipLODBias = 0;
-	sampleDesc.MaxAnisotropy = 1;	//[1,16]
-	sampleDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	sampleDesc.BorderColor[0] = sampleDesc.BorderColor[1] = sampleDesc.BorderColor[2] = sampleDesc.BorderColor[3] = 0.0f;
-	sampleDesc.MinLOD = 0.0f;
-	sampleDesc.MaxLOD = D3D11_FLOAT32_MAX;
-	RendererDX11::getInstance().getDevice()->CreateSamplerState(&sampleDesc, &m_samplerState);
-
+	m_depthStencilDesc.DepthEnable = false;
+	m_depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	m_depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	m_depthStencilDesc.StencilEnable = false;
+	m_depthStencilDesc.StencilReadMask = 0;
+	m_depthStencilDesc.StencilWriteMask = 0;
+	m_depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	m_depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	m_depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	m_depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	m_depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	m_depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	m_depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	m_depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	m_blendState = nullptr;
 	
-	m_ps = nullptr;
-	m_vs = nullptr;
-	//UINT											PSInstancesCount, VSInstancesCount;
-	//ID3D11ClassInstance*        PSInstances[256], *VSInstances[256];   // 256 is max according to PSSetShader documentation
+
+	//create sampler 
+	m_samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	m_samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	m_samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	m_samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	m_samplerDesc.MipLODBias = 0;
+	m_samplerDesc.MaxAnisotropy = 1;	//[1,16]
+	m_samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	m_samplerDesc.BorderColor[0] = m_samplerDesc.BorderColor[1] = m_samplerDesc.BorderColor[2] = m_samplerDesc.BorderColor[3] = 0.0f;
+	m_samplerDesc.MinLOD = 0.0f;
+	m_samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	m_samplerState = nullptr;
+	
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	m_indexBuffer = nullptr;
-	m_vertexBuffer = nullptr;
-	m_vsConstantBuffer = nullptr;
-	m_indexBufferOffset = 0;
-	m_vertexBufferStride = 0;
-	m_vertexBufferOffset = 0;
-	m_indexBufferFormat = DXGI_FORMAT_R16_UINT;
-	m_inputLayout = nullptr;
+}
+
+void RenderStateDX11::createState()
+{
+	RendererDX11::getInstance().getDevice()->CreateRasterizerState(&m_rasterizerDesc, &m_rasterizerState);
+	RendererDX11::getInstance().getDevice()->CreateBlendState(&m_blendDesc, &m_blendState);
+	RendererDX11::getInstance().getDevice()->CreateDepthStencilState(&m_depthStencilDesc, &m_depthStencilState);
+	RendererDX11::getInstance().getDevice()->CreateSamplerState(&m_samplerDesc, &m_samplerState);
 }
 
 RenderStateDX11::~RenderStateDX11()
@@ -106,7 +87,7 @@ RenderStateDX11::~RenderStateDX11()
 	SAFE_RELEASE(m_samplerState);
 }
 
-void RenderStateDX11::setDefaultRenderState(ID3D11DeviceContext* dc)
+void RenderStateDX11::setRenderState(ID3D11DeviceContext* dc)
 {
 	dc->RSSetScissorRects(1, &m_scissorRects);
 	dc->RSSetViewports(1, &m_viewports);

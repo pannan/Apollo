@@ -2,7 +2,7 @@
 
 #include "ShaderDX11.h"
 #include "MeshDX11.h"
-
+#include "RenderStateDX11.h"
 namespace Apollo
 {
 	class ComputerShaderProcessTexture
@@ -30,6 +30,8 @@ namespace Apollo
 		ShaderDX11Ptr		m_psShader;
 
 		MeshDX11Ptr		m_quadMesh;
+
+		RenderStateDX11 m_renderState;
 
 	private:
 	};

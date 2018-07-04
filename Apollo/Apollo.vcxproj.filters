@@ -78,9 +78,6 @@
     <ClInclude Include="ImGui\stb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Application.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Math\Vector2f.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -104,57 +101,6 @@
     </ClInclude>
     <ClInclude Include="Math\Matrix4f.h">
       <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EventManager.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtKeyboardMsg.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtKeyDown.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtKeyUp.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseLButtonDown.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseLButtonUp.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseMButtonDown.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseMButtonUp.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseMove.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseMsg.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseRButtonDown.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseRButtonUp.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtMouseWheel.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtWindowMsg.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\EvtWindowResize.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\IEvent.h">
-      <Filter>Windows\Event</Filter>
-    </ClInclude>
-    <ClInclude Include="Windows\IEventListener.h">
-      <Filter>Windows\Event</Filter>
     </ClInclude>
     <ClInclude Include="DX11\imgui_impl_dx11.h">
       <Filter>Dx11</Filter>
@@ -306,6 +252,12 @@
     <ClInclude Include="Math\Vector4.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Base\EventManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\IEventListener.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -329,9 +281,6 @@
     <ClCompile Include="ImGui\imgui_draw.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Vector2f.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -352,54 +301,6 @@
     </ClCompile>
     <ClCompile Include="Math\Matrix4f.cpp">
       <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtKeyboardMsg.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtKeyDown.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtKeyUp.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseLButtonDown.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseLButtonUp.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseMButtonDown.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseMButtonUp.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseMove.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseMsg.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseRButtonDown.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseRButtonUp.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtMouseWheel.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtWindowMsg.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EvtWindowResize.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\IEventListener.cpp">
-      <Filter>Windows\Event</Filter>
-    </ClCompile>
-    <ClCompile Include="Windows\EventManager.cpp">
-      <Filter>Windows\Event</Filter>
     </ClCompile>
     <ClCompile Include="DX11\imgui_impl_dx11.cpp">
       <Filter>Dx11</Filter>
@@ -513,6 +414,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Math\Vector4.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\EventManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

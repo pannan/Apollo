@@ -44,3 +44,4 @@ namespace Apollo
 		return *this;
 	}
 }
+

@@ -1,32 +1,44 @@
 #include "stdafx.h"
 #include "HeightMapTerrain.h"
 #include "VertexStruct.h"
-#include "RenderStateDX11.h"
 #include "RendererDX11.h"
 #include "TextureDX11ResourceFactory.h"
 #include "Texture2dDX11.h"
+#include "EventManager.h"
+#include "Matrix3f.h"
+
+using namespace DirectX;
 using namespace  Apollo;
 
 HeightMapTerrain::HeightMapTerrain()
 {
 	m_camera = nullptr;
-	m_heightMapTex = nullptr;
 }
 
 HeightMapTerrain::~HeightMapTerrain()
 {
+	if (EventManager::getInstancePtr())
+	{
+		EventManager::getInstance().removeMouseEventListener(this);
+	}
 	SAFE_DELETE(m_camera);
 }
 
 void HeightMapTerrain::init()
 {
-	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 90);
+	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 89);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
+
+	EventManager::getInstance().addMouseEventListener(this);
+
 	m_terrainSize = 129;
 	createMesh();
 
 	createShader();
+
+	m_renderState.m_depthStencilDesc.DepthEnable = true;
+	m_renderState.createState();
 }
 
 void HeightMapTerrain::createMesh()
@@ -64,6 +76,11 @@ void HeightMapTerrain::createMesh()
 		}
 	}
 
+	//计算法线
+	Vector3f* normalBuffer = new Vector3f[vertexCount];
+
+	computeNormal((byte*)data, meshIndex, sizeof(Vertex_Pos_UV0), 0, vertexCount, indexCount, normalBuffer);
+
 	m_terrainMesh = MeshDX11Ptr(new MeshDX11);
 
 	
@@ -75,12 +92,74 @@ void HeightMapTerrain::createMesh()
 	SAFE_DELETE_ARRAY(meshIndex);
 }
 
+//现在这里有问题，缺少高度信息，因为高度是在vs里获取
+//应该可以在cs里计算normnal到一个uva buffer里
+void HeightMapTerrain::computeNormal(	byte* vertexBuffer,uint32_t* indexBuffer,int vertexSize,int positionOffset,int vertexCount,
+																	uint32_t indexCount,Vector3f* outNormalBuffer)
+{
+	struct Triangle 
+	{		
+		uint32_t index[3];
+		Vector3f normal;
+	};
+
+	uint32_t triangleCount = indexCount / 3;
+	Triangle* triangleList = new Triangle[triangleCount];
+
+	for (uint32_t i = 0; i < indexCount; i +=3)
+	{
+		uint32_t triangleIndex = i / 3;
+		uint32_t index0 = indexBuffer[i];
+		uint32_t index1 = indexBuffer[i + 1];
+		uint32_t index2 = indexBuffer[i + 2];
+
+		//计算法线
+		Vector3f* p0 = (Vector3f*)((byte*)vertexBuffer + vertexSize * index0 + positionOffset);
+		Vector3f* p1 = (Vector3f*)((byte*)vertexBuffer + vertexSize * index1 + positionOffset);
+		Vector3f* p2 = (Vector3f*)((byte*)vertexBuffer + vertexSize * index2 + positionOffset);
+
+		Vector3f vec0 = *p1 - *p0;
+		Vector3f vec1 = *p2 - *p0;
+		Vector3f normal = vec0.Cross(vec1);
+		normal.Normalize();
+
+		triangleList[triangleIndex].normal = normal;
+
+		triangleList[triangleIndex].index[0] = index0;
+		triangleList[triangleIndex].index[1] = index1;
+		triangleList[triangleIndex].index[2] = index2;
+	}
+
+	ComputeNormalChunk* tempBuffer = new ComputeNormalChunk[vertexCount];
+	ZeroMemory(tempBuffer, sizeof(ComputeNormalChunk) * vertexCount);
+	for (uint32_t triangleIndex = 0; triangleIndex < triangleCount; ++triangleIndex)
+	{
+		const Triangle& triangle = triangleList[triangleIndex];
+
+		for (int i = 0; i < 3; ++i)
+		{
+			uint32_t vertexIndex = triangle.index[i];
+			tempBuffer[vertexIndex].normal += triangle.normal;
+			++tempBuffer[vertexIndex].shareCount;
+		}
+	}
+
+	//平均normal
+	for (int i = 0; i < vertexCount; ++i)
+	{
+		outNormalBuffer[i] = tempBuffer[i].normal / (float)tempBuffer[i].shareCount;
+		outNormalBuffer[i].Normalize();
+	}
+
+	SAFE_DELETE_ARRAY(tempBuffer);
+}
+
 void HeightMapTerrain::createShader()
 {
 	m_mvpBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(Matrix4x4), true, true, nullptr));
 
 	uint32_t texHandle = TextureDX11ResourceFactory::getInstance().createResource("..\\bin\\Assets\\Texture\\heightmap.dds", "heightmap.dds", "dds");
-	m_heightMapTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(texHandle);
+	Texture2dDX11* heightMapTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(texHandle);
 
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
 	m_vsShader->loadShaderFromFile(VertexShader,
@@ -90,8 +169,7 @@ void HeightMapTerrain::createShader()
 		"vs_5_0");
 
 	m_vsShader->setConstantBuffer("PerObject", m_mvpBuffer);
-	//这里设置现在无效
-	m_vsShader->setTexture2d("HeightMap", m_heightMapTex);
+	m_vsShader->setTexture2d("HeightMap", heightMapTex);
 
 	m_psShader = ShaderDX11Ptr(new ShaderDX11());
 	m_psShader->loadShaderFromFile(PixelShader,
@@ -109,12 +187,38 @@ void HeightMapTerrain::render()
 	m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
 	m_vsShader->bin();
 	m_psShader->bin();
-	RenderStateDX11::getInstance().setDefaultRenderState(RendererDX11::getInstance().getDeviceContex());
+	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
 
-	//现在貌似shader反射检测不到在vs里使用纹理，这种手动设置下
-	RendererDX11::getInstance().getDeviceContex()->VSSetShaderResources(0, 1, m_heightMapTex->getSRVPtr());
 	m_terrainMesh->draw();
 
 	m_vsShader->unBin();
 	m_psShader->unBin();
+}
+
+void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
+{
+	if (arg->rButton == false)
+		return;
+	Vector2f currentMousePos = Vector2f(arg->mouseX, arg->mouseY);
+	Vector2f dxdy = currentMousePos - m_lastMousePos;
+
+	Matrix3f mat;
+	dxdy /= 180.0f;
+	if (abs(dxdy.x) > abs(dxdy.y))
+	{				
+		mat.RotationEuler(Vector3f(0, 1, 0), dxdy.x);
+	}
+	else
+	{
+		mat.RotationEuler(Vector3f(1, 0, 0), dxdy.y);
+	}
+
+	XMMATRIX matxx = XMMatrixRotationRollPitchYaw(dxdy.y, dxdy.x, 0);
+
+	Vector3 camDir = m_camera->getDirection();
+	Vector3f camDir3f(camDir.m_x, camDir.m_y, camDir.m_z);
+	Vector3f newDir = mat * camDir3f;
+	m_camera->setDirection(newDir.x, newDir.y, newDir.z);
+
+	m_lastMousePos = currentMousePos;
 }

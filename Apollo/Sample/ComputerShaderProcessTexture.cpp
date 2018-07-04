@@ -4,7 +4,7 @@
 #include "RendererDX11.h"
 #include "Texture2dDX11.h"
 #include "VertexStruct.h"
-#include "RenderStateDX11.h"
+
 
 using namespace Apollo;
 
@@ -67,6 +67,8 @@ void ComputerShaderProcessTexture::init()
 	m_csShader->setTexture2d("OutputMap", uavTex);
 
 	initQuadMesh();
+
+	m_renderState.createState();
 }
 
 void ComputerShaderProcessTexture::initQuadMesh()
@@ -100,7 +102,8 @@ void ComputerShaderProcessTexture::render()
 	m_csShader->unBin();
 
 	//draw tex
-	RenderStateDX11::getInstance().setDefaultRenderState(RendererDX11::getInstance().getDeviceContex());
+	//RenderStateDX11::getInstance().setRenderState();
+	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
 	m_vsShader->bin();
 	m_psShader->bin();
 	float bf[4] = { 1,1,1,1 };

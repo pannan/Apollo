@@ -62,6 +62,8 @@ namespace Apollo
 
 		const Vector3&	getDirection(){return m_camLookDir;}
 
+		void		setDirection(float x, float y, float z);
+
 	private:
 
 		void init(Vector3 pos,Vector3 lookAt,Vector3 upDir,float nearDis,float farDis,int vpWidth,int vpHeight,float xViewAngle);

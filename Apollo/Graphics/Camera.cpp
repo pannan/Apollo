@@ -7,7 +7,7 @@ namespace Apollo
 
 	Camera::Camera()
 	{
-		init(Vector3(0.0,0.0,-50.0),Vector3(0.0,0.0,0.0),Vector3(0.0,1.0,0.0),1.0,60.0,800,600,90.0f);
+		init(Vector3(0.0,0.0,-50.0),Vector3(0.0,0.0,0.0),Vector3(0.0,1.0,0.0),1.0,60.0,800,600,120);
 	}
 
 	Camera::Camera(Vector3 pos,Vector3 lookAt,Vector3 upDir,float nearDis,float farDis,float xViewAngle)
@@ -209,6 +209,11 @@ namespace Apollo
 	void Camera::move(const Vector3& dir,float moveDis)
 	{
 		m_cameraPos = m_cameraPos + dir * moveDis;
+	}
+
+	void Camera::setDirection(float x, float y, float z)
+	{
+		m_camLookDir = Vector3(x, y, z);
 	}
 
 }
