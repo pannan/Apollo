@@ -32,7 +32,7 @@ void HeightMapTerrain::init()
 
 	EventManager::getInstance().addMouseEventListener(this);
 
-	m_terrainSize = 129;
+	m_terrainSize = 128;//dds纹理size必须为4的倍数，这里改成128
 	createMesh();
 
 	createShader();
