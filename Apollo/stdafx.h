@@ -126,6 +126,7 @@ enum class ShaderParameterType
 	Buffer,     // Buffers, ConstantBuffers, StructuredBuffers.
 	RWTexture,  // Texture that can be written to in a shader (using Store operations).
 	RWBuffer,   // Read/write structured buffers.
+	AppendBuffer,//append struct buffer
 };
 
 

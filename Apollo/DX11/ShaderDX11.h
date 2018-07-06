@@ -4,6 +4,11 @@
 
 namespace Apollo
 {
+	struct  
+	{
+		ShaderParameterPtr	
+	};
+
 	class ShaderDX11
 	{
 	public:

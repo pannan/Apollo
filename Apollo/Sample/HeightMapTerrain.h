@@ -39,14 +39,23 @@ namespace Apollo
 
 		void		computeNormal(byte* vertexBuffer,uint32_t* indexBuffer,int vertexSize,int positionOffset,int vertexCount,uint32_t indexCount,Vector3f* outNormalBuffer);
 
+		void		computeNormalWithGPU();
+
 	private:
 
 		int		m_terrainSize;
+
+		uint32_t	m_vertexCount;
+		uint32_t	m_indexCount;
 
 		MeshDX11Ptr		m_terrainMesh;
 
 		ShaderDX11Ptr		m_vsShader;
 		ShaderDX11Ptr		m_psShader;
+
+		ShaderDX11Ptr		m_computerTriangleNormalShader;
+		ShaderDX11Ptr		m_computerShareVertexNormal;
+		ShaderDX11Ptr		m_computerVertexNormal;
 
 		Matrix4x4				m_mvpMat;
 		ConstantBufferDX11Ptr m_mvpBuffer;
@@ -56,5 +65,14 @@ namespace Apollo
 		RenderStateDX11	m_renderState;
 
 		Vector2f					m_lastMousePos;
+
+		Vector3f*					m_terrainPosBuffer;
+		uint32_t*					m_triangleIndexBuffer;
+
+		StructuredBufferDX11Ptr	m_terrainVertexStructBuffer;
+		StructuredBufferDX11Ptr	m_TerrainIndexStructBuffer;
+		StructuredBufferDX11Ptr	m_TriangleRWStructBuffer;
+		StructuredBufferDX11Ptr	m_shareVertexRWStructBuffer;
+		StructuredBufferDX11Ptr	m_vertexNormalRWStructBuffer;
 	};
 }

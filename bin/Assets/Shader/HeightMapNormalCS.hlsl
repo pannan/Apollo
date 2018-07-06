@@ -51,8 +51,8 @@ triangle_size_y 1
 void CS_ComputeTriangleNormal( uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID, 
 														uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex )
 {
-	uint indexX = GroupID.x * size_x + GroupThreadID.x;
-	uint indexY = GroupID.y * size_y + GroupThreadID.y;
+	uint indexX = GroupID.x * triangle_size_x + GroupThreadID.x;
+	uint indexY = GroupID.y * triangle_size_y + GroupThreadID.y;
 	uint triangleIndex = indexY * 254 + indexX;
 
 	//得到顶点索引
@@ -104,8 +104,8 @@ triangle_size_y 1
 void CS_ComputeShareVertex(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID,
 	uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex)
 {
-	uint indexX = GroupID.x * size_x + GroupThreadID.x;
-	uint indexY = GroupID.y * size_y + GroupThreadID.y;
+	uint indexX = GroupID.x * triangle_size_x + GroupThreadID.x;
+	uint indexY = GroupID.y * triangle_size_y + GroupThreadID.y;
 	uint triangleIndex = indexY * 254 + indexX;
 
 	Triangle tri = TriangleBuffer[triangleIndex];
@@ -128,17 +128,18 @@ vertex_size_x 8
 vertex_size_y 8
 */
 
-#define vertex_size_x 2
-#define vertex_size_y 1
+#define vertex_size_x 8
+#define vertex_size_y 8
 [numthreads(vertex_size_x, vertex_size_y, 1)]
 void CS_ComputeVertexNormal(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID,
 	uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex)
 {
-	uint indexX = GroupID.x * size_x + GroupThreadID.x;
-	uint indexY = GroupID.y * size_y + GroupThreadID.y;
+	uint indexX = GroupID.x * vertex_size_x + GroupThreadID.x;
+	uint indexY = GroupID.y * vertex_size_y + GroupThreadID.y;
 	uint vertexIndex = indexY * 128 + indexX;
 
 	ShareVertex shareVertex = ShareVertexBuffer[vertexIndex];
 
+	GroupMemoryBarrierWithGroupSync();
 	VertexNormalBuffer[vertexIndex] = normalize(shareVertex.normal / shareVertex.shareCount);
 }

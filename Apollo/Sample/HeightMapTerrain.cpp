@@ -10,9 +10,23 @@
 using namespace DirectX;
 using namespace  Apollo;
 
+struct TriangleChunk
+{
+	uint32_t index[3];
+	Vector3 normal;
+};
+
+struct ShareVertex
+{
+	Vector3f	normal;
+	uint32_t   shareCount;
+};
+
 HeightMapTerrain::HeightMapTerrain()
 {
 	m_camera = nullptr;
+	m_terrainPosBuffer = nullptr;
+	m_triangleIndexBuffer = nullptr;
 }
 
 HeightMapTerrain::~HeightMapTerrain()
@@ -22,6 +36,8 @@ HeightMapTerrain::~HeightMapTerrain()
 		EventManager::getInstance().removeMouseEventListener(this);
 	}
 	SAFE_DELETE(m_camera);
+	SAFE_DELETE_ARRAY(m_terrainPosBuffer);
+	SAFE_DELETE_ARRAY(m_triangleIndexBuffer);
 }
 
 void HeightMapTerrain::init()
@@ -43,10 +59,10 @@ void HeightMapTerrain::init()
 
 void HeightMapTerrain::createMesh()
 {
-	uint32_t vertexCount = m_terrainSize * m_terrainSize;
-	uint32_t indexCount = (m_terrainSize - 1) * (m_terrainSize - 1) * 6;
-	Vertex_Pos_UV0* data = new Vertex_Pos_UV0[vertexCount];
-
+	m_vertexCount = m_terrainSize * m_terrainSize;
+	m_indexCount = (m_terrainSize - 1) * (m_terrainSize - 1) * 6;
+	Vertex_Pos_UV0* data = new Vertex_Pos_UV0[m_vertexCount];
+	m_terrainPosBuffer = new Vector3f[m_vertexCount];
 	for (int z = 0; z < m_terrainSize; ++z)
 	{
 		for (int x = 0; x < m_terrainSize; ++x)
@@ -56,7 +72,7 @@ void HeightMapTerrain::createMesh()
 		}
 	}
 
-	uint32_t* meshIndex = new uint32_t[indexCount];
+	uint32_t* meshIndex = new uint32_t[m_indexCount];
 
 	for (int z = 0; z < m_terrainSize - 1; ++z)
 	{
@@ -77,15 +93,15 @@ void HeightMapTerrain::createMesh()
 	}
 
 	//计算法线
-	Vector3f* normalBuffer = new Vector3f[vertexCount];
+	Vector3f* normalBuffer = new Vector3f[m_vertexCount];
 
-	computeNormal((byte*)data, meshIndex, sizeof(Vertex_Pos_UV0), 0, vertexCount, indexCount, normalBuffer);
+	computeNormal((byte*)data, meshIndex, sizeof(Vertex_Pos_UV0), 0, m_vertexCount, m_indexCount, normalBuffer);
 
 	m_terrainMesh = MeshDX11Ptr(new MeshDX11);
 
 	
-	m_terrainMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), vertexCount * sizeof(Vertex_Pos_UV0), vertexCount);
-	m_terrainMesh->createIndexBuffer(meshIndex, sizeof(uint32_t), indexCount * sizeof(uint32_t), indexCount, DXGI_FORMAT_R32_UINT);
+	m_terrainMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), m_vertexCount * sizeof(Vertex_Pos_UV0), m_vertexCount);
+	m_terrainMesh->createIndexBuffer(meshIndex, sizeof(uint32_t), m_indexCount * sizeof(uint32_t), m_indexCount, DXGI_FORMAT_R32_UINT);
 
 
 	SAFE_DELETE_ARRAY(data);
@@ -161,6 +177,38 @@ void HeightMapTerrain::createShader()
 	uint32_t texHandle = TextureDX11ResourceFactory::getInstance().createResource("..\\bin\\Assets\\Texture\\heightmap.dds", "heightmap.dds", "dds");
 	Texture2dDX11* heightMapTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(texHandle);
 
+	////////////////////////////创建cs计算normal需要的buffer资源//////////////////////////////////////////////
+
+	D3D11_SUBRESOURCE_DATA subData;
+	subData.pSysMem = m_terrainPosBuffer;
+	subData.SysMemPitch = 0;
+	subData.SysMemSlicePitch = 0;
+	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3f), false, false, &subData));
+
+	subData.pSysMem = m_triangleIndexBuffer;
+	subData.SysMemPitch = 0;
+	subData.SysMemSlicePitch = 0;
+	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_indexCount, sizeof(uint32_t), false, false, &subData));
+
+	//分配临时数据
+	uint32_t triangleCount = m_indexCount / 3;
+	TriangleChunk* triangleBuffer = new TriangleChunk[triangleCount];
+	ZeroMemory(triangleBuffer, sizeof(TriangleChunk) * triangleCount);
+
+	subData.pSysMem = triangleBuffer;
+	subData.SysMemPitch = 0;
+	subData.SysMemSlicePitch = 0;
+	m_TriangleRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(triangleCount, sizeof(TriangleChunk), false, true, &subData));
+
+	m_shareVertexRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(ShareVertex), false, true, nullptr));
+
+	m_vertexNormalRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3f), false, true, nullptr));
+
+	SAFE_DELETE_ARRAY(triangleBuffer);
+
+
+	////////////////////////////创建cs计算normal需要的shader//////////////////////////////////////////////
+
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
 	m_vsShader->loadShaderFromFile(VertexShader,
 		"../bin/Assets/Shader/HeightTerrain.hlsl",
@@ -170,6 +218,7 @@ void HeightMapTerrain::createShader()
 
 	m_vsShader->setConstantBuffer("PerObject", m_mvpBuffer);
 	m_vsShader->setTexture2d("HeightMap", heightMapTex);
+	m_vsShader->setStructuredBuffer("VertexNormalBuffer",m_vertexNormalRWStructBuffer);
 
 	m_psShader = ShaderDX11Ptr(new ShaderDX11());
 	m_psShader->loadShaderFromFile(PixelShader,
@@ -178,11 +227,61 @@ void HeightMapTerrain::createShader()
 		"PSMAIN",
 		"ps_5_0");
 
+	//////////////////////////////cs shader////////////////////////////////////////////
+
+	m_computerTriangleNormalShader = ShaderDX11Ptr(new ShaderDX11());
+	m_computerTriangleNormalShader->loadShaderFromFile(ComputeShader,
+		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
+		ShaderMacros(),
+		"CS_ComputeTriangleNormal",
+		"cs_5_0");
+
+	m_computerTriangleNormalShader->setStructuredBuffer("TerrainVertexBuffer", m_terrainVertexStructBuffer);
+	m_computerTriangleNormalShader->setStructuredBuffer("IndexBuffer", m_TerrainIndexStructBuffer);
+	m_computerTriangleNormalShader->setStructuredBuffer("TriangleBuffer", m_TriangleRWStructBuffer);
+
+	m_computerShareVertexNormal = ShaderDX11Ptr(new ShaderDX11());
+	m_computerShareVertexNormal->loadShaderFromFile(ComputeShader,
+		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
+		ShaderMacros(),
+		"CS_ComputeShareVertex",
+		"cs_5_0");
+
+	m_computerShareVertexNormal->setStructuredBuffer("TriangleBuffer", m_TriangleRWStructBuffer);
+	m_computerShareVertexNormal->setStructuredBuffer("ShareVertexBuffer", m_shareVertexRWStructBuffer);
+
+	m_computerVertexNormal = ShaderDX11Ptr(new ShaderDX11());
+	m_computerVertexNormal->loadShaderFromFile(ComputeShader,
+		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
+		ShaderMacros(),
+		"CS_ComputeVertexNormal",
+		"cs_5_0");
+
+	m_computerVertexNormal->setStructuredBuffer("ShareVertexBuffer", m_shareVertexRWStructBuffer);
+	m_computerVertexNormal->setStructuredBuffer("VertexNormalBuffer", m_vertexNormalRWStructBuffer);
+
 	
+}
+
+void HeightMapTerrain::computeNormalWithGPU()
+{
+	m_computerTriangleNormalShader->bin();
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(127, 127, 1);
+	m_computerTriangleNormalShader->unBin();
+
+	m_computerShareVertexNormal->bin();
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(127, 127, 1);
+	m_computerShareVertexNormal->unBin();
+
+	m_computerVertexNormal->bin();
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(16, 16, 1);
+	m_computerVertexNormal->unBin();
 }
 
 void HeightMapTerrain::render()
 {
+	computeNormalWithGPU();
+
 	m_camera->updateViewProjMatrix();
 	m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
 	m_vsShader->bin();

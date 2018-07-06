@@ -426,6 +426,9 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 		case D3D_SIT_UAV_RWTYPED:
 			parameterType = ShaderParameterType::RWTexture;
 			break;
+		case  D3D_SIT_UAV_APPEND_STRUCTURED:
+			parameterType = ShaderParameterType::AppendBuffer;
+			break;
 		}
 
 		// Create an empty shader parameter that should be filled-in by the application.

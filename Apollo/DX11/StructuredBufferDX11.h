@@ -6,7 +6,7 @@ namespace Apollo
 	{
 	public:
 
-		StructuredBufferDX11(UINT count, UINT structsize, bool CPUWritable, bool GPUWritable, D3D11_SUBRESOURCE_DATA* pData);
+		StructuredBufferDX11(UINT count, UINT structsize, bool CPUWritable, bool GPUWritable, D3D11_SUBRESOURCE_DATA* pData, ShaderParameterType type);
 		~StructuredBufferDX11();
 
 		// Bind the buffer for rendering.
