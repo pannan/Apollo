@@ -49,12 +49,12 @@ void TextureSelectPropertyUI::render()
 	if (type == TextureType_2D)
 	{
 		Texture2dDX11* tex2d = (Texture2dDX11*)texResource;
-		srv = tex2d->getSRV();
+		//srv = tex2d->getSRV();
 	}
 	else if (type == TextureType_CubeTex)
 	{
 		TextureCubeMapDX11* tex = (TextureCubeMapDX11*)texResource;
-		srv = tex->getSRV();
+		//srv = tex->getSRV();
 	}
 
 	if (srv == nullptr)

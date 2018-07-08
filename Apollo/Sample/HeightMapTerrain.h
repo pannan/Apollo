@@ -67,10 +67,10 @@ namespace Apollo
 		Vector2f					m_lastMousePos;
 
 		Vector3f*					m_terrainPosBuffer;
-		uint32_t*					m_triangleIndexBuffer;
+		uint32_t*					m_terrainIndexBuffer;
 
 		StructuredBufferDX11Ptr	m_terrainVertexStructBuffer;
-		StructuredBufferDX11Ptr	m_TerrainIndexStructBuffer;
+		StructuredBufferDX11Ptr	m_terrainIndexStructBuffer;
 		StructuredBufferDX11Ptr	m_TriangleRWStructBuffer;
 		StructuredBufferDX11Ptr	m_shareVertexRWStructBuffer;
 		StructuredBufferDX11Ptr	m_vertexNormalRWStructBuffer;

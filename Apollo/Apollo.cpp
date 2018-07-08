@@ -171,8 +171,8 @@ int main(int, char**)
 	//GPUParticleSample	particleSample;
 	//particleSample.init();
 
-	//ComputerShaderProcessTexture cspt;
-	//cspt.init();
+//	ComputerShaderProcessTexture cspt;
+//	cspt.init();
 	HeightMapTerrain terrain;
 	terrain.init();
 

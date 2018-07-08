@@ -9,7 +9,7 @@
 
 struct VS_INPUT
 {
-	float4 position : POSITION;
+	float3 position : POSITION;
 	float2 uv0 : TEXCOORD0;
 };
 

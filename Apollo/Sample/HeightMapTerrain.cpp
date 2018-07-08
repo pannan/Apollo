@@ -26,7 +26,7 @@ HeightMapTerrain::HeightMapTerrain()
 {
 	m_camera = nullptr;
 	m_terrainPosBuffer = nullptr;
-	m_triangleIndexBuffer = nullptr;
+	m_terrainIndexBuffer = nullptr;
 }
 
 HeightMapTerrain::~HeightMapTerrain()
@@ -37,7 +37,7 @@ HeightMapTerrain::~HeightMapTerrain()
 	}
 	SAFE_DELETE(m_camera);
 	SAFE_DELETE_ARRAY(m_terrainPosBuffer);
-	SAFE_DELETE_ARRAY(m_triangleIndexBuffer);
+	SAFE_DELETE_ARRAY(m_terrainIndexBuffer);
 }
 
 void HeightMapTerrain::init()
@@ -63,16 +63,18 @@ void HeightMapTerrain::createMesh()
 	m_indexCount = (m_terrainSize - 1) * (m_terrainSize - 1) * 6;
 	Vertex_Pos_UV0* data = new Vertex_Pos_UV0[m_vertexCount];
 	m_terrainPosBuffer = new Vector3f[m_vertexCount];
+	m_terrainIndexBuffer = new uint32_t[m_indexCount];
 	for (int z = 0; z < m_terrainSize; ++z)
 	{
 		for (int x = 0; x < m_terrainSize; ++x)
 		{
 			data[z * m_terrainSize + x].pos = Vector3f(x, 0, z);
 			data[z * m_terrainSize + x].uv0 = Vector2f(x / float(m_terrainSize - 1), z / float(m_terrainSize - 1));
+			m_terrainPosBuffer[z * m_terrainSize + x] = Vector3f(x, 0, z);
 		}
 	}
 
-	uint32_t* meshIndex = new uint32_t[m_indexCount];
+	//uint32_t* meshIndex = new uint32_t[m_indexCount];
 
 	for (int z = 0; z < m_terrainSize - 1; ++z)
 	{
@@ -82,30 +84,30 @@ void HeightMapTerrain::createMesh()
 			uint32_t quadIndex = z * (m_terrainSize - 1) + x;
 			uint32_t baseIndex = quadIndex * 6;		//每个quad两个triangles，6个index
 
-			meshIndex[baseIndex] = z * m_terrainSize + x;
-			meshIndex[baseIndex + 1] = (z + 1) * m_terrainSize + x;
-			meshIndex[baseIndex + 2] = (z + 1) * m_terrainSize + x + 1;
+			m_terrainIndexBuffer[baseIndex] = z * m_terrainSize + x;
+			m_terrainIndexBuffer[baseIndex + 1] = (z + 1) * m_terrainSize + x;
+			m_terrainIndexBuffer[baseIndex + 2] = (z + 1) * m_terrainSize + x + 1;
 
-			meshIndex[baseIndex + 3] = (z + 1) * m_terrainSize + x + 1;
-			meshIndex[baseIndex + 4] = z * m_terrainSize + x + 1;
-			meshIndex[baseIndex + 5] = z * m_terrainSize + x;
+			m_terrainIndexBuffer[baseIndex + 3] = (z + 1) * m_terrainSize + x + 1;
+			m_terrainIndexBuffer[baseIndex + 4] = z * m_terrainSize + x + 1;
+			m_terrainIndexBuffer[baseIndex + 5] = z * m_terrainSize + x;
 		}
 	}
 
 	//计算法线
 	Vector3f* normalBuffer = new Vector3f[m_vertexCount];
 
-	computeNormal((byte*)data, meshIndex, sizeof(Vertex_Pos_UV0), 0, m_vertexCount, m_indexCount, normalBuffer);
+	computeNormal((byte*)data, m_terrainIndexBuffer, sizeof(Vertex_Pos_UV0), 0, m_vertexCount, m_indexCount, normalBuffer);
 
 	m_terrainMesh = MeshDX11Ptr(new MeshDX11);
 
 	
 	m_terrainMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), m_vertexCount * sizeof(Vertex_Pos_UV0), m_vertexCount);
-	m_terrainMesh->createIndexBuffer(meshIndex, sizeof(uint32_t), m_indexCount * sizeof(uint32_t), m_indexCount, DXGI_FORMAT_R32_UINT);
+	m_terrainMesh->createIndexBuffer(m_terrainIndexBuffer, sizeof(uint32_t), m_indexCount * sizeof(uint32_t), m_indexCount, DXGI_FORMAT_R32_UINT);
 
 
 	SAFE_DELETE_ARRAY(data);
-	SAFE_DELETE_ARRAY(meshIndex);
+	//SAFE_DELETE_ARRAY(meshIndex);
 }
 
 //现在这里有问题，缺少高度信息，因为高度是在vs里获取
@@ -185,10 +187,10 @@ void HeightMapTerrain::createShader()
 	subData.SysMemSlicePitch = 0;
 	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3f), false, false, &subData));
 
-	subData.pSysMem = m_triangleIndexBuffer;
+	subData.pSysMem = m_terrainIndexBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_indexCount, sizeof(uint32_t), false, false, &subData));
+	m_terrainIndexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_indexCount, sizeof(uint32_t), false, false, &subData));
 
 	//分配临时数据
 	uint32_t triangleCount = m_indexCount / 3;
@@ -236,8 +238,9 @@ void HeightMapTerrain::createShader()
 		"CS_ComputeTriangleNormal",
 		"cs_5_0");
 
+	m_computerTriangleNormalShader->setTexture2d("heightmap", heightMapTex);
 	m_computerTriangleNormalShader->setStructuredBuffer("TerrainVertexBuffer", m_terrainVertexStructBuffer);
-	m_computerTriangleNormalShader->setStructuredBuffer("IndexBuffer", m_TerrainIndexStructBuffer);
+	m_computerTriangleNormalShader->setStructuredBuffer("IndexBuffer", m_terrainIndexStructBuffer);
 	m_computerTriangleNormalShader->setStructuredBuffer("TriangleBuffer", m_TriangleRWStructBuffer);
 
 	m_computerShareVertexNormal = ShaderDX11Ptr(new ShaderDX11());
