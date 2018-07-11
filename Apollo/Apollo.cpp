@@ -25,7 +25,7 @@
 #include "Sample/ComputerShaderProcessTexture.h"
 #include "Sample/HeightMapTerrain.h"
 #include "EventManager.h"
-
+#include "Sample/TestSample.h"
 using namespace Apollo;
 LogManager logManager;
 MaterialParse materialParse;
@@ -173,8 +173,10 @@ int main(int, char**)
 
 //	ComputerShaderProcessTexture cspt;
 //	cspt.init();
-	HeightMapTerrain terrain;
-	terrain.init();
+	//HeightMapTerrain terrain;
+	//terrain.init();
+	TestSample testSample;
+	testSample.init();
 
 	LPCTSTR sDir = TEXT("F:\\GitHub\\Apollo\\bin\\Assets");
 	DWORD dwNotifyFilter = FileSystemWatcher::FILTER_FILE_NAME | FileSystemWatcher::FILTER_DIR_NAME | FileSystemWatcher::FILTER_LAST_WRITE_NAME | 
@@ -234,7 +236,8 @@ int main(int, char**)
 		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTT(), (float*)&clear_col);
 		ImGui::Render();
 
-		terrain.render();
+	//	terrain.render();
+		testSample.render();
 
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		//cspt.render();
