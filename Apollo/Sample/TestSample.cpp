@@ -7,11 +7,21 @@
 
 using namespace Apollo;
 
+TestSample::TestSample()
+{
+	m_colorBuffer = nullptr;
+}
+
+TestSample::~TestSample()
+{
+	SAFE_DELETE_ARRAY(m_colorBuffer);
+}
+
 void TestSample::init()
 {
 	m_terrainSize = 128;
 
-	Vector3f* colorBuffer = new Vector3f[m_terrainSize * m_terrainSize];
+	m_colorBuffer = new Vector3f[m_terrainSize * m_terrainSize];
 
 	for (int z = 0; z < m_terrainSize; ++z)
 	{
@@ -19,15 +29,15 @@ void TestSample::init()
 		{
 			float u = 1;// (float)x / (m_terrainSize - 1);
 			float v = 1;// (float)z / (m_terrainSize - 1);
-			colorBuffer[z * m_terrainSize + x] = Vector3f(u, v, 0);
+			m_colorBuffer[z * m_terrainSize + x] = Vector3f(u, v, 0);
 		}
 	}
 
 	D3D11_SUBRESOURCE_DATA subData;
-	subData.pSysMem = colorBuffer;
+	subData.pSysMem = m_colorBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3f), false, false, &subData));
+	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3f), true, false, &subData));
 
 	//create texture
 	Texture2dConfigDX11 tex2dConfig;
@@ -94,6 +104,7 @@ void TestSample::initQuadMesh()
 
 void TestSample::render()
 {
+	m_ColorStructBuffer->commit(m_colorBuffer, m_terrainSize * m_terrainSize * sizeof(Vector3f));
 	m_computerFetchColorToTextureShader->bin();
 
 	//≤‚ ‘Œ∆¿ÌŒ™256x256£¨œ»”≤±‡¬Î

@@ -14,6 +14,9 @@ namespace Apollo
 	{
 	public:
 
+		TestSample();
+		~TestSample();
+
 		void  init();
 
 		void render();
@@ -38,5 +41,7 @@ namespace Apollo
 		StructuredBufferDX11Ptr	m_ColorStructBuffer;
 
 		MeshDX11Ptr m_quadMesh;
+
+		Vector3f*			m_colorBuffer;
 	};
 }

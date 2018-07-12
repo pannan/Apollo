@@ -16,6 +16,7 @@ namespace Apollo
 		// Unbind the buffer for rendering.
 		void unBind(unsigned int id, ShaderType shaderType, ShaderParameterType parameterType);
 
+		void	commit(void* data,uint32_t size);
 
 		// Is this an index buffer or an attribute/vertex buffer?
 		//virtual BufferType GetType() const;
@@ -46,7 +47,8 @@ namespace Apollo
 
 		UINT													m_elementCount;
 		UINT													m_elementSize;
-		
+
+		bool													m_CPUWritable;		
 	};
 
 	typedef std::shared_ptr<StructuredBufferDX11>	StructuredBufferDX11Ptr;
