@@ -25,7 +25,7 @@ void CS_Color(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchTh
 	uint indexY = GroupID.y * vertex_size_y + GroupThreadID.y;
 	uint vertexIndex = indexY * 128 + indexX;
 
-	float3 color = TerrainVertexBuffer[indexY * 128 + indexX];
+	float3 color = TerrainVertexBuffer[vertexIndex];
 
 	OutputMap[float2(indexX, indexY)] = float4(color, 1);
 }

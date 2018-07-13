@@ -38,7 +38,9 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 
 float4 PSMAIN(in VS_OUTPUT input) : SV_Target
 {
-	return float4(input.normal,1);
+	float3 lightDir = normalize(float3(1,1,1));
+	float diffuseLighting = dot(input.normal, lightDir);
+	return float4(diffuseLighting, diffuseLighting, diffuseLighting,1);
 	//return( vSample );
 }
 

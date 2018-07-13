@@ -27,8 +27,8 @@ void TestSample::init()
 	{
 		for (int x = 0; x < m_terrainSize; ++x)
 		{
-			float u = 1;// (float)x / (m_terrainSize - 1);
-			float v = 1;// (float)z / (m_terrainSize - 1);
+			float u = (float)x / (m_terrainSize - 1);
+			float v = (float)z / (m_terrainSize - 1);
 			m_colorBuffer[z * m_terrainSize + x] = Vector3f(u, v, 0);
 		}
 	}
@@ -37,7 +37,7 @@ void TestSample::init()
 	subData.pSysMem = m_colorBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3f), true, false, &subData));
+	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3f), false, false, &subData));
 
 	//create texture
 	Texture2dConfigDX11 tex2dConfig;
@@ -104,7 +104,7 @@ void TestSample::initQuadMesh()
 
 void TestSample::render()
 {
-	m_ColorStructBuffer->commit(m_colorBuffer, m_terrainSize * m_terrainSize * sizeof(Vector3f));
+	//m_ColorStructBuffer->commit(m_colorBuffer, m_terrainSize * m_terrainSize * sizeof(Vector3f));
 	m_computerFetchColorToTextureShader->bin();
 
 	//²âÊÔÎÆÀíÎª256x256£¬ÏÈÓ²±àÂë

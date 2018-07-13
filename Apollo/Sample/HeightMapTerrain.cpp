@@ -238,10 +238,19 @@ void HeightMapTerrain::createShader()
 		"CS_ComputeTriangleNormal",
 		"cs_5_0");
 
-	m_computerTriangleNormalShader->setTexture2d("heightmap", heightMapTex);
+	m_computerTriangleNormalShader->setTexture2d("HeightMap", heightMapTex);
 	m_computerTriangleNormalShader->setStructuredBuffer("TerrainVertexBuffer", m_terrainVertexStructBuffer);
 	m_computerTriangleNormalShader->setStructuredBuffer("IndexBuffer", m_terrainIndexStructBuffer);
 	m_computerTriangleNormalShader->setStructuredBuffer("TriangleBuffer", m_TriangleRWStructBuffer);
+
+	m_initShareVertexShader = ShaderDX11Ptr(new ShaderDX11());
+	m_initShareVertexShader->loadShaderFromFile(ComputeShader,
+		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
+		ShaderMacros(),
+		"CS_InitShareVertex",
+		"cs_5_0");
+
+	m_initShareVertexShader->setStructuredBuffer("ShareVertexBuffer", m_shareVertexRWStructBuffer);
 
 	m_computerShareVertexNormal = ShaderDX11Ptr(new ShaderDX11());
 	m_computerShareVertexNormal->loadShaderFromFile(ComputeShader,
@@ -263,7 +272,7 @@ void HeightMapTerrain::createShader()
 	m_computerVertexNormal->setStructuredBuffer("ShareVertexBuffer", m_shareVertexRWStructBuffer);
 	m_computerVertexNormal->setStructuredBuffer("VertexNormalBuffer", m_vertexNormalRWStructBuffer);
 
-	
+	computeNormalWithGPU();
 }
 
 void HeightMapTerrain::computeNormalWithGPU()
@@ -271,6 +280,10 @@ void HeightMapTerrain::computeNormalWithGPU()
 	m_computerTriangleNormalShader->bin();
 	RendererDX11::getInstance().getDeviceContex()->Dispatch(127, 127, 1);
 	m_computerTriangleNormalShader->unBin();
+
+	m_initShareVertexShader->bin();
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(16, 16, 1);
+	m_initShareVertexShader->unBin();
 
 	m_computerShareVertexNormal->bin();
 	RendererDX11::getInstance().getDeviceContex()->Dispatch(127, 127, 1);
@@ -283,7 +296,7 @@ void HeightMapTerrain::computeNormalWithGPU()
 
 void HeightMapTerrain::render()
 {
-	computeNormalWithGPU();
+	//computeNormalWithGPU();
 
 	m_camera->updateViewProjMatrix();
 	m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));

@@ -79,9 +79,9 @@ void CS_ComputeTriangleNormal( uint3 GroupID : SV_GroupID, uint3 DispatchThreadI
 
 	Triangle tri;
 	tri.normal = normal;
-	tri.index[0] = vertex0;
-	tri.index[1] = vertex1;
-	tri.index[2] = vertex2;
+	tri.index[0] = index0;
+	tri.index[1] = index1;
+	tri.index[2] = index2;
 
 	TriangleBuffer[triangleIndex] = tri;
 }
@@ -97,6 +97,19 @@ Dispatch(127,127,1)
 triangle_size_x 2
 triangle_size_y 1
 */
+
+//≥ı ºªØsharevertex
+[numthreads(8, 8, 1)]
+void CS_InitShareVertex(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID,
+	uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex)
+{
+	uint indexX = GroupID.x * 8 + GroupThreadID.x;
+	uint indexY = GroupID.y * 8 + GroupThreadID.y;
+	uint vertexIndex = indexY * 128 + indexX;
+
+	ShareVertexBuffer[vertexIndex].normal = float3(0,0,0);
+	ShareVertexBuffer[vertexIndex].shareCount = 0;
+}
 
 #define triangle_size_x 2
 #define triangle_size_y 1

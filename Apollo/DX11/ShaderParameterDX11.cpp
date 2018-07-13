@@ -32,9 +32,22 @@ void ShaderParameterDX11::setStructuredBuffer(StructuredBufferDX11Ptr buffer)
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 		srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 		srvDesc.ViewDimension = D3D_SRV_DIMENSION_BUFFER;
-		srvDesc.Buffer.ElementOffset = 0;
+		/*
+		typedef struct D3D11_BUFFER_SRV {
+			union {
+				UINT FirstElement;
+				UINT ElementOffset;
+			};
+			union {
+				UINT NumElements;
+				UINT ElementWidth;
+			};
+			上面是union，所以只能设置一个
+		};
+		*/
+		//srvDesc.Buffer.ElementOffset = 0;
 		srvDesc.Buffer.NumElements = buffer->m_elementCount;
-		srvDesc.Buffer.ElementWidth = buffer->m_elementSize;
+		//srvDesc.Buffer.ElementWidth = buffer->m_elementSize;
 		srvDesc.Buffer.FirstElement = 0;
 		HRESULT hr = RendererDX11::getInstance().getDevice()->CreateShaderResourceView(m_structuredBufferPtr->m_bufferComPtr.Get(), 
 																																			&srvDesc, m_shaderResourceViewPtr.GetAddressOf());
@@ -50,7 +63,7 @@ void ShaderParameterDX11::setStructuredBuffer(StructuredBufferDX11Ptr buffer)
 		uavDesc.Format = DXGI_FORMAT_UNKNOWN;
 		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 		uavDesc.Buffer.FirstElement = 0;
-		uavDesc.Buffer.NumElements = buffer->m_elementSize;;
+		uavDesc.Buffer.NumElements = buffer->m_elementCount;;
 		uavDesc.Buffer.Flags = 0;
 		if (m_parameterType == ShaderParameterType::AppendBuffer)
 			uavDesc.Buffer.Flags = D3D11_BUFFER_UAV_FLAG_APPEND;

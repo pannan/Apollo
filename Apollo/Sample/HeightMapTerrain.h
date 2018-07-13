@@ -54,6 +54,7 @@ namespace Apollo
 		ShaderDX11Ptr		m_psShader;
 
 		ShaderDX11Ptr		m_computerTriangleNormalShader;
+		ShaderDX11Ptr		m_initShareVertexShader;
 		ShaderDX11Ptr		m_computerShareVertexNormal;
 		ShaderDX11Ptr		m_computerVertexNormal;
 
