@@ -6,6 +6,7 @@
 #include "Texture2dDX11.h"
 #include "EventManager.h"
 #include "Matrix3f.h"
+#include "Graphics/Camera.h"
 
 using namespace DirectX;
 using namespace  Apollo;
@@ -42,9 +43,9 @@ HeightMapTerrain::~HeightMapTerrain()
 
 void HeightMapTerrain::init()
 {
-	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 89);
-	m_camera->setViewportWidth(1280);
-	m_camera->setViewportHeight(800);
+	//m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 89);
+	//m_camera->setViewportWidth(1280);
+	//m_camera->setViewportHeight(800);
 
 	EventManager::getInstance().addMouseEventListener(this);
 
@@ -298,8 +299,8 @@ void HeightMapTerrain::render()
 {
 	//computeNormalWithGPU();
 
-	m_camera->updateViewProjMatrix();
-	m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
+	//m_camera->updateViewProjMatrix();
+	//m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
 	m_vsShader->bin();
 	m_psShader->bin();
 	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
@@ -330,10 +331,10 @@ void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
 
 	XMMATRIX matxx = XMMatrixRotationRollPitchYaw(dxdy.y, dxdy.x, 0);
 
-	Vector3 camDir = m_camera->getDirection();
-	Vector3f camDir3f(camDir.m_x, camDir.m_y, camDir.m_z);
-	Vector3f newDir = mat * camDir3f;
-	m_camera->setDirection(newDir.x, newDir.y, newDir.z);
+	//Vector3 camDir = m_camera->getDirection();
+	//Vector3f camDir3f(camDir.m_x, camDir.m_y, camDir.m_z);
+	//Vector3f newDir = mat * camDir3f;
+	//m_camera->setDirection(newDir.x, newDir.y, newDir.z);
 
 	m_lastMousePos = currentMousePos;
 }

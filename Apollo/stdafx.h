@@ -32,7 +32,11 @@
 #include <d3d11shader.h>
 #include <DirectXMath.h>
 #include <utility>
-
+#include <DirectXMath.h>
+#include <DirectXPackedVector.h>
+#include <DirectXMathVector.inl>
+#include <DirectXMathMatrix.inl>
+#include <random>
 #include "imgui.h"
 
 #if defined(_WIN32_WINNT_WIN10) 
@@ -75,7 +79,14 @@
 
 #define GET_RESOURCE_INDEX(handle) ((handle >> 8) & 0x00ffffff);
 
-
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
 
 #ifndef _max
 #define _max(a,b)            (((a) > (b)) ? (a) : (b))

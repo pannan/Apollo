@@ -234,9 +234,6 @@
     <ClInclude Include="Graphics\Camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Quaternion.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Math\Matrix3x3.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -256,6 +253,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Base\IEventListener.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\TestSample.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\SF11_Math.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -401,9 +404,6 @@
     <ClCompile Include="Graphics\Camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Quaternion.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Matrix3x3.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -417,6 +417,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Base\EventManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\TestSample.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\SF11_Math.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
