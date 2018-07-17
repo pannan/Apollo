@@ -1,4 +1,5 @@
 #pragma once
+#include "KeyCodes.h"
 
 namespace Apollo
 {
@@ -23,6 +24,7 @@ namespace Apollo
 
 		virtual void onMouseMoveEvent(MouseEventArg* arg) = 0;
 
+		virtual void	onKeyDownEvent(KeyCode code) = 0;
 
 	protected:
 	private:

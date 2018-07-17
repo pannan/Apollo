@@ -11,11 +11,12 @@
 namespace Apollo
 {
 	class Texture2dDX11;
+	class FirstPersonCamera;
 
 	struct ComputeNormalChunk
 	{
 		Vector3f	normal;
-		int			shareCount;
+		int			shareCount; 
 	};
 
 	class HeightMapTerrain : public IEventListener
@@ -41,6 +42,8 @@ namespace Apollo
 
 		void		computeNormalWithGPU();
 
+		void		updateCamera();
+
 	private:
 
 		int		m_terrainSize;
@@ -61,7 +64,7 @@ namespace Apollo
 		Matrix4x4				m_mvpMat;
 		ConstantBufferDX11Ptr m_mvpBuffer;
 
-		Camera*					m_camera;
+		FirstPersonCamera*					m_camera;
 
 		RenderStateDX11	m_renderState;
 

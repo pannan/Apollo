@@ -7,6 +7,7 @@
 #include "EventManager.h"
 #include "Matrix3f.h"
 #include "Graphics/Camera.h"
+#include "Timer.h"
 
 using namespace DirectX;
 using namespace  Apollo;
@@ -46,6 +47,8 @@ void HeightMapTerrain::init()
 	//m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 89);
 	//m_camera->setViewportWidth(1280);
 	//m_camera->setViewportHeight(800);
+	m_camera = new FirstPersonCamera(1280.0f / 800.0f, Pi_4 * 0.75f, 0.01, 10000);
+	m_camera->SetLookAt(Float3(400, 100, -150), Float3(0, 0, 0), Float3(0, 1, 0));
 
 	EventManager::getInstance().addMouseEventListener(this);
 
@@ -295,12 +298,24 @@ void HeightMapTerrain::computeNormalWithGPU()
 	m_computerVertexNormal->unBin();
 }
 
+void HeightMapTerrain::updateCamera()
+{
+	const float FilmSize = 35.0f * 0.001f;
+	const float FocalLength = 35.0f * 0.001f;
+	const float aspectRatio = m_camera->AspectRatio();
+	float verticalSize = FilmSize / aspectRatio;
+	const float VerticalFOV = 2.0f * std::atan2(verticalSize, 2.0f * FocalLength);
+
+	m_camera->SetFieldOfView(VerticalFOV);
+}
+
 void HeightMapTerrain::render()
 {
+	updateCamera();
 	//computeNormalWithGPU();
 
 	//m_camera->updateViewProjMatrix();
-	//m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
+	m_mvpBuffer->set(m_camera->ViewProjectionMatrix().m, sizeof(Float4x4));
 	m_vsShader->bin();
 	m_psShader->bin();
 	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
@@ -315,26 +330,26 @@ void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
 {
 	if (arg->rButton == false)
 		return;
+
+	static bool g_firstMoveMouse = true;
+	if (g_firstMoveMouse)
+	{
+		g_firstMoveMouse = false;
+		m_lastMousePos = Vector2f(arg->mouseX, arg->mouseY);
+		return;
+	}
+
 	Vector2f currentMousePos = Vector2f(arg->mouseX, arg->mouseY);
 	Vector2f dxdy = currentMousePos - m_lastMousePos;
-
-	Matrix3f mat;
-	dxdy /= 180.0f;
-	if (abs(dxdy.x) > abs(dxdy.y))
-	{				
-		mat.RotationEuler(Vector3f(0, 1, 0), dxdy.x);
-	}
-	else
-	{
-		mat.RotationEuler(Vector3f(1, 0, 0), dxdy.y);
-	}
-
-	XMMATRIX matxx = XMMatrixRotationRollPitchYaw(dxdy.y, dxdy.x, 0);
-
-	//Vector3 camDir = m_camera->getDirection();
-	//Vector3f camDir3f(camDir.m_x, camDir.m_y, camDir.m_z);
-	//Vector3f newDir = mat * camDir3f;
-	//m_camera->setDirection(newDir.x, newDir.y, newDir.z);
-
 	m_lastMousePos = currentMousePos;
+
+	float CamMoveSpeed = 5.0f *  Timer::getInstance().elapsed();
+	const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
+
+	float xRot = m_camera->XRotation();
+	float yRot = m_camera->YRotation();
+	xRot += dxdy.y * CamRotSpeed;
+	yRot += dxdy.x * CamRotSpeed;
+	m_camera->SetXRotation(xRot);
+	m_camera->SetYRotation(yRot);
 }

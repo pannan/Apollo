@@ -26,6 +26,7 @@
 #include "Sample/HeightMapTerrain.h"
 #include "EventManager.h"
 #include "Sample/TestSample.h"
+#include "KeyCodes.h"
 using namespace Apollo;
 LogManager logManager;
 MaterialParse materialParse;
@@ -59,6 +60,30 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
 			return 0;
 		break;
+	case WM_KEYDOWN:
+	{
+		MSG charMsg;
+
+		// Get the unicode character (UTF-16)
+		unsigned int c = 0;
+		// For printable characters, the next message will be WM_CHAR.
+		// This message contains the character code we need to send the KeyPressed event.
+		// Inspired by the SDL 1.2 implementation.
+		/*if (PeekMessage(&charMsg, hwnd, 0, 0, PM_NOREMOVE) && charMsg.message == WM_CHAR)
+		{
+			GetMessage(&charMsg, hwnd, 0, 0);
+			c = static_cast<unsigned int>(charMsg.wParam);
+		}*/
+
+		bool shift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+		bool control = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+		bool alt = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
+
+		KeyCode key = (KeyCode)wParam;
+		/*unsigned int scanCode = (lParam & 0x00FF0000) >> 16;
+		KeyEventArgs keyEventArgs(*pWindow, key, c, KeyEventArgs::Pressed, control, shift, alt);
+		pWindow->OnKeyPressed(keyEventArgs);*/
+	}
 	case WM_MOUSEMOVE:
 	{
 		MouseEventArg mea;
