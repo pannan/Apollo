@@ -261,6 +261,12 @@
     <ClInclude Include="Math\SF11_Math.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Sample\SampleManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\SampleBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -423,6 +429,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Math\SF11_Math.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\SampleManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

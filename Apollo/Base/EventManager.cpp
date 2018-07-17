@@ -31,7 +31,7 @@ void EventManager::addKeyDownEventListener(IEventListener* listener)
 		return;
 	}
 
-	for each (IEventListener* var in m_mouseEventListenerList)
+	for each (IEventListener* var in m_keydownEventListenerList)
 	{
 		if (var == listener)
 		{
@@ -40,7 +40,7 @@ void EventManager::addKeyDownEventListener(IEventListener* listener)
 		}
 	}
 
-	m_mouseEventListenerList.push_back(listener);
+	m_keydownEventListenerList.push_back(listener);
 }
 
 void EventManager::removeMouseEventListener(IEventListener* listener)
@@ -50,6 +50,18 @@ void EventManager::removeMouseEventListener(IEventListener* listener)
 		if (*it == listener)
 		{
 			m_mouseEventListenerList.erase(it);
+			return;
+		}
+	}
+}
+
+void EventManager::removeKeyDownEventListener(IEventListener* listener)
+{
+	for (std::list<IEventListener*>::iterator it = m_keydownEventListenerList.begin(); it != m_keydownEventListenerList.end(); ++it)
+	{
+		if (*it == listener)
+		{
+			m_keydownEventListenerList.erase(it);
 			return;
 		}
 	}

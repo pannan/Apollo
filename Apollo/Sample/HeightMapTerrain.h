@@ -8,6 +8,7 @@
 #include "IEventListener.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
+#include "SampleBase.h"
 namespace Apollo
 {
 	class Texture2dDX11;
@@ -19,18 +20,22 @@ namespace Apollo
 		int			shareCount; 
 	};
 
-	class HeightMapTerrain : public IEventListener
+	class HeightMapTerrain : public IEventListener, public SampleBase
 	{
 	public:
 
 		HeightMapTerrain();
 		~HeightMapTerrain();
 
-		void  init();
+		virtual void  init();
 
-		void	render();
+		virtual void	render();
+
+		virtual Camera* getCamera() { return m_camera; }
 
 		virtual void onMouseMoveEvent(MouseEventArg* arg);
+
+		virtual void	onKeyDownEvent(KeyCode code);
 
 	protected:
 

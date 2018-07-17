@@ -78,10 +78,12 @@ namespace Apollo
 
 	void Camera::SetPosition(const Float3& newPosition)
 	{
-		position = newPosition;
-		world.SetTranslation(newPosition);
+		//position = newPosition;
+		//world.SetTranslation(newPosition);
 
-		WorldMatrixChanged();
+		//WorldMatrixChanged();
+		Float3 lookAt = newPosition + Forward() * 2;
+		SetLookAt(newPosition, lookAt, Float3(0, 1, 0));
 	}
 
 	void Camera::SetOrientation(const Quaternion& newOrientation)

@@ -36,6 +36,7 @@ HeightMapTerrain::~HeightMapTerrain()
 	if (EventManager::getInstancePtr())
 	{
 		EventManager::getInstance().removeMouseEventListener(this);
+		EventManager::getInstance().removeKeyDownEventListener(this);
 	}
 	SAFE_DELETE(m_camera);
 	SAFE_DELETE_ARRAY(m_terrainPosBuffer);
@@ -51,6 +52,7 @@ void HeightMapTerrain::init()
 	m_camera->SetLookAt(Float3(400, 100, -150), Float3(0, 0, 0), Float3(0, 1, 0));
 
 	EventManager::getInstance().addMouseEventListener(this);
+	EventManager::getInstance().addKeyDownEventListener(this);
 
 	m_terrainSize = 128;//dds纹理size必须为4的倍数，这里改成128
 	createMesh();
@@ -343,7 +345,7 @@ void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
 	Vector2f dxdy = currentMousePos - m_lastMousePos;
 	m_lastMousePos = currentMousePos;
 
-	float CamMoveSpeed = 5.0f *  Timer::getInstance().elapsed();
+	
 	const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
 
 	float xRot = m_camera->XRotation();
@@ -352,4 +354,18 @@ void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
 	yRot += dxdy.x * CamRotSpeed;
 	m_camera->SetXRotation(xRot);
 	m_camera->SetYRotation(yRot);
+}
+
+void HeightMapTerrain::onKeyDownEvent(KeyCode code)
+{
+	float CamMoveSpeed = 5.0f *  Timer::getInstance().elapsed();
+	Float3 camPos = m_camera->Position();
+	switch (code)
+	{
+	case  KeyCode::W:
+		camPos += m_camera->Forward() * CamMoveSpeed;
+		break;
+	}
+
+	m_camera->SetPosition(camPos);
 }

@@ -23,10 +23,10 @@
 #include "Timer.h"
 #include "Sample/GPUParticleSample.h"
 #include "Sample/ComputerShaderProcessTexture.h"
-#include "Sample/HeightMapTerrain.h"
 #include "EventManager.h"
 #include "Sample/TestSample.h"
 #include "KeyCodes.h"
+#include "Sample/SampleManager.h"
 using namespace Apollo;
 LogManager logManager;
 MaterialParse materialParse;
@@ -41,6 +41,11 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
 		return true;
+
+	if (GetKeyState('W') & 0x8000/*check if high-order bit is set (1 << 15)*/)
+	{
+		g_eventManager.notifyKeyDownEvent(KeyCode::W);
+	}
 
 	switch (msg)
 	{
@@ -80,9 +85,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		bool alt = (GetAsyncKeyState(VK_MENU) & 0x8000) != 0;
 
 		KeyCode key = (KeyCode)wParam;
-		/*unsigned int scanCode = (lParam & 0x00FF0000) >> 16;
-		KeyEventArgs keyEventArgs(*pWindow, key, c, KeyEventArgs::Pressed, control, shift, alt);
-		pWindow->OnKeyPressed(keyEventArgs);*/
+		unsigned int scanCode = (lParam & 0x00FF0000) >> 16;
+		//KeyEventArgs keyEventArgs(*pWindow, key, c, KeyEventArgs::Pressed, control, shift, alt);
+		//pWindow->OnKeyPressed(keyEventArgs);
+		//g_eventManager.notifyKeyDownEvent(key);
 	}
 	case WM_MOUSEMOVE:
 	{
@@ -198,10 +204,12 @@ int main(int, char**)
 
 //	ComputerShaderProcessTexture cspt;
 //	cspt.init();
-	HeightMapTerrain terrain;
-	terrain.init();
+	//HeightMapTerrain terrain;
+	//terrain.init();
 	//TestSample testSample;
 	//testSample.init();
+	SampleManager sampleManager;
+	sampleManager.init();
 
 	LPCTSTR sDir = TEXT("F:\\GitHub\\Apollo\\bin\\Assets");
 	DWORD dwNotifyFilter = FileSystemWatcher::FILTER_FILE_NAME | FileSystemWatcher::FILTER_DIR_NAME | FileSystemWatcher::FILTER_LAST_WRITE_NAME | 
@@ -256,12 +264,14 @@ int main(int, char**)
 		timer.update();
 		uiRoot.render(g_windowsWidth,g_windowsHeight);
 		logUI.render();
+		sampleManager.debugOverlay();
 
 		// Rendering
 		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTT(), (float*)&clear_col);
 		ImGui::Render();
 
-		terrain.render();
+		//terrain.render();
+		sampleManager.render();
 		//testSample.render();
 
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
