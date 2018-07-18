@@ -38,7 +38,7 @@ RenderStateDX11::RenderStateDX11()
 	m_stencilRef = 0;
 
 	//create DepthStencilState
-	m_depthStencilDesc.DepthEnable = false;
+	m_depthStencilDesc.DepthEnable = true;
 	m_depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	m_depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	m_depthStencilDesc.StencilEnable = false;
@@ -69,6 +69,11 @@ RenderStateDX11::RenderStateDX11()
 	m_samplerState = nullptr;
 	
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+
+	m_rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	m_rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	m_rasterizerDesc.FrontCounterClockwise = false;
 }
 
 void RenderStateDX11::createState()

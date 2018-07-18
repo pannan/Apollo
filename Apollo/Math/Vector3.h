@@ -45,6 +45,22 @@ namespace Apollo
 			return *this;
 		}
 
+		Vector3 operator += (const Vector3& vec3)
+		{
+			m_x += vec3.m_x;
+			m_y += vec3.m_y;
+			m_z += vec3.m_z;
+			return *this;
+		}
+
+		Vector3 operator -= (const Vector3& vec3)
+		{
+			m_x -= vec3.m_x;
+			m_y -= vec3.m_y;
+			m_z -= vec3.m_z;
+			return *this;
+		}
+
 		Vector3 operator - (const Vector3& vec) const
 		{
 			return Vector3(m_x - vec.m_x,m_y - vec.m_y,m_z - vec.m_z);

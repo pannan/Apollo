@@ -46,6 +46,18 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		g_eventManager.notifyKeyDownEvent(KeyCode::W);
 	}
+	else if (GetKeyState('D') & 0x8000)
+	{
+		g_eventManager.notifyKeyDownEvent(KeyCode::D);
+	}
+	else if (GetKeyState('A') & 0x8000)
+	{
+		g_eventManager.notifyKeyDownEvent(KeyCode::A);
+	}
+	else if (GetKeyState('S') & 0x8000)
+	{
+		g_eventManager.notifyKeyDownEvent(KeyCode::S);
+	}
 
 	switch (msg)
 	{

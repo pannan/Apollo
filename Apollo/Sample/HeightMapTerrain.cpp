@@ -45,11 +45,11 @@ HeightMapTerrain::~HeightMapTerrain()
 
 void HeightMapTerrain::init()
 {
-	//m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 89);
-	//m_camera->setViewportWidth(1280);
-	//m_camera->setViewportHeight(800);
-	m_camera = new FirstPersonCamera(1280.0f / 800.0f, Pi_4 * 0.75f, 0.01, 10000);
-	m_camera->SetLookAt(Float3(400, 100, -150), Float3(0, 0, 0), Float3(0, 1, 0));
+	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 90 * PI / 180.0f);
+	m_camera->setViewportWidth(1280);
+	m_camera->setViewportHeight(800);
+	//m_camera = new FirstPersonCamera(1280.0f / 800.0f, Pi_4 * 0.75f, 0.01, 10000);
+	///m_camera->SetLookAt(Float3(400, 100, -150), Float3(0, 0, 0), Float3(0, 1, 0));
 
 	EventManager::getInstance().addMouseEventListener(this);
 	EventManager::getInstance().addKeyDownEventListener(this);
@@ -302,13 +302,13 @@ void HeightMapTerrain::computeNormalWithGPU()
 
 void HeightMapTerrain::updateCamera()
 {
-	const float FilmSize = 35.0f * 0.001f;
+	/*const float FilmSize = 35.0f * 0.001f;
 	const float FocalLength = 35.0f * 0.001f;
 	const float aspectRatio = m_camera->AspectRatio();
 	float verticalSize = FilmSize / aspectRatio;
 	const float VerticalFOV = 2.0f * std::atan2(verticalSize, 2.0f * FocalLength);
 
-	m_camera->SetFieldOfView(VerticalFOV);
+	m_camera->SetFieldOfView(VerticalFOV);*/
 }
 
 void HeightMapTerrain::render()
@@ -316,8 +316,9 @@ void HeightMapTerrain::render()
 	updateCamera();
 	//computeNormalWithGPU();
 
-	//m_camera->updateViewProjMatrix();
-	m_mvpBuffer->set(m_camera->ViewProjectionMatrix().m, sizeof(Float4x4));
+	m_camera->updateViewProjMatrix();
+	//m_mvpBuffer->set(m_camera->ViewProjectionMatrix().m, sizeof(Float4x4));
+	m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
 	m_vsShader->bin();
 	m_psShader->bin();
 	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
@@ -348,24 +349,34 @@ void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
 	
 	const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
 
-	float xRot = m_camera->XRotation();
+	/*float xRot = m_camera->XRotation();
 	float yRot = m_camera->YRotation();
 	xRot += dxdy.y * CamRotSpeed;
 	yRot += dxdy.x * CamRotSpeed;
 	m_camera->SetXRotation(xRot);
-	m_camera->SetYRotation(yRot);
+	m_camera->SetYRotation(yRot);*/
 }
 
 void HeightMapTerrain::onKeyDownEvent(KeyCode code)
 {
-	float CamMoveSpeed = 5.0f *  Timer::getInstance().elapsed();
-	Float3 camPos = m_camera->Position();
+	float CamMoveSpeed = 1000 *  Timer::getInstance().elapsed();
+	Vector3 camPos = m_camera->getPosition();
 	switch (code)
 	{
 	case  KeyCode::W:
-		camPos += m_camera->Forward() * CamMoveSpeed;
+		camPos += m_camera->getDirection() * CamMoveSpeed;
+		m_camera->setposition(camPos);
+		break;
+	case  KeyCode::S:
+		camPos -= m_camera->getDirection() * CamMoveSpeed;
+		m_camera->setposition(camPos);
+		break;
+
+	case  KeyCode::D:
+		m_camera->rotationViewDir(-1);
+		break;
+	case  KeyCode::A:
+		m_camera->rotationViewDir(1);
 		break;
 	}
-
-	m_camera->SetPosition(camPos);
 }

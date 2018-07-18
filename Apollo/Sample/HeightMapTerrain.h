@@ -69,7 +69,7 @@ namespace Apollo
 		Matrix4x4				m_mvpMat;
 		ConstantBufferDX11Ptr m_mvpBuffer;
 
-		FirstPersonCamera*					m_camera;
+		Camera*					m_camera;
 
 		RenderStateDX11	m_renderState;
 

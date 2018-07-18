@@ -204,7 +204,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Matrix3x3.h" />
     <ClInclude Include="Math\Matrix4f.h" />
     <ClInclude Include="Math\Matrix4x4.h" />
-    <ClInclude Include="Math\SF11_Math.h" />
+    <ClInclude Include="Math\Quaternion.h" />
     <ClInclude Include="Math\Vector2.h" />
     <ClInclude Include="Math\Vector2f.h" />
     <ClInclude Include="Math\Vector3.h" />
@@ -266,7 +266,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Math\Matrix3x3.cpp" />
     <ClCompile Include="Math\Matrix4f.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />
-    <ClCompile Include="Math\SF11_Math.cpp" />
+    <ClCompile Include="Math\Quaternion.cpp" />
     <ClCompile Include="Math\Vector2f.cpp" />
     <ClCompile Include="Math\Vector3.cpp" />
     <ClCompile Include="Math\Vector3f.cpp" />

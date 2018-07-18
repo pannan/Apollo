@@ -258,13 +258,13 @@
     <ClInclude Include="Sample\TestSample.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Math\SF11_Math.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Sample\SampleManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Sample\SampleBase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Quaternion.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -428,10 +428,10 @@
     <ClCompile Include="Sample\TestSample.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Math\SF11_Math.cpp">
+    <ClCompile Include="Sample\SampleManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Sample\SampleManager.cpp">
+    <ClCompile Include="Math\Quaternion.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

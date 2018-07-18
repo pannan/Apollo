@@ -2,7 +2,8 @@
 #include "SampleManager.h"
 #include "SampleBase.h"
 #include "HeightMapTerrain.h"
-
+#include "Graphics/Camera.h"
+#include "Timer.h"
 using namespace Apollo;
 
 SampleManager::SampleManager()
@@ -32,6 +33,9 @@ void SampleManager::render()
 
 void SampleManager::debugOverlay()
 {
+	
+	int frameRate = Timer::getInstance().framerate();
+
 	static bool g_overLayShow = true;
 	ImGui::SetNextWindowPos(ImVec2(400, 0));
 	if (!ImGui::Begin("Example: Fixed Overlay", &g_overLayShow, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings))
@@ -39,8 +43,13 @@ void SampleManager::debugOverlay()
 		ImGui::End();
 		return;
 	}
-	ImGui::Text("Simple overlay\non the top-left side of the screen.");
+
+	Camera* cam = m_currentSample->getCamera();
+	Vector3 camPos = cam->getPosition();
+	Vector3 forward = cam->getDirection();
+	ImGui::Text("FPS: (%.1i)", frameRate);
 	ImGui::Separator();
-	ImGui::Text("Mouse Position: (%.1f,%.1f)", ImGui::GetIO().MousePos.x, ImGui::GetIO().MousePos.y);
+	ImGui::Text("Camera Position: (%.1f,%.1f,%.1f)", camPos.m_x, camPos.m_y, camPos.m_z);
+	ImGui::Text("Camera Forward: (%.1f,%.1f,%.1f)", forward.m_x, forward.m_y, forward.m_z);
 	ImGui::End();
 }

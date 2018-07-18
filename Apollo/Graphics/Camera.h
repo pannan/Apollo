@@ -3,99 +3,93 @@
 #include "Vector3.h"
 
 #include "Matrix4x4.h"
-#include "SF11_Math.h"
 
 namespace Apollo
 {
+	class Quaternion;
 	class Camera
 	{
-	protected:
-
-		Float4x4 view;
-		Float4x4 projection;
-		Float4x4 viewProjection;
-
-		Float4x4 world;
-		Float3 position;
-		Quaternion orientation;
-
-		float nearZ;
-		float farZ;
-
-		virtual void CreateProjection() = 0;
-		void WorldMatrixChanged();
-
 	public:
 
-		Camera(float nearZ, float farZ);
-		~Camera();
+		Camera();
+		Camera(Vector3 pos, Vector3 lookAt, Vector3 upDir, float nearDis, float farDis, float xViewAngle);
 
-		const Float4x4& ViewMatrix() const { return view; };
-		const Float4x4& ProjectionMatrix() const { return projection; };
-		const Float4x4& ViewProjectionMatrix() const { return viewProjection; };
-		const Float4x4& WorldMatrix() const { return world; };
-		const Float3& Position() const { return position; };
-		const Quaternion& Orientation() const { return orientation; };
-		const float& NearClip() const { return nearZ; };
-		const float& FarClip() const { return farZ; };
+		void render();
 
-		Float3 Forward() const;
-		Float3 Back() const;
-		Float3 Up() const;
-		Float3 Down() const;
-		Float3 Right() const;
-		Float3 Left() const;
+		void updateViewProjMatrix();
 
-		void SetLookAt(const Float3& eye, const Float3& lookAt, const Float3& up);
-		void SetWorldMatrix(const Float4x4& newWorld);
-		void SetPosition(const Float3& newPosition);
-		void SetOrientation(const Quaternion& newOrientation);
-		void SetNearClip(float newNearClip);
-		void SetFarClip(float newFarClip);
-		void SetProjection(const Float4x4& newProjection);
-	};
+		float getAspectRatio()
+		{
+			return (float)m_viewportWidth / m_viewportHeight;
+		}
 
-	// Camera with a perspective projection
-	class PerspectiveCamera : public Camera
-	{
+		void rotationViewDir(float angle);
 
-	protected:
+		void rotationQuaternion(const Quaternion& qua);
 
-		float aspect;
-		float fov;
+		Vector4 transformToSceenPos(const Vector3& localPos);
 
-		virtual void CreateProjection() override;
+		void setViewportWidth(int width)
+		{
+			m_viewportWidth = width;
+		}
 
-	public:
+		void setViewportHeight(int height)
+		{
+			m_viewportHeight = height;
+		}
 
-		PerspectiveCamera(float aspectRatio, float fieldOfView, float nearClip, float farClip);
-		~PerspectiveCamera();
+		const Matrix4x4&	getProjMat() const
+		{
+			return m_projectMatrix;
+		}
 
-		float AspectRatio() const { return aspect; };
-		float FieldOfView() const { return fov; };
+		const Matrix4x4&	getViewProjMat() const
+		{
+			return m_viewProjMatrix;
+		}
 
-		void SetAspectRatio(float aspectRatio);
-		void SetFieldOfView(float fieldOfView);
-	};
+		const Matrix4x4&	getViewMat() const
+		{
+			return m_viewMatrix;
+		}
 
-	// Perspective camera that rotates about Z and Y axes
-	class FirstPersonCamera : public PerspectiveCamera
-	{
+		int		getViewportWidth()const { return m_viewportWidth; }
 
-	protected:
+		int		getViewportHeight()const { return m_viewportHeight; }
 
-		float xRot;
-		float yRot;
+		void	move(const Vector3& dir, float moveDis);
 
-	public:
+		const Vector3&	getDirection() { return m_camLookDir; }
 
-		FirstPersonCamera(float aspectRatio = 16.0f / 9.0f, float fieldOfView = Pi_4, float nearClip = 0.01f, float farClip = 100.0f);
-		~FirstPersonCamera();
+		const Vector3&  getPosition() { return m_cameraPos; }
 
-		float XRotation() const { return xRot; };
-		float YRotation() const { return yRot; };
+		void setposition(const Vector3& pos) { m_cameraPos = pos; }
 
-		void SetXRotation(float xRotation);
-		void SetYRotation(float yRotation);
+	private:
+
+		void init(Vector3 pos, Vector3 lookAt, Vector3 upDir, float nearDis, float farDis, int vpWidth, int vpHeight, float xViewAngle);
+
+		void updateViewMatrix();
+
+		void updateProjMatrix();
+
+	private:
+
+		Vector3	m_cameraPos;
+		Vector3	m_camLookDir;
+		Vector3 m_upDir;
+
+		float  m_nearClipDis;
+		float  m_farClipDis;
+		float  m_xVIewAngle;
+
+
+		Matrix4x4	m_viewMatrix;
+		Matrix4x4	m_projectMatrix;
+		Matrix4x4	m_viewProjMatrix;
+
+		int			m_viewportWidth;
+		int			m_viewportHeight;
 	};
 }
