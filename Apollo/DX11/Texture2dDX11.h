@@ -25,6 +25,8 @@ namespace Apollo
 
 		ID3D11Texture2D*	getTexture2D() { return m_tex2dDx11.Get(); }
 
+		ID3D11DepthStencilView*	getDepthStencilView() { return m_depthStencilViewPtr.Get(); }
+
 	protected:
 
 		DepthStencilViewComPtr			m_depthStencilViewPtr;

@@ -102,6 +102,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		//pWindow->OnKeyPressed(keyEventArgs);
 		//g_eventManager.notifyKeyDownEvent(key);
 	}
+	break;
 	case WM_MOUSEMOVE:
 	{
 		MouseEventArg mea;
@@ -202,7 +203,7 @@ int main(int, char**)
 	HLSLResourceFactory hlslFactory;
 //	TextureResourceFactory textureFactroy;
 	TextureDX11ResourceFactory textureFactroy;
-	
+	dx11Renderer.createMainDepthStencil();
 	AssetsDirectoryManager* directoryManager = new AssetsDirectoryManager;
 	directoryManager->init("..\\bin\\Assets");
 
@@ -280,6 +281,7 @@ int main(int, char**)
 
 		// Rendering
 		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTT(), (float*)&clear_col);
+		dx11Renderer.getDeviceContex()->ClearDepthStencilView(dx11Renderer.getMainDepthSteniclView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		ImGui::Render();
 
 		//terrain.render();

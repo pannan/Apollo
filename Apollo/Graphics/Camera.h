@@ -23,7 +23,9 @@ namespace Apollo
 			return (float)m_viewportWidth / m_viewportHeight;
 		}
 
-		void rotationViewDir(float angle);
+		void rotationYaw(float angle);
+
+		void rotationRoll(float angle);
 
 		void rotationQuaternion(const Quaternion& qua);
 
@@ -66,11 +68,13 @@ namespace Apollo
 
 		void setposition(const Vector3& pos) { m_cameraPos = pos; }
 
+		const Vector3& getRightDir() { return m_rightDir; }
+
 	private:
 
 		void init(Vector3 pos, Vector3 lookAt, Vector3 upDir, float nearDis, float farDis, int vpWidth, int vpHeight, float xViewAngle);
 
-		void updateViewMatrix();
+		void updateViewMatrix(bool isYaw = true);
 
 		void updateProjMatrix();
 
@@ -79,6 +83,7 @@ namespace Apollo
 		Vector3	m_cameraPos;
 		Vector3	m_camLookDir;
 		Vector3 m_upDir;
+		Vector3	m_rightDir;
 
 		float  m_nearClipDis;
 		float  m_farClipDis;

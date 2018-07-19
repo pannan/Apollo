@@ -41,7 +41,7 @@ namespace Apollo
 
 
 	//viewmatrix两部分，一个是平移到视点位置，二是选择世界坐标和相机坐标系一致
-	void Camera::updateViewMatrix()
+	void Camera::updateViewMatrix(bool isYaw)
 	{
 		Matrix4x4 tranMat;
 		tranMat.makeTransformMatrix(Vector3(-m_cameraPos.m_x, -m_cameraPos.m_y, -m_cameraPos.m_z));
@@ -49,10 +49,22 @@ namespace Apollo
 
 		m_camLookDir.normalize();
 		m_upDir.normalize();
-		Vector3 leftDir = m_upDir.corss(m_camLookDir);
-		leftDir.normalize();
+
+		if (isYaw)
+		{
+			//yaw是绕up轴旋转，所以up是不变的，利用up和dir来计算rightdir
+			m_rightDir = m_upDir.corss(m_camLookDir);
+			m_rightDir.normalize();
+		}
+		else
+		{
+			//roll是绕rightdir轴旋转，所以rightdir是不变的，利用rightdir和dir来计算up dir
+			m_upDir = m_camLookDir.corss(m_rightDir);
+			m_upDir.normalize();
+		}
+		
 		rotateMatrix.Identity();
-		rotateMatrix.m_matrix[0][0] = leftDir.m_x; rotateMatrix.m_matrix[0][1] = leftDir.m_y; rotateMatrix.m_matrix[0][2] = leftDir.m_z;
+		rotateMatrix.m_matrix[0][0] = m_rightDir.m_x; rotateMatrix.m_matrix[0][1] = m_rightDir.m_y; rotateMatrix.m_matrix[0][2] = m_rightDir.m_z;
 		rotateMatrix.m_matrix[1][0] = m_upDir.m_x; rotateMatrix.m_matrix[1][1] = m_upDir.m_y; rotateMatrix.m_matrix[1][2] = m_upDir.m_z;
 		rotateMatrix.m_matrix[2][0] = m_camLookDir.m_x; rotateMatrix.m_matrix[2][1] = m_camLookDir.m_y; rotateMatrix.m_matrix[2][2] = m_camLookDir.m_z;
 
@@ -187,7 +199,7 @@ namespace Apollo
 		mOrientation = qnorm * mOrientation;*/
 	}
 
-	void Camera::rotationViewDir(float angle)
+	void Camera::rotationYaw(float angle)
 	{
 		Quaternion rotQua;
 		rotQua.createFromAxisAngle(m_upDir.m_x, m_upDir.m_y, m_upDir.m_z, angle);
@@ -204,6 +216,25 @@ namespace Apollo
 		m_camLookDir.normalize();
 
 		updateViewMatrix();
+	}
+
+	void Camera::rotationRoll(float angle)
+	{
+		Quaternion rotQua;
+		rotQua.createFromAxisAngle(m_rightDir.m_x, m_rightDir.m_y, m_rightDir.m_z, angle);
+		Quaternion viewDirQua;
+		viewDirQua.m_x = m_camLookDir.m_x;
+		viewDirQua.m_y = m_camLookDir.m_y;
+		viewDirQua.m_z = m_camLookDir.m_z;
+		viewDirQua.m_w = 0.0;
+
+		Quaternion rel = viewDirQua * rotQua;
+		m_camLookDir.m_x = rel.m_x;
+		m_camLookDir.m_y = rel.m_y;
+		m_camLookDir.m_z = rel.m_z;
+		m_camLookDir.normalize();
+
+		updateViewMatrix(false);
 	}
 
 	void Camera::move(const Vector3& dir, float moveDis)

@@ -15,7 +15,7 @@ Texture2D<float4>					HeightMap : register(t0);
 
 StructuredBuffer<float3>		TerrainVertexBuffer;
 
-StructuredBuffer<uint>							IndexBuffer;
+StructuredBuffer<uint>				IndexBuffer;
 
 RWStructuredBuffer<Triangle> TriangleBuffer;
 
@@ -29,8 +29,8 @@ RWStructuredBuffer<float3>					VertexNormalBuffer;
 
 float fetchHeightMap(uint index)
 {
-	uint x = index % 128;
-	uint y = index / 128;
+	uint x = index % 1024;
+	uint y = index / 1024;
 	return HeightMap.Load(float3(x,y,0)).x;
 }
 
@@ -53,7 +53,7 @@ void CS_ComputeTriangleNormal( uint3 GroupID : SV_GroupID, uint3 DispatchThreadI
 {
 	uint indexX = GroupID.x * triangle_size_x + GroupThreadID.x;
 	uint indexY = GroupID.y * triangle_size_y + GroupThreadID.y;
-	uint triangleIndex = indexY * 254 + indexX;
+	uint triangleIndex = indexY * (1023 * 2) + indexX;
 
 	//得到顶点索引
 	uint baseIndex = triangleIndex * 3;
@@ -66,9 +66,9 @@ void CS_ComputeTriangleNormal( uint3 GroupID : SV_GroupID, uint3 DispatchThreadI
 	float y1 = fetchHeightMap(index1) * 50;
 	float y2 = fetchHeightMap(index2) * 50;
 
-	float3 vertex0 = TerrainVertexBuffer[index0];
-	float3 vertex1 = TerrainVertexBuffer[index1];
-	float3 vertex2 = TerrainVertexBuffer[index2];
+	float3 vertex0 = TerrainVertexBuffer[index0] * 4;
+	float3 vertex1 = TerrainVertexBuffer[index1] * 4;
+	float3 vertex2 = TerrainVertexBuffer[index2] * 4;
 	vertex0.y = y0;
 	vertex1.y = y1;
 	vertex2.y = y2;
@@ -99,13 +99,13 @@ triangle_size_y 1
 */
 
 //初始化sharevertex
-[numthreads(8, 8, 1)]
+[numthreads(32, 32, 1)]
 void CS_InitShareVertex(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID,
 	uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex)
 {
-	uint indexX = GroupID.x * 8 + GroupThreadID.x;
-	uint indexY = GroupID.y * 8 + GroupThreadID.y;
-	uint vertexIndex = indexY * 128 + indexX;
+	uint indexX = GroupID.x * 32 + GroupThreadID.x;
+	uint indexY = GroupID.y * 32 + GroupThreadID.y;
+	uint vertexIndex = indexY * 1024 + indexX;
 
 	ShareVertexBuffer[vertexIndex].normal = float3(0,0,0);
 	ShareVertexBuffer[vertexIndex].shareCount = 0;
@@ -119,7 +119,7 @@ void CS_ComputeShareVertex(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : 
 {
 	uint indexX = GroupID.x * triangle_size_x + GroupThreadID.x;
 	uint indexY = GroupID.y * triangle_size_y + GroupThreadID.y;
-	uint triangleIndex = indexY * 254 + indexX;
+	uint triangleIndex = indexY * (1023 * 2) + indexX;
 
 	Triangle tri = TriangleBuffer[triangleIndex];
 
@@ -141,15 +141,15 @@ vertex_size_x 8
 vertex_size_y 8
 */
 
-#define vertex_size_x 8
-#define vertex_size_y 8
+#define vertex_size_x 32
+#define vertex_size_y 32
 [numthreads(vertex_size_x, vertex_size_y, 1)]
 void CS_ComputeVertexNormal(uint3 GroupID : SV_GroupID, uint3 DispatchThreadID : SV_DispatchThreadID,
 	uint3 GroupThreadID : SV_GroupThreadID, uint GroupIndex : SV_GroupIndex)
 {
 	uint indexX = GroupID.x * vertex_size_x + GroupThreadID.x;
 	uint indexY = GroupID.y * vertex_size_y + GroupThreadID.y;
-	uint vertexIndex = indexY * 128 + indexX;
+	uint vertexIndex = indexY * 1024 + indexX;
 
 	ShareVertex shareVertex = ShareVertexBuffer[vertexIndex];
 

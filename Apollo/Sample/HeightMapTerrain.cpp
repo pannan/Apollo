@@ -45,7 +45,7 @@ HeightMapTerrain::~HeightMapTerrain()
 
 void HeightMapTerrain::init()
 {
-	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 1, 5000, 90 * PI / 180.0f);
+	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * PI / 180.0f);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
 	//m_camera = new FirstPersonCamera(1280.0f / 800.0f, Pi_4 * 0.75f, 0.01, 10000);
@@ -54,7 +54,7 @@ void HeightMapTerrain::init()
 	EventManager::getInstance().addMouseEventListener(this);
 	EventManager::getInstance().addKeyDownEventListener(this);
 
-	m_terrainSize = 128;//dds纹理size必须为4的倍数，这里改成128
+	m_terrainSize = 1024;//dds纹理size必须为4的倍数，这里改成128
 	createMesh();
 
 	createShader();
@@ -101,9 +101,9 @@ void HeightMapTerrain::createMesh()
 	}
 
 	//计算法线
-	Vector3f* normalBuffer = new Vector3f[m_vertexCount];
+	//Vector3f* normalBuffer = new Vector3f[m_vertexCount];
 
-	computeNormal((byte*)data, m_terrainIndexBuffer, sizeof(Vertex_Pos_UV0), 0, m_vertexCount, m_indexCount, normalBuffer);
+	//computeNormal((byte*)data, m_terrainIndexBuffer, sizeof(Vertex_Pos_UV0), 0, m_vertexCount, m_indexCount, normalBuffer);
 
 	m_terrainMesh = MeshDX11Ptr(new MeshDX11);
 
@@ -284,19 +284,19 @@ void HeightMapTerrain::createShader()
 void HeightMapTerrain::computeNormalWithGPU()
 {
 	m_computerTriangleNormalShader->bin();
-	RendererDX11::getInstance().getDeviceContex()->Dispatch(127, 127, 1);
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(1023, 1023, 1);
 	m_computerTriangleNormalShader->unBin();
 
 	m_initShareVertexShader->bin();
-	RendererDX11::getInstance().getDeviceContex()->Dispatch(16, 16, 1);
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(32, 32, 1);
 	m_initShareVertexShader->unBin();
 
 	m_computerShareVertexNormal->bin();
-	RendererDX11::getInstance().getDeviceContex()->Dispatch(127, 127, 1);
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(1023, 1023, 1);
 	m_computerShareVertexNormal->unBin();
 
 	m_computerVertexNormal->bin();
-	RendererDX11::getInstance().getDeviceContex()->Dispatch(16, 16, 1);
+	RendererDX11::getInstance().getDeviceContex()->Dispatch(32, 32, 1);
 	m_computerVertexNormal->unBin();
 }
 
@@ -331,9 +331,6 @@ void HeightMapTerrain::render()
 
 void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
 {
-	if (arg->rButton == false)
-		return;
-
 	static bool g_firstMoveMouse = true;
 	if (g_firstMoveMouse)
 	{
@@ -346,15 +343,15 @@ void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
 	Vector2f dxdy = currentMousePos - m_lastMousePos;
 	m_lastMousePos = currentMousePos;
 
+	if (arg->rButton == false)
+		return;
 	
-	const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
-
-	/*float xRot = m_camera->XRotation();
-	float yRot = m_camera->YRotation();
-	xRot += dxdy.y * CamRotSpeed;
-	yRot += dxdy.x * CamRotSpeed;
-	m_camera->SetXRotation(xRot);
-	m_camera->SetYRotation(yRot);*/
+	//const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
+	Vector2f dxdySpeed = dxdy * 0.18f;
+	if(abs(dxdySpeed.x) > abs(dxdySpeed.y))
+		m_camera->rotationYaw(-dxdySpeed.x);
+	else
+		m_camera->rotationRoll(-dxdySpeed.y);
 }
 
 void HeightMapTerrain::onKeyDownEvent(KeyCode code)
@@ -373,10 +370,10 @@ void HeightMapTerrain::onKeyDownEvent(KeyCode code)
 		break;
 
 	case  KeyCode::D:
-		m_camera->rotationViewDir(-1);
+		m_camera->move(m_camera->getRightDir(),CamMoveSpeed);
 		break;
 	case  KeyCode::A:
-		m_camera->rotationViewDir(1);
+		m_camera->move(m_camera->getRightDir(), -CamMoveSpeed);
 		break;
 	}
 }

@@ -19,6 +19,8 @@ namespace Apollo
 
 		void				createMainRTT();
 
+		void				createMainDepthStencil();
+
 		inline ID3D11Device*				getDevice() { return m_pd3dDevice; }
 
 		inline ID3D11DeviceContext* getDeviceContex() { return m_pd3dDeviceContext; }
@@ -26,6 +28,8 @@ namespace Apollo
 		inline IDXGISwapChain*			getSwapChain() { return m_pSwapChain; }
 
 		inline ID3D11RenderTargetView*	getMainRTT() { return m_mainRenderTargetView; }
+
+		ID3D11DepthStencilView*				getMainDepthSteniclView();
 
 		BufferComPtr		createConstantBuffer(UINT size,bool dynamic,bool CPUupdates, D3D11_SUBRESOURCE_DATA* pData);
 
@@ -45,7 +49,9 @@ namespace Apollo
 		ID3D11Device*						m_pd3dDevice;
 		ID3D11DeviceContext*			m_pd3dDeviceContext;
 		IDXGISwapChain*					m_pSwapChain;
-		ID3D11RenderTargetView*	m_mainRenderTargetView;
+		ID3D11RenderTargetView*		m_mainRenderTargetView;
+
+		uint32_t									m_depthStencilHandle;
 
 	private:
 	};

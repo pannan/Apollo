@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "RendererDX11.h"
-
+#include "Texture2dConfigDX11.h"
+#include "Texture2dDX11.h"
+#include "TextureDX11ResourceFactory.h"
 using namespace Apollo;
 using namespace std;
 
@@ -84,6 +86,12 @@ HRESULT RendererDX11::init(HWND hWnd)
 	return S_OK;
 }
 
+ID3D11DepthStencilView*	RendererDX11::getMainDepthSteniclView()
+{
+	Texture2dDX11* depthDX11 = (Texture2dDX11*)(TextureDX11ResourceFactory::getInstance().getResource(m_depthStencilHandle));
+	return depthDX11->getDepthStencilView();
+}
+
 void RendererDX11::createMainRTT()
 {
 	//create main rtt
@@ -95,10 +103,24 @@ void RendererDX11::createMainRTT()
 	ZeroMemory(&render_target_view_desc, sizeof(render_target_view_desc));
 	render_target_view_desc.Format = sd.BufferDesc.Format;
 	render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer); 
 	m_pd3dDevice->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &m_mainRenderTargetView);
-	m_pd3dDeviceContext->OMSetRenderTargets(1, &m_mainRenderTargetView, NULL);
+	
 	pBackBuffer->Release();
+}
+
+void RendererDX11::createMainDepthStencil()
+{
+	//create depth stencil buffer
+	ID3D11Resource* pBackBuffer = nullptr;
+	m_mainRenderTargetView->GetResource(&pBackBuffer);
+	ID3D11Texture2D* dx11BackBuffer = (ID3D11Texture2D*)pBackBuffer;
+	D3D11_TEXTURE2D_DESC desc;
+	dx11BackBuffer->GetDesc(&desc);
+	Texture2dConfigDX11 depthStencilConf;
+	depthStencilConf.SetDepthBuffer(desc.Width, desc.Height);
+	m_depthStencilHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("MainDepthStencil", depthStencilConf);
+	m_pd3dDeviceContext->OMSetRenderTargets(1, &m_mainRenderTargetView, getMainDepthSteniclView());
 }
 
 void RendererDX11::release()

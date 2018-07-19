@@ -28,8 +28,8 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 	VS_OUTPUT output;
 	
 	//float height = HeightMap.Sample(TexSampler, input.uv0).x;
-	float height = HeightMap.Load(float3(input.uv0.x * 128, input.uv0.y * 128,0)).x * 50;
-	float4 terrainLocalPos = float4(input.position.x, height, input.position.z, 1);
+	float height = HeightMap.Load(float3(input.uv0.x * 1024, input.uv0.y * 1024,0)).x * 50;
+	float4 terrainLocalPos = float4(input.position.x * 4, height, input.position.z * 4, 1);
 	output.position = mul(MVPMatrix, terrainLocalPos);
 	output.uv0 = input.uv0;
 	output.normal = VertexNormalBuffer[input.vertexid];

@@ -71,6 +71,7 @@ RenderStateDX11::RenderStateDX11()
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 
+	ZeroMemory(&m_rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
 	m_rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	m_rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	m_rasterizerDesc.FrontCounterClockwise = false;
