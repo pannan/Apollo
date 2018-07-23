@@ -38,7 +38,7 @@
 #include <DirectXMathMatrix.inl>
 #include <random>
 #include "imgui.h"
-
+#include <d3d9.h>
 #if defined(_WIN32_WINNT_WIN10) 
 #   include <d3d12.h>
 #   include <dxgi1_4.h>

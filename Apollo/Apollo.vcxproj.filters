@@ -270,6 +270,9 @@
     <ClInclude Include="Sample\OutDoorScene.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\SDKMesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -435,6 +438,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Math\Quaternion.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\OutDoorScene.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\SDKMesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\MaterialDX11.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

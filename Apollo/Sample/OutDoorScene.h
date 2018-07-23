@@ -1,11 +1,22 @@
 #pragma once
-
+#include "SampleBase.h"
 namespace Apollo
 {
-	class OutDoorScene
+	class OutDoorScene : public SampleBase
 	{
-	public:
+		OutDoorScene();
+		~OutDoorScene();
+
+		virtual void  init();
+
+		virtual void	render();
+
+		virtual Camera* getCamera() { return m_camera; }
+
 	protected:
+
+		Camera*					m_camera;
+
 	private:
 	};	  
 }

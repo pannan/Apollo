@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ShaderDX11.h"
+
 namespace Apollo
 {
 	class MaterialDX11
@@ -10,10 +12,13 @@ namespace Apollo
 
 		virtual ~MaterialDX11();
 
-//	protected:
 
-		uint32_t	m_vs;
-		uint32_t	m_ps;
+		ShaderDX11Ptr		m_vs;
+		ShaderDX11Ptr		m_ps;
+
+		std::string					m_albedoMap;
+		std::string					m_normalMap;
+
 
 	private:
 	};

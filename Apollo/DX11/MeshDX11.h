@@ -9,6 +9,8 @@ namespace Apollo
 		MeshDX11();
 		~MeshDX11();
 
+		void			createFromSDKMeshFile(LPCWSTR fileName);
+
 		void			createVertexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t vertexCount);
 
 		void			createIndexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t	indexCount, DXGI_FORMAT type = DXGI_FORMAT_R16_UINT);

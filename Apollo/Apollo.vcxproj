@@ -193,6 +193,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Graphics\IRenderable.h" />
     <ClInclude Include="Graphics\IScene.h" />
     <ClInclude Include="Graphics\ScreenSpaceRenderPass.h" />
+    <ClInclude Include="Graphics\SDKMesh.h" />
     <ClInclude Include="Graphics\Task.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -248,6 +249,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\ConstantBufferDX11.cpp" />
     <ClCompile Include="DX11\GeometryDX11.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
+    <ClCompile Include="DX11\MaterialDX11.cpp" />
     <ClCompile Include="DX11\MeshDX11.cpp" />
     <ClCompile Include="DX11\RendererDX11.cpp" />
     <ClCompile Include="DX11\RenderStateDX11.cpp" />
@@ -260,6 +262,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp" />
+    <ClCompile Include="Graphics\SDKMesh.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
@@ -276,6 +279,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp" />
     <ClCompile Include="Sample\GPUParticleSample.cpp" />
     <ClCompile Include="Sample\HeightMapTerrain.cpp" />
+    <ClCompile Include="Sample\OutDoorScene.cpp" />
     <ClCompile Include="Sample\SampleManager.cpp" />
     <ClCompile Include="Sample\TestSample.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -2,7 +2,8 @@
 #include "MeshDX11.h"
 #include "RendererDX11.h"
 #include "LogManager.h"
-
+#include "Graphics/SDKMesh.h"
+#include "MaterialDX11.h"
 using namespace Apollo;
 
 MeshDX11::MeshDX11()
@@ -17,6 +18,26 @@ MeshDX11::MeshDX11()
 MeshDX11::~MeshDX11()
 {
 
+}
+
+void MeshDX11::createFromSDKMeshFile(LPCWSTR fileName)
+{
+	SDKMesh sdkMesh;
+	sdkMesh.Create(fileName);
+
+	uint32 numMaterials = sdkMesh.GetNumMaterials();
+	for (uint32 i = 0; i < numMaterials; ++i)
+	{
+		MaterialDX11 material;
+		SDKMESH_MATERIAL* mat = sdkMesh.GetMaterial(i);
+		
+		material.m_albedoMap = mat->DiffuseTexture;// AnsiToWString(mat->DiffuseTexture);
+		material.m_normalMap = mat->NormalTexture;// AnsiToWString(mat->NormalTexture);
+
+		//LoadMaterialResources(material, directory, device);
+
+		//meshMaterials.push_back(material);
+	}
 }
 
 void MeshDX11::createVertexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t vertexCount)
