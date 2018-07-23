@@ -66,9 +66,9 @@ void CS_ComputeTriangleNormal( uint3 GroupID : SV_GroupID, uint3 DispatchThreadI
 	float y1 = fetchHeightMap(index1) * 50;
 	float y2 = fetchHeightMap(index2) * 50;
 
-	float3 vertex0 = TerrainVertexBuffer[index0] * 4;
-	float3 vertex1 = TerrainVertexBuffer[index1] * 4;
-	float3 vertex2 = TerrainVertexBuffer[index2] * 4;
+	float3 vertex0 = TerrainVertexBuffer[index0];
+	float3 vertex1 = TerrainVertexBuffer[index1];
+	float3 vertex2 = TerrainVertexBuffer[index2];
 	vertex0.y = y0;
 	vertex1.y = y1;
 	vertex2.y = y2;

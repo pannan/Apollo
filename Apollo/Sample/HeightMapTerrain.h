@@ -20,7 +20,7 @@ namespace Apollo
 		int			shareCount; 
 	};
 
-	class HeightMapTerrain : public IEventListener, public SampleBase
+	class HeightMapTerrain : public SampleBase
 	{
 	public:
 
@@ -32,10 +32,6 @@ namespace Apollo
 		virtual void	render();
 
 		virtual Camera* getCamera() { return m_camera; }
-
-		virtual void onMouseMoveEvent(MouseEventArg* arg);
-
-		virtual void	onKeyDownEvent(KeyCode code);
 
 	protected:
 
@@ -72,8 +68,6 @@ namespace Apollo
 		Camera*					m_camera;
 
 		RenderStateDX11	m_renderState;
-
-		Vector2f					m_lastMousePos;
 
 		Vector3f*					m_terrainPosBuffer;
 		uint32_t*					m_terrainIndexBuffer;

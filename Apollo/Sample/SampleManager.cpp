@@ -47,9 +47,11 @@ void SampleManager::debugOverlay()
 	Camera* cam = m_currentSample->getCamera();
 	Vector3 camPos = cam->getPosition();
 	Vector3 forward = cam->getDirection();
+	Vector3 rightDir = cam->getRightDir();
 	ImGui::Text("FPS: (%.1i)", frameRate);
 	ImGui::Separator();
 	ImGui::Text("Camera Position: (%.1f,%.1f,%.1f)", camPos.m_x, camPos.m_y, camPos.m_z);
 	ImGui::Text("Camera Forward: (%.1f,%.1f,%.1f)", forward.m_x, forward.m_y, forward.m_z);
+	ImGui::Text("Camera RightDir: (%.1f,%.1f,%.1f)", rightDir.m_x, rightDir.m_y, rightDir.m_z);
 	ImGui::End();
 }

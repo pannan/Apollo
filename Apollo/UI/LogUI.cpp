@@ -6,7 +6,7 @@ using namespace Apollo;
 
 void LogUI::render()
 {
-	ImGui::SetNextWindowPos(ImVec2(200, 600), ImGuiCond_Once);
+	ImGui::SetNextWindowPos(ImVec2(200, 700), ImGuiCond_Once);
 	ImGui::SetNextWindowSize(ImVec2(600, 200));
 
 	ImGuiWindowFlags window_flags = 0;

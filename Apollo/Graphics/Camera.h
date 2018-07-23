@@ -1,18 +1,26 @@
 #pragma once
 
 #include "Vector3.h"
-
+#include "IEventListener.h"
 #include "Matrix4x4.h"
+#include "Vector2f.h"
 
 namespace Apollo
 {
 	class Quaternion;
-	class Camera
+
+	class Camera : public IEventListener
 	{
 	public:
 
 		Camera();
 		Camera(Vector3 pos, Vector3 lookAt, Vector3 upDir, float nearDis, float farDis, float xViewAngle);
+
+		~Camera();
+
+		virtual void onMouseMoveEvent(MouseEventArg* arg);
+
+		virtual void	onKeyDownEvent(KeyCode code);
 
 		void render();
 
@@ -25,7 +33,7 @@ namespace Apollo
 
 		void rotationYaw(float angle);
 
-		void rotationRoll(float angle);
+		void rotationPitch(float angle);
 
 		void rotationQuaternion(const Quaternion& qua);
 
@@ -96,5 +104,7 @@ namespace Apollo
 
 		int			m_viewportWidth;
 		int			m_viewportHeight;
+
+		Vector2f		m_lastMousePos;
 	};
 }

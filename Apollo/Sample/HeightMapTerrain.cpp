@@ -4,7 +4,6 @@
 #include "RendererDX11.h"
 #include "TextureDX11ResourceFactory.h"
 #include "Texture2dDX11.h"
-#include "EventManager.h"
 #include "Matrix3f.h"
 #include "Graphics/Camera.h"
 #include "Timer.h"
@@ -33,11 +32,6 @@ HeightMapTerrain::HeightMapTerrain()
 
 HeightMapTerrain::~HeightMapTerrain()
 {
-	if (EventManager::getInstancePtr())
-	{
-		EventManager::getInstance().removeMouseEventListener(this);
-		EventManager::getInstance().removeKeyDownEventListener(this);
-	}
 	SAFE_DELETE(m_camera);
 	SAFE_DELETE_ARRAY(m_terrainPosBuffer);
 	SAFE_DELETE_ARRAY(m_terrainIndexBuffer);
@@ -50,9 +44,6 @@ void HeightMapTerrain::init()
 	m_camera->setViewportHeight(800);
 	//m_camera = new FirstPersonCamera(1280.0f / 800.0f, Pi_4 * 0.75f, 0.01, 10000);
 	///m_camera->SetLookAt(Float3(400, 100, -150), Float3(0, 0, 0), Float3(0, 1, 0));
-
-	EventManager::getInstance().addMouseEventListener(this);
-	EventManager::getInstance().addKeyDownEventListener(this);
 
 	m_terrainSize = 1024;//dds纹理size必须为4的倍数，这里改成128
 	createMesh();
@@ -327,53 +318,4 @@ void HeightMapTerrain::render()
 
 	m_vsShader->unBin();
 	m_psShader->unBin();
-}
-
-void HeightMapTerrain::onMouseMoveEvent(MouseEventArg* arg)
-{
-	static bool g_firstMoveMouse = true;
-	if (g_firstMoveMouse)
-	{
-		g_firstMoveMouse = false;
-		m_lastMousePos = Vector2f(arg->mouseX, arg->mouseY);
-		return;
-	}
-
-	Vector2f currentMousePos = Vector2f(arg->mouseX, arg->mouseY);
-	Vector2f dxdy = currentMousePos - m_lastMousePos;
-	m_lastMousePos = currentMousePos;
-
-	if (arg->rButton == false)
-		return;
-	
-	//const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
-	Vector2f dxdySpeed = dxdy * 0.18f;
-	if(abs(dxdySpeed.x) > abs(dxdySpeed.y))
-		m_camera->rotationYaw(-dxdySpeed.x);
-	else
-		m_camera->rotationRoll(-dxdySpeed.y);
-}
-
-void HeightMapTerrain::onKeyDownEvent(KeyCode code)
-{
-	float CamMoveSpeed = 1000 *  Timer::getInstance().elapsed();
-	Vector3 camPos = m_camera->getPosition();
-	switch (code)
-	{
-	case  KeyCode::W:
-		camPos += m_camera->getDirection() * CamMoveSpeed;
-		m_camera->setposition(camPos);
-		break;
-	case  KeyCode::S:
-		camPos -= m_camera->getDirection() * CamMoveSpeed;
-		m_camera->setposition(camPos);
-		break;
-
-	case  KeyCode::D:
-		m_camera->move(m_camera->getRightDir(),CamMoveSpeed);
-		break;
-	case  KeyCode::A:
-		m_camera->move(m_camera->getRightDir(), -CamMoveSpeed);
-		break;
-	}
 }

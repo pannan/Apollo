@@ -214,6 +214,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\ComputerShaderProcessTexture.h" />
     <ClInclude Include="Sample\GPUParticleSample.h" />
     <ClInclude Include="Sample\HeightMapTerrain.h" />
+    <ClInclude Include="Sample\OutDoorScene.h" />
     <ClInclude Include="Sample\SampleBase.h" />
     <ClInclude Include="Sample\SampleManager.h" />
     <ClInclude Include="Sample\TestSample.h" />

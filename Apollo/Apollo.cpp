@@ -31,8 +31,8 @@ using namespace Apollo;
 LogManager logManager;
 MaterialParse materialParse;
 
-int g_windowsWidth = 1280;
-int g_windowsHeight = 800;
+int g_windowsWidth = 1600;
+int g_windowsHeight = 900;
 
 EventManager	g_eventManager;
 

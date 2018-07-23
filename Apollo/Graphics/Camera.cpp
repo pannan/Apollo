@@ -1,18 +1,33 @@
 #include "stdafx.h"
 #include "Camera.h"
 #include "Quaternion.h"
-
+#include "Timer.h"
+#include "EventManager.h"
 namespace Apollo
 {
 
 	Camera::Camera()
 	{
 		init(Vector3(0.0, 0.0, -50.0), Vector3(0.0, 0.0, 0.0), Vector3(0.0, 1.0, 0.0), 1.0, 60.0, 800, 600, 90.0f);
+		
+		EventManager::getInstance().addMouseEventListener(this);
+		EventManager::getInstance().addKeyDownEventListener(this);
 	}
 
 	Camera::Camera(Vector3 pos, Vector3 lookAt, Vector3 upDir, float nearDis, float farDis, float xViewAngle)
 	{
 		init(pos, lookAt, upDir, nearDis, farDis, 800, 600, xViewAngle);
+		
+		EventManager::getInstance().addMouseEventListener(this);
+		EventManager::getInstance().addKeyDownEventListener(this);
+	}
+	Camera::~Camera()
+	{
+		if (EventManager::getInstancePtr())
+		{
+			EventManager::getInstance().removeMouseEventListener(this);
+			EventManager::getInstance().removeKeyDownEventListener(this);
+		}
 	}
 
 	void Camera::init(Vector3 pos, Vector3 lookAt, Vector3 upDir, float nearDis, float farDis, int vpWidth, int vpHeight, float xViewAngle)
@@ -25,6 +40,9 @@ namespace Apollo
 		m_camLookDir.normalize();
 
 		m_upDir = upDir;
+
+		m_rightDir = m_upDir.corss(m_camLookDir);
+		m_rightDir.normalize();
 
 		m_nearClipDis = nearDis;
 		m_farClipDis = farDis;
@@ -49,19 +67,26 @@ namespace Apollo
 
 		m_camLookDir.normalize();
 		m_upDir.normalize();
+		m_rightDir.normalize();
 
 		if (isYaw)
 		{
 			//yaw是绕up轴旋转，所以up是不变的，利用up和dir来计算rightdir
-			m_rightDir = m_upDir.corss(m_camLookDir);
-			m_rightDir.normalize();
+			m_camLookDir = m_rightDir.corss(m_upDir);
+			m_upDir = m_camLookDir.corss(m_rightDir);
+			//m_upDir = m_camLookDir.corss(m_rightDir);			
 		}
 		else
 		{
-			//roll是绕rightdir轴旋转，所以rightdir是不变的，利用rightdir和dir来计算up dir
+			//Pitch是绕rightdir轴旋转，所以rightdir是不变的，利用rightdir和dir来计算up dir
 			m_upDir = m_camLookDir.corss(m_rightDir);
-			m_upDir.normalize();
+			//m_camLookDir = m_rightDir.corss(m_upDir);
+		//	m_upDir = m_camLookDir.corss(m_rightDir);		
 		}
+
+		m_camLookDir.normalize();
+		m_upDir.normalize();
+		m_rightDir.normalize();
 		
 		rotateMatrix.Identity();
 		rotateMatrix.m_matrix[0][0] = m_rightDir.m_x; rotateMatrix.m_matrix[0][1] = m_rightDir.m_y; rotateMatrix.m_matrix[0][2] = m_rightDir.m_z;
@@ -202,23 +227,30 @@ namespace Apollo
 	void Camera::rotationYaw(float angle)
 	{
 		Quaternion rotQua;
-		rotQua.createFromAxisAngle(m_upDir.m_x, m_upDir.m_y, m_upDir.m_z, angle);
+		//rotQua.createFromAxisAngle(m_upDir.m_x, m_upDir.m_y, m_upDir.m_z, angle);
+		rotQua.createFromAxisAngle(0,1,0, angle);
 		Quaternion viewDirQua;
-		viewDirQua.m_x = m_camLookDir.m_x;
+		/*viewDirQua.m_x = m_camLookDir.m_x;
 		viewDirQua.m_y = m_camLookDir.m_y;
-		viewDirQua.m_z = m_camLookDir.m_z;
+		viewDirQua.m_z = m_camLookDir.m_z;*/
+		viewDirQua.m_x = m_rightDir.m_x;
+		viewDirQua.m_y = m_rightDir.m_y;
+		viewDirQua.m_z = m_rightDir.m_z;
 		viewDirQua.m_w = 0.0;
 
 		Quaternion rel = viewDirQua * rotQua;
-		m_camLookDir.m_x = rel.m_x;
+		/*m_camLookDir.m_x = rel.m_x;
 		m_camLookDir.m_y = rel.m_y;
-		m_camLookDir.m_z = rel.m_z;
-		m_camLookDir.normalize();
+		m_camLookDir.m_z = rel.m_z;*/
+		m_rightDir.m_x = rel.m_x;
+		m_rightDir.m_y = rel.m_y;
+		m_rightDir.m_z = rel.m_z;
+		m_rightDir.normalize();
 
 		updateViewMatrix();
 	}
 
-	void Camera::rotationRoll(float angle)
+	void Camera::rotationPitch(float angle)
 	{
 		Quaternion rotQua;
 		rotQua.createFromAxisAngle(m_rightDir.m_x, m_rightDir.m_y, m_rightDir.m_z, angle);
@@ -242,4 +274,54 @@ namespace Apollo
 		m_cameraPos = m_cameraPos + dir * moveDis;
 	}
 
+	void Camera::onMouseMoveEvent(MouseEventArg* arg)
+	{
+		static bool g_firstMoveMouse = true;
+		if (g_firstMoveMouse)
+		{
+			g_firstMoveMouse = false;
+			m_lastMousePos = Vector2f(arg->mouseX, arg->mouseY);
+			return;
+		}
+
+		Vector2f currentMousePos = Vector2f(arg->mouseX, arg->mouseY);
+		Vector2f dxdy = currentMousePos - m_lastMousePos;
+		m_lastMousePos = currentMousePos;
+
+		if (arg->rButton == false)
+			return;
+
+		const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
+		Vector2f dxdySpeed = dxdy * 0.18f;
+		//if (abs(dxdySpeed.x) > abs(dxdySpeed.y))
+		rotationYaw(-dxdySpeed.x);
+		//else
+		rotationPitch(-dxdySpeed.y);
+	}
+
+	void Camera::onKeyDownEvent(KeyCode code)
+	{
+		float CamMoveSpeed = 1;//1000 *  Timer::getInstance().elapsed();
+		Vector3 camPos = m_cameraPos;
+		switch (code)
+		{
+		case  KeyCode::W:
+			camPos += m_camLookDir * CamMoveSpeed;
+			m_cameraPos = camPos;
+			break;
+		case  KeyCode::S:
+			camPos -= m_camLookDir * CamMoveSpeed;
+			m_cameraPos = camPos;
+			break;
+
+		case  KeyCode::D:
+			move(m_rightDir, CamMoveSpeed);
+			//m_camera->rotationYaw(-1);
+			break;
+		case  KeyCode::A:
+			move(m_rightDir, -CamMoveSpeed);
+			//m_camera->rotationYaw(1);
+			break;
+		}
+	}
 }

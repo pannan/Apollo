@@ -7,11 +7,11 @@ RenderStateDX11::RenderStateDX11()
 {
 	m_scissorRects.left = 0.0f;
 	m_scissorRects.top = 0.0f;
-	m_scissorRects.bottom = 762;
-	m_scissorRects.right = 1264;
+	m_scissorRects.bottom = 900;
+	m_scissorRects.right = 1600;
 
-	m_viewports.Width = 1264;
-	m_viewports.Height = 762;
+	m_viewports.Width = 1600;
+	m_viewports.Height = 900;
 	m_viewports.TopLeftX = 0.0f;
 	m_viewports.TopLeftY = 0.0f;
 	m_viewports.MinDepth = 0.0f;

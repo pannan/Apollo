@@ -29,7 +29,7 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 	
 	//float height = HeightMap.Sample(TexSampler, input.uv0).x;
 	float height = HeightMap.Load(float3(input.uv0.x * 1024, input.uv0.y * 1024,0)).x * 50;
-	float4 terrainLocalPos = float4(input.position.x * 4, height, input.position.z * 4, 1);
+	float4 terrainLocalPos = float4(input.position.x, height, input.position.z, 1);
 	output.position = mul(MVPMatrix, terrainLocalPos);
 	output.uv0 = input.uv0;
 	output.normal = VertexNormalBuffer[input.vertexid];
@@ -39,7 +39,9 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 float4 PSMAIN(in VS_OUTPUT input) : SV_Target
 {
 	float3 lightDir = normalize(float3(1,1,1));
-	float diffuseLighting = dot(input.normal, lightDir);
+	float3 normal = normalize(input.normal);
+	float diffuseLighting = dot(normal, lightDir);
+	//return float4(normal, 1);
 	return float4(diffuseLighting, diffuseLighting, diffuseLighting,1);
 	//return( vSample );
 }
