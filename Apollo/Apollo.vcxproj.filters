@@ -273,6 +273,12 @@
     <ClInclude Include="Graphics\SDKMesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DX11\SubMeshDX11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\ModelDX11.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -447,6 +453,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DX11\MaterialDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\SubMeshDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\ModelDX11.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

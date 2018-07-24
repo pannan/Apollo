@@ -20,7 +20,7 @@ ComputerShaderProcessTexture::~ComputerShaderProcessTexture()
 
 void ComputerShaderProcessTexture::init()
 {
-	m_srcTextureHandle = TextureDX11ResourceFactory::getInstance().createResource("..\\bin\\Assets\\Texture\\BRDF.dds", "BRDF.dds","dds");
+	m_srcTextureHandle = TextureDX11ResourceFactory::getInstance().createResource("..\\bin\\Assets\\Texture\\BRDF.dds", "BRDF.dds", "dds");
 	Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_srcTextureHandle);
 	//ID3D11Resource* dx11Resource = nullptr;
 	//srcTex2d->getSRV()->GetResource(&dx11Resource);

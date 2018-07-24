@@ -181,10 +181,12 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\IResourceDX11.h" />
     <ClInclude Include="DX11\MaterialDX11.h" />
     <ClInclude Include="DX11\MeshDX11.h" />
+    <ClInclude Include="DX11\ModelDX11.h" />
     <ClInclude Include="DX11\RendererDX11.h" />
     <ClInclude Include="DX11\RenderStateDX11.h" />
     <ClInclude Include="DX11\ShaderDX11.h" />
     <ClInclude Include="DX11\ShaderParameterDX11.h" />
+    <ClInclude Include="DX11\SubMeshDX11.h" />
     <ClInclude Include="DX11\Texture2dConfigDX11.h" />
     <ClInclude Include="DX11\Texture2dDX11.h" />
     <ClInclude Include="DX11\TextureCubeMapDX11.h" />
@@ -251,11 +253,13 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
     <ClCompile Include="DX11\MaterialDX11.cpp" />
     <ClCompile Include="DX11\MeshDX11.cpp" />
+    <ClCompile Include="DX11\ModelDX11.cpp" />
     <ClCompile Include="DX11\RendererDX11.cpp" />
     <ClCompile Include="DX11\RenderStateDX11.cpp" />
     <ClCompile Include="DX11\ShaderDX11.cpp" />
     <ClCompile Include="DX11\ShaderParameterDX11.cpp" />
     <ClCompile Include="DX11\StructuredBufferDX11.cpp" />
+    <ClCompile Include="DX11\SubMeshDX11.cpp" />
     <ClCompile Include="DX11\Texture2dConfigDX11.cpp" />
     <ClCompile Include="DX11\Texture2dDX11.cpp" />
     <ClCompile Include="DX11\TextureCubeMapDX11.cpp" />

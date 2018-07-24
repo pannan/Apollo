@@ -8,9 +8,9 @@ namespace Apollo
 	{
 	public:
 
-		MaterialDX11();
+		MaterialDX11(){}
 
-		virtual ~MaterialDX11();
+		virtual ~MaterialDX11(){}
 
 
 		ShaderDX11Ptr		m_vs;
