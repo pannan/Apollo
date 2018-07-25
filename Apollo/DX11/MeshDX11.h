@@ -7,6 +7,8 @@ namespace Apollo
 	{
 	public:
 
+		friend class ModelDX11;
+
 		MeshDX11();
 		~MeshDX11();
 
@@ -14,11 +16,11 @@ namespace Apollo
 
 		void			createFromMemory(void* vertexBuffer, int vertexSize, uint32_t vertexCount,void* indexBuffer,uint32_t	indexCount, DXGI_FORMAT type = DXGI_FORMAT_R16_UINT);
 
-		void			createVertexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t vertexCount);
+		//void			createVertexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t vertexCount);
 
-		void			createIndexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t	indexCount, DXGI_FORMAT type = DXGI_FORMAT_R16_UINT);
+		//void			createIndexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t	indexCount, DXGI_FORMAT type = DXGI_FORMAT_R16_UINT);
 
-		void			draw();
+		void			drawSubMesh(uint32_t subMeshID)const;
 
 		D3D11_PRIMITIVE_TOPOLOGY getPrimitiveType() { return m_ePrimType; }
 		void			setPrimitiveType(D3D11_PRIMITIVE_TOPOLOGY type) { m_ePrimType = type; }

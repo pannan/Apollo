@@ -94,52 +94,6 @@ void MeshDX11::createFromSDKMeshFile(SDKMesh& sdkMesh, uint32 meshIdx)
 	}
 }
 
-
-void MeshDX11::createVertexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t vertexCount)
-{
-	m_vertexCount = vertexCount;
-	m_strideSize = vertexSize;
-	D3D11_BUFFER_DESC desc;
-	desc.ByteWidth = buffSize;
-	desc.Usage = D3D11_USAGE_IMMUTABLE;
-	desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	desc.CPUAccessFlags = 0;// D3D11_CPU_ACCESS_WRITE;
-	desc.MiscFlags = 0;
-	desc.StructureByteStride = 0;
-
-	D3D11_SUBRESOURCE_DATA subData;
-	subData.pSysMem = data;
-	subData.SysMemPitch = 0;
-	subData.SysMemSlicePitch = 0;
-	HRESULT hr = RendererDX11::getInstance().getDevice()->CreateBuffer(&desc, &subData, m_vertexBufferPtr.GetAddressOf());
-	if (hr != S_OK)
-	{
-		LogManager::getInstance().log("Create VertexBuffer Failse!");
-	}
-}
-
-void MeshDX11::createIndexBuffer(void* data, int vertexSize, uint32_t buffSize,uint32_t indexCount, DXGI_FORMAT type)
-{
-	m_indexType = type;
-	m_indexCount = indexCount;
-	D3D11_BUFFER_DESC desc;
-	desc.ByteWidth = buffSize;
-	desc.Usage = D3D11_USAGE_IMMUTABLE;
-	desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	desc.CPUAccessFlags = 0;// D3D11_CPU_ACCESS_WRITE;
-	desc.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA subData;
-	subData.pSysMem = data;
-	subData.SysMemPitch = 0;
-	subData.SysMemSlicePitch = 0;
-	HRESULT hr = RendererDX11::getInstance().getDevice()->CreateBuffer(&desc, &subData, m_indexBufferPtr.GetAddressOf());
-	if (hr != S_OK)
-	{
-		LogManager::getInstance().log("Create IndexBuffer False!");
-	}
-}
-
 void MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t vertexCount, void* indexBuffer, 
 															uint32_t indexCount, DXGI_FORMAT type /* = DXGI_FORMAT_R16_UINT */)
 {
@@ -167,7 +121,7 @@ void MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t ver
 	//create index buffer
 	m_indexType = type;
 	m_indexCount = indexCount;
-	D3D11_BUFFER_DESC desc;
+	//D3D11_BUFFER_DESC desc;
 	if(m_indexType == DXGI_FORMAT_R16_UINT)
 		desc.ByteWidth = indexCount * 2;
 	else 
@@ -177,11 +131,11 @@ void MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t ver
 	desc.CPUAccessFlags = 0;// D3D11_CPU_ACCESS_WRITE;
 	desc.MiscFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA subData;
+//	D3D11_SUBRESOURCE_DATA subData;
 	subData.pSysMem = indexBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	HRESULT hr = RendererDX11::getInstance().getDevice()->CreateBuffer(&desc, &subData, m_indexBufferPtr.GetAddressOf());
+	hr = RendererDX11::getInstance().getDevice()->CreateBuffer(&desc, &subData, m_indexBufferPtr.GetAddressOf());
 	if (hr != S_OK)
 	{
 		LogManager::getInstance().log("Create IndexBuffer False!");
@@ -196,10 +150,18 @@ void MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t ver
 	m_subMeshList.push_back(subMesh);
 }
 
-void MeshDX11::draw()
+void MeshDX11::drawSubMesh(uint32_t subMeshID)const
 {
+	if (subMeshID >= m_subMeshList.size())
+		return;
 	RendererDX11::getInstance().getDeviceContex()->IASetVertexBuffers(0, 1, m_vertexBufferPtr.GetAddressOf(), &m_strideSize, &m_vertexBufferOffset);
 	RendererDX11::getInstance().getDeviceContex()->IASetIndexBuffer(m_indexBufferPtr.Get(), m_indexType, 0);
 	RendererDX11::getInstance().getDeviceContex()->IASetPrimitiveTopology(m_ePrimType);
-	RendererDX11::getInstance().getDeviceContex()->DrawIndexed(m_indexCount, 0, 0);
+	//RendererDX11::getInstance().getDeviceContex()->DrawIndexed(m_indexCount, 0, 0);
+	//for (size_t i = 0; i < m_subMeshList.size(); ++i)
+	{
+		const SubMeshDX11& subMesh = m_subMeshList[subMeshID];
+		//RendererDX11::getInstance().getDeviceContex()->DrawIndexed(subMesh.m_indexCount, subMesh.m_indexStart, subMesh.m_vertexStart);
+		RendererDX11::getInstance().drawIndexed(subMesh.m_indexCount, subMesh.m_indexStart, subMesh.m_vertexStart);
+	}
 }

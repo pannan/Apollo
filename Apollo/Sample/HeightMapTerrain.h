@@ -1,5 +1,5 @@
 #pragma once
-#include "MeshDX11.h"
+#include "ModelDX11.h"
 #include "ShaderDX11.h"
 #include "ConstantBufferDX11.h"
 #include "Matrix4x4.h"
@@ -52,7 +52,7 @@ namespace Apollo
 		uint32_t	m_vertexCount;
 		uint32_t	m_indexCount;
 
-		MeshDX11Ptr		m_terrainMesh;
+		ModelDX11				m_terrainModel;
 
 		ShaderDX11Ptr		m_vsShader;
 		ShaderDX11Ptr		m_psShader;

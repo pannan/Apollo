@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ShaderDX11.h"
-#include "MeshDX11.h"
+#include "ModelDX11.h"
 #include "RenderStateDX11.h"
 namespace Apollo
 {
@@ -29,7 +29,7 @@ namespace Apollo
 		ShaderDX11Ptr		m_vsShader;
 		ShaderDX11Ptr		m_psShader;
 
-		MeshDX11Ptr		m_quadMesh;
+		ModelDX11				m_quadModel;
 
 		RenderStateDX11 m_renderState;
 

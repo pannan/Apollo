@@ -27,6 +27,7 @@
 #include "Sample/TestSample.h"
 #include "KeyCodes.h"
 #include "Sample/SampleManager.h"
+
 using namespace Apollo;
 LogManager logManager;
 MaterialParse materialParse;

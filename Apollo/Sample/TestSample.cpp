@@ -4,7 +4,7 @@
 #include "RendererDX11.h"
 #include "Texture2dDX11.h"
 #include "VertexStruct.h"
-
+#include "MaterialDX11.h"
 using namespace Apollo;
 
 TestSample::TestSample()
@@ -66,6 +66,10 @@ void TestSample::init()
 		"ps_5_0");
 
 	m_psShader->setTexture2d("ColorMap00", uavTex);
+	MaterialDX11 material;
+	material.m_vs = m_vsShader;
+	material.m_ps = m_psShader;
+	m_quadModel.addMaterial(material);
 
 	m_computerFetchColorToTextureShader = ShaderDX11Ptr(new ShaderDX11());
 	m_computerFetchColorToTextureShader->loadShaderFromFile(ComputeShader,
@@ -84,7 +88,7 @@ void TestSample::init()
 
 void TestSample::initQuadMesh()
 {
-	m_quadMesh = MeshDX11Ptr(new MeshDX11);
+	//m_quadMesh = MeshDX11Ptr(new MeshDX11);
 
 	Vertex_Pos_UV0 data[4];
 	data[0].pos = Vector3f(-1, 1, 0);
@@ -96,10 +100,11 @@ void TestSample::initQuadMesh()
 	data[3].pos = Vector3f(-1, -1, 0);
 	data[3].uv0 = Vector2f(0, 1);
 
-	m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0), 4);
+	//m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0), 4);
 
 	uint16_t index[6] = { 0,1,2,2,3,0 };
-	m_quadMesh->createIndexBuffer(index, sizeof(uint16_t), 6 * sizeof(uint16_t), 6);
+	//m_quadMesh->createIndexBuffer(index, sizeof(uint16_t), 6 * sizeof(uint16_t), 6);
+	m_quadModel.createFromMemory(data, sizeof(Vertex_Pos_UV0), 4, index, 6);
 }
 
 void TestSample::render()
@@ -115,13 +120,14 @@ void TestSample::render()
 	//draw tex
 	//RenderStateDX11::getInstance().setRenderState();
 	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
-	m_vsShader->bin();
-	m_psShader->bin();
+	//m_vsShader->bin();
+	//m_psShader->bin();
 	float bf[4] = { 1,1,1,1 };
 	//RendererDX11::getInstance().getDeviceContex()->OMSetBlendState(m_blendState, bf, 0xffffffff);
 	//RendererDX11::getInstance().getDeviceContex()->IASetInputLayout(g_pInputLayout);
-	m_quadMesh->draw();
+	//m_quadMesh->draw();
+	m_quadModel.draw();
 
-	m_vsShader->unBin();
-	m_psShader->unBin();
+	//m_vsShader->unBin();
+	//m_psShader->unBin();
 }

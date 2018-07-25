@@ -96,12 +96,12 @@ void HeightMapTerrain::createMesh()
 
 	//computeNormal((byte*)data, m_terrainIndexBuffer, sizeof(Vertex_Pos_UV0), 0, m_vertexCount, m_indexCount, normalBuffer);
 
-	m_terrainMesh = MeshDX11Ptr(new MeshDX11);
+	//m_terrainMesh = MeshDX11Ptr(new MeshDX11);
 
 	
-	m_terrainMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), m_vertexCount * sizeof(Vertex_Pos_UV0), m_vertexCount);
-	m_terrainMesh->createIndexBuffer(m_terrainIndexBuffer, sizeof(uint32_t), m_indexCount * sizeof(uint32_t), m_indexCount, DXGI_FORMAT_R32_UINT);
-
+	//m_terrainMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), m_vertexCount * sizeof(Vertex_Pos_UV0), m_vertexCount);
+	//m_terrainMesh->createIndexBuffer(m_terrainIndexBuffer, sizeof(uint32_t), m_indexCount * sizeof(uint32_t), m_indexCount, DXGI_FORMAT_R32_UINT);
+	m_terrainModel.createFromMemory(data, sizeof(Vertex_Pos_UV0), m_vertexCount, m_terrainIndexBuffer, m_indexCount, DXGI_FORMAT_R32_UINT);
 
 	SAFE_DELETE_ARRAY(data);
 	//SAFE_DELETE_ARRAY(meshIndex);
@@ -208,6 +208,7 @@ void HeightMapTerrain::createShader()
 
 	////////////////////////////创建cs计算normal需要的shader//////////////////////////////////////////////
 
+	//render shader
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
 	m_vsShader->loadShaderFromFile(VertexShader,
 		"../bin/Assets/Shader/HeightTerrain.hlsl",
@@ -225,6 +226,11 @@ void HeightMapTerrain::createShader()
 		ShaderMacros(),
 		"PSMAIN",
 		"ps_5_0");
+
+	MaterialDX11 material;
+	material.m_vs = m_vsShader;
+	material.m_ps = m_psShader;
+	m_terrainModel.addMaterial(material);
 
 	//////////////////////////////cs shader////////////////////////////////////////////
 
@@ -310,12 +316,12 @@ void HeightMapTerrain::render()
 	m_camera->updateViewProjMatrix();
 	//m_mvpBuffer->set(m_camera->ViewProjectionMatrix().m, sizeof(Float4x4));
 	m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
-	m_vsShader->bin();
-	m_psShader->bin();
+	//m_vsShader->bin();
+	//m_psShader->bin();
 	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
 
-	m_terrainMesh->draw();
+	m_terrainModel.draw();
 
-	m_vsShader->unBin();
-	m_psShader->unBin();
+	//m_vsShader->unBin();
+	//m_psShader->unBin();
 }

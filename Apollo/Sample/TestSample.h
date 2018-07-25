@@ -5,7 +5,7 @@
 #include "RenderStateDX11.h"
 #include "Vector2f.h"
 #include "Vector3f.h"
-#include "MeshDX11.h"
+#include "ModelDX11.h"
 
 namespace Apollo
 {
@@ -40,7 +40,7 @@ namespace Apollo
 
 		StructuredBufferDX11Ptr	m_ColorStructBuffer;
 
-		MeshDX11Ptr m_quadMesh;
+		ModelDX11 m_quadModel;
 
 		Vector3f*			m_colorBuffer;
 	};

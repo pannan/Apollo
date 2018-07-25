@@ -10,7 +10,7 @@ namespace Apollo
 	public:
 
 		friend class MeshDX11;
-
+		friend class ModelDX11;
 	protected:
 
 		uint32_t					m_indexStart;

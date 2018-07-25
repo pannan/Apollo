@@ -12,6 +12,10 @@ namespace Apollo
 
 		virtual ~MaterialDX11(){}
 
+		void			bind() const;
+
+		void			unBind() const;
+
 
 		ShaderDX11Ptr		m_vs;
 		ShaderDX11Ptr		m_ps;

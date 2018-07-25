@@ -3,6 +3,7 @@
 #include "SampleBase.h"
 #include "HeightMapTerrain.h"
 #include "Graphics/Camera.h"
+#include "Sample/OutDoorScene.h"
 #include "Timer.h"
 using namespace Apollo;
 
@@ -21,7 +22,7 @@ SampleManager::~SampleManager()
 
 void SampleManager::init()
 {
-	m_currentSample = new HeightMapTerrain;
+	m_currentSample = new OutDoorScene;
 	m_currentSample->init();
 	m_sampleList.push_back(m_currentSample);
 }

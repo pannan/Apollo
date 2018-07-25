@@ -41,7 +41,9 @@ namespace Apollo
 
 		BufferComPtr		createIndirectArgsBuffer(UINT size, D3D11_SUBRESOURCE_DATA* pData);
 
-	
+		void						drawIndexed(uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart);
+
+		void						clearDebugInfo();
 
 	protected:
 
@@ -52,6 +54,9 @@ namespace Apollo
 		ID3D11RenderTargetView*		m_mainRenderTargetView;
 
 		uint32_t									m_depthStencilHandle;
+
+		//debug info
+		uint32_t									m_drawCallCount;
 
 	private:
 	};

@@ -253,3 +253,14 @@ BufferComPtr RendererDX11::createIndirectArgsBuffer(UINT size, D3D11_SUBRESOURCE
 	}
 	return(pBuffer);
 }
+
+void RendererDX11::clearDebugInfo()
+{
+	m_drawCallCount = 0;
+}
+
+void RendererDX11::drawIndexed(uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart)
+{
+	++m_drawCallCount;
+	m_pd3dDeviceContext->DrawIndexed(indexCount, indexStart, vertexStart);
+}
