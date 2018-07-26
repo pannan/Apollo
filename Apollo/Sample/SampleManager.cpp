@@ -28,12 +28,12 @@ void SampleManager::init()
 }
 
 void SampleManager::render()
-{
+{ 
 	m_currentSample->render();
 }
 
 void SampleManager::debugOverlay()
-{
+{ 
 	
 	int frameRate = Timer::getInstance().framerate();
 

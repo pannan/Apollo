@@ -57,9 +57,9 @@ RenderStateDX11::RenderStateDX11()
 
 	//create sampler 
 	m_samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
-	m_samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	m_samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	m_samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	m_samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	m_samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	m_samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	m_samplerDesc.MipLODBias = 0;
 	m_samplerDesc.MaxAnisotropy = 1;	//[1,16]
 	m_samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;

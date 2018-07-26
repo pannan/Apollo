@@ -55,5 +55,5 @@ void OutDoorScene::render()
 	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
 
 	RendererDX11::getInstance().clearDebugInfo();
-	//m_modelScene.draw();
+	m_modelScene.draw();
 }

@@ -7,8 +7,8 @@ cbuffer PerObject : register(b0)
 struct VS_INPUT
 {
 	float3 position : POSITION;
-	float2 uv0 : TEXCOORD0;
 	float3 normal : NORMAL;
+	float2 uv0 : TEXCOORD0;
 };
 
 struct VS_OUTPUT
