@@ -168,6 +168,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\MaterialResourceFactory.h" />
     <ClInclude Include="Base\miniz.h" />
     <ClInclude Include="Base\ofbx.h" />
+    <ClInclude Include="Base\Query.h" />
     <ClInclude Include="Base\Resource.h" />
     <ClInclude Include="Base\ResourceManager.h" />
     <ClInclude Include="Base\Singleton.h" />
@@ -182,6 +183,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\MaterialDX11.h" />
     <ClInclude Include="DX11\MeshDX11.h" />
     <ClInclude Include="DX11\ModelDX11.h" />
+    <ClInclude Include="DX11\QueryDX11.h" />
     <ClInclude Include="DX11\RendererDX11.h" />
     <ClInclude Include="DX11\RenderStateDX11.h" />
     <ClInclude Include="DX11\ShaderDX11.h" />
@@ -254,6 +256,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\MaterialDX11.cpp" />
     <ClCompile Include="DX11\MeshDX11.cpp" />
     <ClCompile Include="DX11\ModelDX11.cpp" />
+    <ClCompile Include="DX11\QueryDX11.cpp" />
     <ClCompile Include="DX11\RendererDX11.cpp" />
     <ClCompile Include="DX11\RenderStateDX11.cpp" />
     <ClCompile Include="DX11\ShaderDX11.cpp" />

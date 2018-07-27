@@ -119,6 +119,8 @@ typedef Microsoft::WRL::ComPtr<ID3D11ComputeShader> CSComPtr;
 typedef Microsoft::WRL::ComPtr<ID3DBlob> BlobComPtr;
 typedef Microsoft::WRL::ComPtr<ID3D11InputLayout> InputLayoutComPtr;
 
+typedef std::vector< Microsoft::WRL::ComPtr<ID3D11Query> > QueryBufferComPtr;
+
 typedef std::map< std::string, std::string > ShaderMacros;
 
 enum ShaderType

@@ -9,7 +9,8 @@ using namespace Apollo;
 
 SampleManager::SampleManager()
 {
-
+	m_gpuFrameTimes = 0.0f;
+	m_query = new QueryDX11(Query::QueryType::Timer, 2);
 }
 
 SampleManager::~SampleManager()
@@ -18,6 +19,8 @@ SampleManager::~SampleManager()
 	{
 		SAFE_DELETE(var);
 	}
+
+	SAFE_DELETE(m_query);
 }
 
 void SampleManager::init()
@@ -27,9 +30,29 @@ void SampleManager::init()
 	m_sampleList.push_back(m_currentSample);
 }
 
+void SampleManager::preRender()
+{
+	uint32_t frameCount = Timer::getInstance().frameCount();
+	m_query->Begin(frameCount);
+}
+
 void SampleManager::render()
 { 
 	m_currentSample->render();
+}
+
+void SampleManager::postRender()
+{
+	uint32_t frameCount = Timer::getInstance().frameCount();
+	m_query->End(frameCount);
+
+	Query::QueryResult frameResult = m_query->GetQueryResult(frameCount - (m_query->GetBufferCount() - 1));
+	if (frameResult.IsValid)
+	{
+		// Frame time in milliseconds
+		m_gpuFrameTimes = frameResult.ElapsedTime * 1000.0;
+		//g_FrameStatistic.Sample(g_FrameTime);
+	}
 }
 
 void SampleManager::debugOverlay()
@@ -54,5 +77,6 @@ void SampleManager::debugOverlay()
 	ImGui::Text("Camera Position: (%.1f,%.1f,%.1f)", camPos.m_x, camPos.m_y, camPos.m_z);
 	ImGui::Text("Camera Forward: (%.1f,%.1f,%.1f)", forward.m_x, forward.m_y, forward.m_z);
 	ImGui::Text("Camera RightDir: (%.1f,%.1f,%.1f)", rightDir.m_x, rightDir.m_y, rightDir.m_z);
+	ImGui::Text("GPU Times: (%.1f)", m_gpuFrameTimes);
 	ImGui::End();
 }

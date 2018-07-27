@@ -276,9 +276,11 @@ int main(int, char**)
 		//	ImGui::ShowTestWindow();
 		//}
 		timer.update();
-		uiRoot.render(g_windowsWidth,g_windowsHeight);
-		logUI.render();
+		//uiRoot.render(g_windowsWidth,g_windowsHeight);
+		//logUI.render();
 		sampleManager.debugOverlay();
+
+		sampleManager.preRender();
 
 		// Rendering
 		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTT(), (float*)&clear_col);
@@ -293,6 +295,8 @@ int main(int, char**)
 		//cspt.render();
 		
 		dx11Renderer.getSwapChain()->Present(0, 0);
+
+		sampleManager.postRender();
 	}
 
 	SAFE_DELETE(directoryManager);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Singleton.h"
-
+#include "QueryDX11.h"
 namespace Apollo
 {
 	class SampleBase;
@@ -15,7 +15,11 @@ namespace Apollo
 
 		void	init();
 
-		void render();
+		void		preRender();
+
+		void		render();
+
+		void		postRender();
 
 		void debugOverlay();
 
@@ -28,6 +32,10 @@ namespace Apollo
 		SampleBase*		m_currentSample;
 
 		std::vector<SampleBase*>	m_sampleList;
+
+		QueryDX11*			m_query;
+
+		float				m_gpuFrameTimes;
 
 	private:
 	};
