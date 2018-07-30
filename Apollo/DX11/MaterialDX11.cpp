@@ -15,8 +15,8 @@ void MaterialDX11::bind() const
 void MaterialDX11::unBind() const
 {
 	if (m_vs)
-		m_vs->unBin();
+		m_vs->unBind();
 
 	if (m_ps)
-		m_ps->unBin();
+		m_ps->unBind();
 }

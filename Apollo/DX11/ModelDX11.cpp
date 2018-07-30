@@ -97,7 +97,7 @@ void ModelDX11::draw()
 
 			mesh.drawSubMesh(subMeshID);
 
-			material.unBind();
+			//material.unBind();
 
 		}
 	}

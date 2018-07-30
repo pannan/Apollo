@@ -106,7 +106,7 @@ void ComputerShaderProcessTexture::render()
 	//²âÊÔÎÆÀíÎª256x256£¬ÏÈÓ²±àÂë
 	RendererDX11::getInstance().getDeviceContex()->Dispatch(16,16,1);
 
-	m_csShader->unBin();
+	m_csShader->unBind();
 
 	//draw tex
 	//RenderStateDX11::getInstance().setRenderState();
@@ -119,6 +119,6 @@ void ComputerShaderProcessTexture::render()
 	//m_quadMesh->draw();
 	m_quadModel.draw();
 
-	//m_vsShader->unBin();
-	//m_psShader->unBin();
+	//m_vsShader->unBind();
+	//m_psShader->unBind();
 }

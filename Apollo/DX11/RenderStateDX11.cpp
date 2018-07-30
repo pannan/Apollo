@@ -56,7 +56,7 @@ RenderStateDX11::RenderStateDX11()
 	
 
 	//create sampler 
-	m_samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+	m_samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;// D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 	m_samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	m_samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	m_samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;

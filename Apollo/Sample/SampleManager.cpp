@@ -33,7 +33,7 @@ void SampleManager::init()
 void SampleManager::preRender()
 {
 	uint32_t frameCount = Timer::getInstance().frameCount();
-	m_query->Begin(frameCount);
+	//m_query->Begin(frameCount);
 }
 
 void SampleManager::render()
@@ -44,15 +44,15 @@ void SampleManager::render()
 void SampleManager::postRender()
 {
 	uint32_t frameCount = Timer::getInstance().frameCount();
-	m_query->End(frameCount);
+	//m_query->End(frameCount);
 
-	Query::QueryResult frameResult = m_query->GetQueryResult(frameCount - (m_query->GetBufferCount() - 1));
-	if (frameResult.IsValid)
-	{
-		// Frame time in milliseconds
-		m_gpuFrameTimes = frameResult.ElapsedTime * 1000.0;
-		//g_FrameStatistic.Sample(g_FrameTime);
-	}
+	//Query::QueryResult frameResult = m_query->GetQueryResult(frameCount - (m_query->GetBufferCount() - 1));
+	//if (frameResult.IsValid)
+	//{
+	//	// Frame time in milliseconds
+	//	m_gpuFrameTimes = frameResult.ElapsedTime * 1000.0;
+	//	//g_FrameStatistic.Sample(g_FrameTime);
+	//}
 }
 
 void SampleManager::debugOverlay()

@@ -24,7 +24,7 @@ namespace Apollo
 
 		void bin();
 
-		void unBin();
+		void unBind();
 
 		//void setConstantBuffer(std::shared_ptr<ConstantBuffer> constantBuffer);
 		//void setTexture(std::shared_ptr<Texture> texture);

@@ -282,19 +282,19 @@ void HeightMapTerrain::computeNormalWithGPU()
 {
 	m_computerTriangleNormalShader->bin();
 	RendererDX11::getInstance().getDeviceContex()->Dispatch(1023, 1023, 1);
-	m_computerTriangleNormalShader->unBin();
+	m_computerTriangleNormalShader->unBind();
 
 	m_initShareVertexShader->bin();
 	RendererDX11::getInstance().getDeviceContex()->Dispatch(32, 32, 1);
-	m_initShareVertexShader->unBin();
+	m_initShareVertexShader->unBind();
 
 	m_computerShareVertexNormal->bin();
 	RendererDX11::getInstance().getDeviceContex()->Dispatch(1023, 1023, 1);
-	m_computerShareVertexNormal->unBin();
+	m_computerShareVertexNormal->unBind();
 
 	m_computerVertexNormal->bin();
 	RendererDX11::getInstance().getDeviceContex()->Dispatch(32, 32, 1);
-	m_computerVertexNormal->unBin();
+	m_computerVertexNormal->unBind();
 }
 
 void HeightMapTerrain::updateCamera()
@@ -322,6 +322,6 @@ void HeightMapTerrain::render()
 
 	m_terrainModel.draw();
 
-	//m_vsShader->unBin();
-	//m_psShader->unBin();
+	//m_vsShader->unBind();
+	//m_psShader->unBind();
 }
