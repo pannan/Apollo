@@ -16,17 +16,17 @@ void GeometryDX11::createFullSrceenQuad()
 	desc.MiscFlags = 0;
 
 	Vertex_Pos_UV0 data[4];
-	data[0].pos = Vector3f(-1.0f, 1.0f, 0.0f);
-	data[0].uv0 = Vector2f(0.0f, 1.0f);
+	data[0].pos = Vector3(-1.0f, 1.0f, 0.0f);
+	data[0].uv0 = Vector2(0.0f, 1.0f);
 
-	data[1].pos = Vector3f(1.0f, 1.0f, 0.0f);
-	data[1].uv0 = Vector2f(1.0f, 1.0f);
+	data[1].pos = Vector3(1.0f, 1.0f, 0.0f);
+	data[1].uv0 = Vector2(1.0f, 1.0f);
 
-	data[2].pos = Vector3f(1.0f, -1.0f, 0.0f);
-	data[2].uv0 = Vector2f(1.0f, 0.0f);
+	data[2].pos = Vector3(1.0f, -1.0f, 0.0f);
+	data[2].uv0 = Vector2(1.0f, 0.0f);
 
-	data[3].pos = Vector3f(-1.0f, -1.0f, 0.0f);
-	data[3].uv0 = Vector2f(0.0f, 0.0f);
+	data[3].pos = Vector3(-1.0f, -1.0f, 0.0f);
+	data[3].uv0 = Vector2(0.0f, 0.0f);
 	D3D11_SUBRESOURCE_DATA subData;
 	subData.pSysMem = data;
 	subData.SysMemPitch = 0;

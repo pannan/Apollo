@@ -4,7 +4,6 @@
 #include "RendererDX11.h"
 #include "TextureDX11ResourceFactory.h"
 #include "Texture2dDX11.h"
-#include "Matrix3f.h"
 #include "Graphics/Camera.h"
 #include "Timer.h"
 
@@ -19,7 +18,7 @@ struct TriangleChunk
 
 struct ShareVertex
 {
-	Vector3f	normal;
+	Vector3	normal;
 	uint32_t   shareCount;
 };
 
@@ -59,15 +58,15 @@ void HeightMapTerrain::createMesh()
 	m_vertexCount = m_terrainSize * m_terrainSize;
 	m_indexCount = (m_terrainSize - 1) * (m_terrainSize - 1) * 6;
 	Vertex_Pos_UV0* data = new Vertex_Pos_UV0[m_vertexCount];
-	m_terrainPosBuffer = new Vector3f[m_vertexCount];
+	m_terrainPosBuffer = new Vector3[m_vertexCount];
 	m_terrainIndexBuffer = new uint32_t[m_indexCount];
 	for (int z = 0; z < m_terrainSize; ++z)
 	{
 		for (int x = 0; x < m_terrainSize; ++x)
 		{
-			data[z * m_terrainSize + x].pos = Vector3f(x, 0, z);
-			data[z * m_terrainSize + x].uv0 = Vector2f(x / float(m_terrainSize - 1), z / float(m_terrainSize - 1));
-			m_terrainPosBuffer[z * m_terrainSize + x] = Vector3f(x, 0, z);
+			data[z * m_terrainSize + x].pos = Vector3(x, 0, z);
+			data[z * m_terrainSize + x].uv0 = Vector2(x / float(m_terrainSize - 1), z / float(m_terrainSize - 1));
+			m_terrainPosBuffer[z * m_terrainSize + x] = Vector3(x, 0, z);
 		}
 	}
 
@@ -92,7 +91,7 @@ void HeightMapTerrain::createMesh()
 	}
 
 	//计算法线
-	//Vector3f* normalBuffer = new Vector3f[m_vertexCount];
+	//Vector3* normalBuffer = new Vector3[m_vertexCount];
 
 	//computeNormal((byte*)data, m_terrainIndexBuffer, sizeof(Vertex_Pos_UV0), 0, m_vertexCount, m_indexCount, normalBuffer);
 
@@ -110,12 +109,12 @@ void HeightMapTerrain::createMesh()
 //现在这里有问题，缺少高度信息，因为高度是在vs里获取
 //应该可以在cs里计算normnal到一个uva buffer里
 void HeightMapTerrain::computeNormal(	byte* vertexBuffer,uint32_t* indexBuffer,int vertexSize,int positionOffset,int vertexCount,
-																	uint32_t indexCount,Vector3f* outNormalBuffer)
+																	uint32_t indexCount,Vector3* outNormalBuffer)
 {
 	struct Triangle 
 	{		
 		uint32_t index[3];
-		Vector3f normal;
+		Vector3 normal;
 	};
 
 	uint32_t triangleCount = indexCount / 3;
@@ -129,14 +128,14 @@ void HeightMapTerrain::computeNormal(	byte* vertexBuffer,uint32_t* indexBuffer,i
 		uint32_t index2 = indexBuffer[i + 2];
 
 		//计算法线
-		Vector3f* p0 = (Vector3f*)((byte*)vertexBuffer + vertexSize * index0 + positionOffset);
-		Vector3f* p1 = (Vector3f*)((byte*)vertexBuffer + vertexSize * index1 + positionOffset);
-		Vector3f* p2 = (Vector3f*)((byte*)vertexBuffer + vertexSize * index2 + positionOffset);
+		Vector3* p0 = (Vector3*)((byte*)vertexBuffer + vertexSize * index0 + positionOffset);
+		Vector3* p1 = (Vector3*)((byte*)vertexBuffer + vertexSize * index1 + positionOffset);
+		Vector3* p2 = (Vector3*)((byte*)vertexBuffer + vertexSize * index2 + positionOffset);
 
-		Vector3f vec0 = *p1 - *p0;
-		Vector3f vec1 = *p2 - *p0;
-		Vector3f normal = vec0.Cross(vec1);
-		normal.Normalize();
+		Vector3 vec0 = *p1 - *p0;
+		Vector3 vec1 = *p2 - *p0;
+		Vector3 normal = vec0.corss(vec1);
+		normal.normalize();
 
 		triangleList[triangleIndex].normal = normal;
 
@@ -163,7 +162,7 @@ void HeightMapTerrain::computeNormal(	byte* vertexBuffer,uint32_t* indexBuffer,i
 	for (int i = 0; i < vertexCount; ++i)
 	{
 		outNormalBuffer[i] = tempBuffer[i].normal / (float)tempBuffer[i].shareCount;
-		outNormalBuffer[i].Normalize();
+		outNormalBuffer[i].normalize();
 	}
 
 	SAFE_DELETE_ARRAY(tempBuffer);
@@ -182,7 +181,7 @@ void HeightMapTerrain::createShader()
 	subData.pSysMem = m_terrainPosBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3f), false, false, &subData));
+	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3), false, false, &subData));
 
 	subData.pSysMem = m_terrainIndexBuffer;
 	subData.SysMemPitch = 0;
@@ -201,7 +200,7 @@ void HeightMapTerrain::createShader()
 
 	m_shareVertexRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(ShareVertex), false, true, nullptr));
 
-	m_vertexNormalRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3f), false, true, nullptr));
+	m_vertexNormalRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3), false, true, nullptr));
 
 	SAFE_DELETE_ARRAY(triangleBuffer);
 

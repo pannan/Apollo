@@ -36,6 +36,11 @@ namespace Apollo
 			return Vector3(m_x *f,m_y *f,m_z * f);
 		}
 
+		Vector3 operator / (const float& f)const
+		{
+			return Vector3(m_x / f, m_y / f, m_z / f);
+		}
+
 		Vector3 operator *= (const float& f)
 		{
 			m_x *= f;

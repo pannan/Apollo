@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GPUParticleSample.h"
 #include "RendererDX11.h"
-#include "Vector4f.h"
+#include "Vector4.h"
 
 using namespace Apollo;
 
@@ -21,8 +21,8 @@ void GPUParticleSample::init()
 		"cs_5_0");
 
 	//设置insert粒子位置，方向参数
-	m_particleInsertData.EmitterLocation = Vector4f(0, 0, 0, 1);
-	m_particleInsertData.RandomVector = Vector4f(1, 0, 0, 0);
+	m_particleInsertData.EmitterLocation = Vector4(0, 0, 0, 1);
+	m_particleInsertData.RandomVector = Vector4(1, 0, 0, 0);
 	D3D11_SUBRESOURCE_DATA InitialData;
 	InitialData.pSysMem = &m_particleInsertData;
 	InitialData.SysMemPitch = 0;
@@ -35,8 +35,8 @@ void GPUParticleSample::init()
 	Particle* pData = new Particle[m_particleCount];
 	for (int i = 0; i < m_particleCount; i++)
 	{
-		pData[i].position.MakeZero();
-		pData[i].direction = Vector3f(0.0f, 0.0f, 1.0f);
+		//pData[i].position.MakeZero();
+		pData[i].direction = Vector3(0.0f, 0.0f, 1.0f);
 		pData[i].time = 0.0f;
 	}
 
@@ -59,8 +59,8 @@ void GPUParticleSample::init()
 	m_updateParticleCS->setStructuredBuffer("NewSimulationState", m_nextParticleBuffer);
 
 
-	m_updateParticleData.ConsumerLocation = Vector4f(5, 5, 0, 1);
-	m_updateParticleData.TimeFactors = Vector4f(0, 0, 0, 0);
+	m_updateParticleData.ConsumerLocation = Vector4(5, 5, 0, 1);
+	m_updateParticleData.TimeFactors = Vector4(0, 0, 0, 0);
 	//D3D11_SUBRESOURCE_DATA InitialData;
 	InitialData.pSysMem = &m_updateParticleData;
 	InitialData.SysMemPitch = 0;
@@ -113,7 +113,7 @@ void GPUParticleSample::init()
 	m_transformConstantBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(Transforms), true, true, nullptr));
 	m_renderParticleGS->setConstantBuffer("Transforms", m_transformConstantBuffer);
 
-	m_particleRenderParameter.ConsumerLocation = Vector4f(5, 0, 0, 0);
+	m_particleRenderParameter.ConsumerLocation = Vector4(5, 0, 0, 0);
 
 	//////////////////////////////////////////////////////////////////////////
 }
@@ -125,7 +125,7 @@ void GPUParticleSample::init()
 //	for (int i = 0; i < m_particleCount; i++)
 //	{
 //		pData[i].position.MakeZero();
-//		pData[i].direction = Vector3f(0.0f, 0.0f, 1.0f);
+//		pData[i].direction = Vector3(0.0f, 0.0f, 1.0f);
 //		pData[i].time = 0.0f;
 //	}
 //

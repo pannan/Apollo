@@ -280,23 +280,23 @@ namespace Apollo
 		if (g_firstMoveMouse)
 		{
 			g_firstMoveMouse = false;
-			m_lastMousePos = Vector2f(arg->mouseX, arg->mouseY);
+			m_lastMousePos = Vector2(arg->mouseX, arg->mouseY);
 			return;
 		}
 
-		Vector2f currentMousePos = Vector2f(arg->mouseX, arg->mouseY);
-		Vector2f dxdy = currentMousePos - m_lastMousePos;
+		Vector2 currentMousePos = Vector2(arg->mouseX, arg->mouseY);
+		Vector2 dxdy = currentMousePos - m_lastMousePos;
 		m_lastMousePos = currentMousePos;
 
 		if (arg->rButton == false)
 			return;
 
 		const float CamRotSpeed = 0.180f * Timer::getInstance().elapsed();
-		Vector2f dxdySpeed = dxdy * 0.18f;
+		Vector2 dxdySpeed = dxdy * 0.18f;
 		//if (abs(dxdySpeed.x) > abs(dxdySpeed.y))
-		rotationYaw(-dxdySpeed.x);
+		rotationYaw(-dxdySpeed.m_x);
 		//else
-		rotationPitch(-dxdySpeed.y);
+		rotationPitch(-dxdySpeed.m_y);
 	}
 
 	void Camera::onKeyDownEvent(KeyCode code)

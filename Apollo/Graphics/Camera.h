@@ -3,7 +3,7 @@
 #include "Vector3.h"
 #include "IEventListener.h"
 #include "Matrix4x4.h"
-#include "Vector2f.h"
+#include "Vector2.h"
 
 namespace Apollo
 {
@@ -105,6 +105,6 @@ namespace Apollo
 		int			m_viewportWidth;
 		int			m_viewportHeight;
 
-		Vector2f		m_lastMousePos;
+		Vector2		m_lastMousePos;
 	};
 }

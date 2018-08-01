@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Vector3f.h"
-#include "Vector4f.h"
-#include "Matrix4f.h"
+#include "Vector3.h"
+#include "Vector4.h"
 #include "ShaderDX11.h"
-
+#include "Matrix4x4.h"
 namespace Apollo
 {
 	/*
@@ -24,34 +23,34 @@ namespace Apollo
 
 	struct Particle
 	{
-		Vector3f position;
-		Vector3f direction;
+		Vector3 position;
+		Vector3 direction;
 		float    time;
 	};
 
 	__declspec(align(16)) struct ParticleInsertParameters
 	{
-		Vector4f EmitterLocation;
-		Vector4f RandomVector;
+		Vector4 EmitterLocation;
+		Vector4 RandomVector;
 	};
 
 	__declspec(align(16)) struct SimulationParameters
 	{
-		Vector4f TimeFactors;
+		Vector4 TimeFactors;
 		//float4 EmitterLocation;
-		Vector4f ConsumerLocation;
+		Vector4 ConsumerLocation;
 	};
 
 	__declspec(align(16)) struct Transforms
 	{
-		Matrix4f WorldViewMatrix;
-		Matrix4f ProjMatrix;
+		Matrix4x4 WorldViewMatrix;
+		Matrix4x4 ProjMatrix;
 	};
 
 	struct ParticleRenderParameters
 	{
 		//float4 EmitterLocation;
-		Vector4f ConsumerLocation;
+		Vector4 ConsumerLocation;
 	};
 
 	class GPUParticleSample

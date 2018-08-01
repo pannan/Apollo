@@ -6,8 +6,8 @@
 #include "Graphics/Camera.h"
 #include "RenderStateDX11.h"
 #include "IEventListener.h"
-#include "Vector2f.h"
-#include "Vector3f.h"
+#include "Vector2.h"
+#include "Vector3.h"
 #include "SampleBase.h"
 namespace Apollo
 {
@@ -16,7 +16,7 @@ namespace Apollo
 
 	struct ComputeNormalChunk
 	{
-		Vector3f	normal;
+		Vector3	normal;
 		int			shareCount; 
 	};
 
@@ -39,7 +39,7 @@ namespace Apollo
 
 		void		createShader();
 
-		void		computeNormal(byte* vertexBuffer,uint32_t* indexBuffer,int vertexSize,int positionOffset,int vertexCount,uint32_t indexCount,Vector3f* outNormalBuffer);
+		void		computeNormal(byte* vertexBuffer,uint32_t* indexBuffer,int vertexSize,int positionOffset,int vertexCount,uint32_t indexCount,Vector3* outNormalBuffer);
 
 		void		computeNormalWithGPU();
 
@@ -69,7 +69,7 @@ namespace Apollo
 
 		RenderStateDX11	m_renderState;
 
-		Vector3f*					m_terrainPosBuffer;
+		Vector3*					m_terrainPosBuffer;
 		uint32_t*					m_terrainIndexBuffer;
 
 		StructuredBufferDX11Ptr	m_terrainVertexStructBuffer;

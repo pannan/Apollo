@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Win32RenderWindow.h"
-#include "Vector2f.h"
+#include "Vector2.h"
 //--------------------------------------------------------------------------------
 using namespace Apollo;
 //--------------------------------------------------------------------------------
@@ -128,11 +128,11 @@ void Win32RenderWindow::Paint()
 
 }
 //--------------------------------------------------------------------------------
-Vector2f Win32RenderWindow::GetCursorPosition()
+Vector2 Win32RenderWindow::GetCursorPosition()
 {
 	POINT p;
 	GetCursorPos(&p);
 	ScreenToClient(m_hWnd, &p);
 
-	return(Vector2f(static_cast<float>(p.x), static_cast<float>(p.y)));
+	return(Vector2(static_cast<float>(p.x), static_cast<float>(p.y)));
 }

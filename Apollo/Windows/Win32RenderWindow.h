@@ -4,7 +4,7 @@
 
 namespace Apollo
 {
-	class Vector2f;
+	class Vector2;
 
 	class Win32RenderWindow : public RenderWindow
 	{
@@ -16,6 +16,6 @@ namespace Apollo
 		virtual void Shutdown();
 		virtual void Paint();
 
-		Vector2f GetCursorPosition();
+		Vector2 GetCursorPosition();
 	};
 }

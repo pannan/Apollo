@@ -21,7 +21,7 @@ void TestSample::init()
 {
 	m_terrainSize = 128;
 
-	m_colorBuffer = new Vector3f[m_terrainSize * m_terrainSize];
+	m_colorBuffer = new Vector3[m_terrainSize * m_terrainSize];
 
 	for (int z = 0; z < m_terrainSize; ++z)
 	{
@@ -29,7 +29,7 @@ void TestSample::init()
 		{
 			float u = (float)x / (m_terrainSize - 1);
 			float v = (float)z / (m_terrainSize - 1);
-			m_colorBuffer[z * m_terrainSize + x] = Vector3f(u, v, 0);
+			m_colorBuffer[z * m_terrainSize + x] = Vector3(u, v, 0);
 		}
 	}
 
@@ -37,7 +37,7 @@ void TestSample::init()
 	subData.pSysMem = m_colorBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3f), false, false, &subData));
+	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3), false, false, &subData));
 
 	//create texture
 	Texture2dConfigDX11 tex2dConfig;
@@ -91,14 +91,14 @@ void TestSample::initQuadMesh()
 	//m_quadMesh = MeshDX11Ptr(new MeshDX11);
 
 	Vertex_Pos_UV0 data[4];
-	data[0].pos = Vector3f(-1, 1, 0);
-	data[0].uv0 = Vector2f(0, 0);
-	data[1].pos = Vector3f(1, 1, 0);
-	data[1].uv0 = Vector2f(1, 0);
-	data[2].pos = Vector3f(1, -1, 0);
-	data[2].uv0 = Vector2f(1, 1);
-	data[3].pos = Vector3f(-1, -1, 0);
-	data[3].uv0 = Vector2f(0, 1);
+	data[0].pos = Vector3(-1, 1, 0);
+	data[0].uv0 = Vector2(0, 0);
+	data[1].pos = Vector3(1, 1, 0);
+	data[1].uv0 = Vector2(1, 0);
+	data[2].pos = Vector3(1, -1, 0);
+	data[2].uv0 = Vector2(1, 1);
+	data[3].pos = Vector3(-1, -1, 0);
+	data[3].uv0 = Vector2(0, 1);
 
 	//m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0), 4);
 
@@ -109,7 +109,7 @@ void TestSample::initQuadMesh()
 
 void TestSample::render()
 {
-	//m_ColorStructBuffer->commit(m_colorBuffer, m_terrainSize * m_terrainSize * sizeof(Vector3f));
+	//m_ColorStructBuffer->commit(m_colorBuffer, m_terrainSize * m_terrainSize * sizeof(Vector3));
 	m_computerFetchColorToTextureShader->bin();
 
 	//²âÊÔÎÆÀíÎª256x256£¬ÏÈÓ²±àÂë

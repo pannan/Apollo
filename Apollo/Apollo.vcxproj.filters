@@ -78,15 +78,6 @@
     <ClInclude Include="ImGui\stb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Math\Vector2f.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector3f.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector4f.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="Windows\IWindowProc.h">
       <Filter>Windows</Filter>
     </ClInclude>
@@ -95,12 +86,6 @@
     </ClInclude>
     <ClInclude Include="Windows\Win32RenderWindow.h">
       <Filter>Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix3f.h">
-      <Filter>Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix4f.h">
-      <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="DX11\imgui_impl_dx11.h">
       <Filter>Dx11</Filter>
@@ -285,6 +270,15 @@
     <ClInclude Include="DX11\QueryDX11.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Math\Plane.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Frustum.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\AABB.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -308,26 +302,11 @@
     <ClCompile Include="ImGui\imgui_draw.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Math\Vector2f.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Vector3f.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Vector4f.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Windows\RenderWindow.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
     <ClCompile Include="Windows\Win32RenderWindow.cpp">
       <Filter>Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Matrix3f.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Matrix4f.cpp">
-      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="DX11\imgui_impl_dx11.cpp">
       <Filter>Dx11</Filter>
@@ -471,6 +450,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\IRenderable.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Frustum.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\AABB.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

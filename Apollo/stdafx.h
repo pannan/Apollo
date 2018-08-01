@@ -41,6 +41,7 @@
 #include <d3d9.h>
 #include <algorithm>
 
+
 #if defined(_WIN32_WINNT_WIN10) 
 #   include <d3d12.h>
 #   include <dxgi1_4.h>
@@ -146,5 +147,6 @@ enum class ShaderParameterType
 	AppendBuffer,//append struct buffer
 };
 
-
+const float MAX_FLOAT = std::numeric_limits<float>::max();
+const float MIN_FLOAT = std::numeric_limits<float>::min();
 // TODO:  在此处引用程序需要的其他头文件

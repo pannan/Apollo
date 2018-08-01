@@ -1,26 +1,26 @@
 #pragma once
 
-#include "Vector2f.h"
-#include "Vector3f.h"
-#include "Vector4f.h"
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Vector4.h"
 
 namespace Apollo
 {
 	struct  Vertex_Pos
 	{
-		Vector3f pos;
+		Vector3 pos;
 	};
 
 	struct  Vertex_Pos_UV0
 	{
-		Vector3f pos;
-		Vector2f uv0;
+		Vector3 pos;
+		Vector2 uv0;
 	};
 
 	struct  Vertex_Pos_UV0_Normal
 	{
-		Vector3f pos;
-		Vector2f uv0;
-		Vector3f normal;
+		Vector3 pos;
+		Vector2 uv0;
+		Vector3 normal;
 	};
 }

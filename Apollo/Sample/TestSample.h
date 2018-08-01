@@ -3,8 +3,8 @@
 #include "ShaderDX11.h"
 #include "ConstantBufferDX11.h"
 #include "RenderStateDX11.h"
-#include "Vector2f.h"
-#include "Vector3f.h"
+#include "Vector2.h"
+#include "Vector3.h"
 #include "ModelDX11.h"
 
 namespace Apollo
@@ -42,6 +42,6 @@ namespace Apollo
 
 		ModelDX11 m_quadModel;
 
-		Vector3f*			m_colorBuffer;
+		Vector3*			m_colorBuffer;
 	};
 }
