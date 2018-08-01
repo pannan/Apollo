@@ -458,5 +458,8 @@
     <ClCompile Include="Graphics\AABB.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Plane.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

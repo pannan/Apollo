@@ -42,7 +42,7 @@ void AABB::merge(const Vector3& pos)
 		m_max.m_z = pos.m_z;
 }
 
-const Vector3*		AABB::getCotner() const
+const Vector3*		AABB::getCotner() 
 {
 	if (m_isDirty == false)
 		return m_corner;
@@ -56,4 +56,6 @@ const Vector3*		AABB::getCotner() const
 	m_corner[ACI_BACK_RT] = Vector3(m_min.m_x, m_max.m_y, m_max.m_z);
 	m_corner[ACI_FRONT_RB] = Vector3(m_min.m_x, m_min.m_y, m_max.m_z);
 	m_corner[ACI_FRONT_LB] = Vector3(m_max.m_x, m_min.m_y, m_max.m_z);
+
+	return m_corner;
 }

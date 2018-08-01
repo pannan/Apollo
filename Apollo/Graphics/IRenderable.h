@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MaterialDX11.h"
+#include "AABB.h"
 
 namespace Apollo
 {
@@ -25,6 +26,8 @@ namespace Apollo
 		}
 
 		uint32_t			m_handle;// 0-15 material id
+
+		AABB				m_aabb;
 
 	protected:
 	private:

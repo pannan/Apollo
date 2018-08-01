@@ -28,7 +28,11 @@ namespace Apollo
 
 		void			merge(const Vector3& pos);
 
-		const Vector3*	getCotner()const;
+		const Vector3*	getCotner();
+
+		const Vector3& getMin() const { return m_min; }
+
+		const Vector3& getMax() const  { return m_max; }
 
 	protected:
 

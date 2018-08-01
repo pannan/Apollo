@@ -149,4 +149,11 @@ enum class ShaderParameterType
 
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const float MIN_FLOAT = std::numeric_limits<float>::min();
+
+enum PlaneAABBIntersectType
+{
+	PAIT_INSIDE,
+	PAIT_OUTSIDE,
+	PAIT_INTERSECT
+};
 // TODO:  在此处引用程序需要的其他头文件

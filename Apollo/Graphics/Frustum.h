@@ -23,7 +23,7 @@ namespace Apollo
 
 		void				extractionPlane(const Matrix4x4& mat);
 
-		bool				isVisible(const AABB& aabb);
+		bool				isVisible(AABB& aabb);
 
 	protected:
 

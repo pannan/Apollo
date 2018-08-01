@@ -5,6 +5,8 @@
 
 namespace Apollo
 {
+	class AABB;
+
 	class Plane
 	{
 	public:
@@ -18,6 +20,8 @@ namespace Apollo
 		{
 			return a * pos.m_x + b * pos.m_y + c * pos.m_z + d * pos.m_w;
 		}
+
+		PlaneAABBIntersectType	intersectWithAABB(const AABB& aabb);
 
 		float a;
 		float b;

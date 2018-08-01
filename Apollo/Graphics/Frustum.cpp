@@ -36,12 +36,15 @@ void Frustum::extractionPlane(const Matrix4x4& mat)
 	m_frustumPlane[FP_FAR].d = mat.m_matrix[3][3] - mat.m_matrix[3][2];
 }
 
-bool Frustum::isVisible(const AABB& aabb)
+bool Frustum::isVisible(AABB& aabb)
 {
-	const Vector3* corner = aabb.getCotner();
-
-	for (int i = 0;  i < 8; ++i)
+	for (int i = 0; i < 6; ++i)
 	{
+		Plane& plane = m_frustumPlane[i];
 
+		if (plane.intersectWithAABB(aabb) == PAIT_OUTSIDE)
+			return false;
 	}
+
+	return true;
 }

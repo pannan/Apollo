@@ -11,6 +11,8 @@ namespace Apollo
 		Vector3(float x,float y,float z) : m_x(x),m_y(y),m_z(z){}
 		Vector3():m_x(0.0f),m_y(0.0f),m_z(0.0f){}
 
+		Vector3(const Vector3& vec) : m_x(vec.m_x),m_y(vec.m_y),m_z(vec.m_z){}
+
 		float dot(const Vector3& vec3)
 		{
 			return m_x * vec3.m_x + m_y * vec3.m_y + m_z * vec3.m_z;
@@ -39,6 +41,14 @@ namespace Apollo
 		Vector3 operator / (const float& f)const
 		{
 			return Vector3(m_x / f, m_y / f, m_z / f);
+		}
+
+		Vector3 operator = (const Vector3& vec3)
+		{
+			m_x = vec3.m_x;
+			m_y = vec3.m_y;
+			m_z = vec3.m_z;
+			return *this;
 		}
 
 		Vector3 operator *= (const float& f)
