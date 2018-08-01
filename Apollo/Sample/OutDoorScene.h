@@ -5,6 +5,7 @@
 #include "RenderStateDX11.h"
 namespace Apollo
 {
+	//class IRenderable;
 	class OutDoorScene : public SampleBase
 	{
 	public:
@@ -26,6 +27,8 @@ namespace Apollo
 		ConstantBufferDX11Ptr m_matrixBuffer;
 
 		RenderStateDX11 m_renderState;
+
+	//	std::vector<IRenderable*>		m_renderableList;
 
 	private:
 	};	  

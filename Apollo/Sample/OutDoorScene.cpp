@@ -41,6 +41,9 @@ void OutDoorScene::init()
 
 	m_renderState.m_depthStencilDesc.DepthEnable = true;
 	m_renderState.createState();
+
+	//add renderalbe
+
 }
 
 void OutDoorScene::render()
@@ -50,8 +53,7 @@ void OutDoorScene::render()
 	matrixBuffer.MVPMatrix = m_camera->getViewProjMat();
 
 	m_matrixBuffer->set(&matrixBuffer, sizeof(MatrixBuffer));
-	//m_vsShader->bin();
-	//m_psShader->bin();
+
 	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
 
 	RendererDX11::getInstance().clearDebugInfo();

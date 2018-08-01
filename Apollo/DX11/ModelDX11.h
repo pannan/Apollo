@@ -4,6 +4,7 @@
 #include "ShaderDX11.h"
 namespace Apollo
 {
+
 	class ModelDX11
 	{
 	public:
@@ -28,6 +29,8 @@ namespace Apollo
 		std::vector<MeshDX11> m_meshList;
 
 		std::vector<MaterialDX11> m_materialList;
+
+		std::vector<SubMeshDX11*>		m_subMeshList;
 
 	private:
 	};

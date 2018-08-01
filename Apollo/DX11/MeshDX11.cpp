@@ -90,7 +90,10 @@ void MeshDX11::createFromSDKMeshFile(SDKMesh& sdkMesh, uint32 meshIdx)
 		subMesh.m_indexCount = static_cast<uint32>(subset.IndexCount);
 		subMesh.m_vertexStart = static_cast<uint32>(subset.VertexStart);
 		subMesh.m_vertexCount = static_cast<uint32>(subset.VertexCount);
-		subMesh.m_materialID = subset.MaterialID;
+		subMesh.m_subMeshID = i;
+		//subMesh.m_materialID = subset.MaterialID;
+		subMesh.m_parent = this;
+		subMesh.setMaterialID(subset.MaterialID);
 	}
 }
 
@@ -150,18 +153,18 @@ void MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t ver
 	m_subMeshList.push_back(subMesh);
 }
 
+void MeshDX11::bind()const
+{
+	RendererDX11::getInstance().getDeviceContex()->IASetVertexBuffers(0, 1, m_vertexBufferPtr.GetAddressOf(), &m_strideSize, &m_vertexBufferOffset);
+	RendererDX11::getInstance().getDeviceContex()->IASetIndexBuffer(m_indexBufferPtr.Get(), m_indexType, 0);
+	RendererDX11::getInstance().getDeviceContex()->IASetPrimitiveTopology(m_ePrimType);
+}
+
 void MeshDX11::drawSubMesh(uint32_t subMeshID)const
 {
 	if (subMeshID >= m_subMeshList.size())
 		return;
-	RendererDX11::getInstance().getDeviceContex()->IASetVertexBuffers(0, 1, m_vertexBufferPtr.GetAddressOf(), &m_strideSize, &m_vertexBufferOffset);
-	RendererDX11::getInstance().getDeviceContex()->IASetIndexBuffer(m_indexBufferPtr.Get(), m_indexType, 0);
-	RendererDX11::getInstance().getDeviceContex()->IASetPrimitiveTopology(m_ePrimType);
-	//RendererDX11::getInstance().getDeviceContex()->DrawIndexed(m_indexCount, 0, 0);
-	//for (size_t i = 0; i < m_subMeshList.size(); ++i)
-	{
-		const SubMeshDX11& subMesh = m_subMeshList[subMeshID];
-		//RendererDX11::getInstance().getDeviceContex()->DrawIndexed(subMesh.m_indexCount, subMesh.m_indexStart, subMesh.m_vertexStart);
-		RendererDX11::getInstance().drawIndexed(subMesh.m_indexCount, subMesh.m_indexStart, subMesh.m_vertexStart);
-	}
+
+	const SubMeshDX11& subMesh = m_subMeshList[subMeshID];
+	RendererDX11::getInstance().drawIndexed(subMesh.m_indexCount, subMesh.m_indexStart, subMesh.m_vertexStart);	
 }

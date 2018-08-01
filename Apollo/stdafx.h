@@ -39,6 +39,7 @@
 #include <random>
 #include "imgui.h"
 #include <d3d9.h>
+#include <algorithm>
 
 #if defined(_WIN32_WINNT_WIN10) 
 #   include <d3d12.h>

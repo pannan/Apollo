@@ -6,6 +6,13 @@
 #include "MaterialDX11.h"
 using namespace Apollo;
 
+struct DepthSortAscendingLess
+{
+	bool operator()(const IRenderable* a, const IRenderable* b) const
+	{
+		return a->m_handle < b->m_handle;
+	}
+};
 
 void ModelDX11::loadMaterialResources(const MaterialDX11& material)
 {
@@ -72,6 +79,20 @@ void ModelDX11::createFromSDKMeshFile(LPCWSTR fileName, ShaderDX11Ptr vsShader)
 	m_meshList.resize(numMeshes);
 	for (uint32 meshIdx = 0; meshIdx < numMeshes; ++meshIdx)
 		m_meshList[meshIdx].createFromSDKMeshFile(sdkMesh,meshIdx);// Initialize(device, sdkMesh, meshIdx, generateTangentFrame);
+
+	//add submesh list
+	for (size_t meshID = 0; meshID < m_meshList.size(); ++meshID)
+	{
+		const MeshDX11& mesh = m_meshList[meshID];
+
+		for (size_t subMeshID = 0; subMeshID < mesh.m_subMeshList.size(); ++subMeshID)
+		{
+			const SubMeshDX11& subMesh = mesh.m_subMeshList[subMeshID];
+			m_subMeshList.push_back((SubMeshDX11*)(&subMesh));
+		}
+	}
+
+	std::sort(m_subMeshList.begin(), m_subMeshList.end(), DepthSortAscendingLess());
 }
 
 void ModelDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t vertexCount, void* indexBuffer,
@@ -84,21 +105,42 @@ void ModelDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t ve
 
 void ModelDX11::draw()
 {
-	for (size_t meshID = 0; meshID < m_meshList.size(); ++meshID)
+	uint16_t currentMaterialID = -1;
+	MeshDX11* currentMesh = nullptr;
+	for (size_t i = 0; i < m_subMeshList.size(); ++i)
 	{
-		const MeshDX11& mesh = m_meshList[meshID];
-
-		for (size_t subMeshID = 0; subMeshID < mesh.m_subMeshList.size(); ++subMeshID)
+		SubMeshDX11* subMesh = m_subMeshList[i];
+		if (subMesh->m_materialID != currentMaterialID)
 		{
-			const SubMeshDX11& subMesh = mesh.m_subMeshList[subMeshID];
-			const MaterialDX11& material = m_materialList[subMesh.m_materialID];
-
+			currentMaterialID = subMesh->m_materialID;
+			const MaterialDX11& material = m_materialList[currentMaterialID];
 			material.bind();
-
-			mesh.drawSubMesh(subMeshID);
-
-			//material.unBind();
-
 		}
+
+		if (subMesh->m_parent != currentMesh)
+		{
+			currentMesh = subMesh->m_parent;
+			currentMesh->bind();
+		}
+
+		subMesh->m_parent->drawSubMesh(subMesh->m_subMeshID);
 	}
+
+	//for (size_t meshID = 0; meshID < m_meshList.size(); ++meshID)
+	//{
+	//	const MeshDX11& mesh = m_meshList[meshID];
+	//	mesh.bind();
+	//	for (size_t subMeshID = 0; subMeshID < mesh.m_subMeshList.size(); ++subMeshID)
+	//	{
+	//		const SubMeshDX11& subMesh = mesh.m_subMeshList[subMeshID];
+	//		const MaterialDX11& material = m_materialList[subMesh.m_materialID];
+
+	//		material.bind();
+
+	//		mesh.drawSubMesh(subMeshID);
+
+	//		//material.unBind();
+
+	//	}
+	//}
 }

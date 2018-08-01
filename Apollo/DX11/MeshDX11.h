@@ -25,6 +25,8 @@ namespace Apollo
 		D3D11_PRIMITIVE_TOPOLOGY getPrimitiveType() { return m_ePrimType; }
 		void			setPrimitiveType(D3D11_PRIMITIVE_TOPOLOGY type) { m_ePrimType = type; }
 
+		void			bind()const;
+
 	protected:
 
 		void		loadMaterialResources(const MaterialDX11& material);
