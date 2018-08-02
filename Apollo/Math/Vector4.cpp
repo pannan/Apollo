@@ -4,6 +4,8 @@
 
 namespace Apollo
 {
+	Vector4 Vector4::ZERO = Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+
 	float Vector4::dot(const Vector4 vec4)
 	{
 		return m_w * vec4.m_w + m_x * vec4.m_x + m_y * vec4.m_y + m_z * vec4.m_z;

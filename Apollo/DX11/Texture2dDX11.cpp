@@ -31,6 +31,22 @@ Texture2dDX11::~Texture2dDX11()
 	int ii = 0;
 }
 
+void Texture2dDX11::clear(ClearFlags clearFlags,const Vector4& color /* = Vector4::ZERO */, float depth /* = 1.0f */, uint8_t stencil /* = 0 */)
+{
+	if (m_renderTargetViewPtr)
+	{
+		RendererDX11::getInstance().getDeviceContex()->ClearRenderTargetView(m_renderTargetViewPtr.Get(), (float*)&color);
+	}
+
+	if (m_depthStencilViewPtr)
+	{
+		UINT flags = 0;
+		flags |= ((int)clearFlags & (int)ClearFlags::Depth) != 0 ? D3D11_CLEAR_DEPTH : 0;
+		flags |= ((int)clearFlags & (int)ClearFlags::Stencil) != 0 ? D3D11_CLEAR_STENCIL : 0;
+		RendererDX11::getInstance().getDeviceContex()->ClearDepthStencilView(m_depthStencilViewPtr.Get(), flags, depth, stencil);
+	}
+}
+
 void Texture2dDX11::bind(UINT slotID, ShaderType shaderType, ShaderParameterType parameterType)
 {
 }

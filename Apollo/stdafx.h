@@ -156,4 +156,13 @@ enum PlaneAABBIntersectType
 	PAIT_OUTSIDE,
 	PAIT_INTERSECT
 };
+
+enum class ClearFlags : uint8_t
+{
+	Color = 1 << 0,
+	Depth = 1 << 1,
+	Stencil = 1 << 2,
+	DepthStencil = Depth | Stencil,
+	All = Color | Depth | Stencil,
+};
 // TODO:  在此处引用程序需要的其他头文件

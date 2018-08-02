@@ -9,6 +9,8 @@ namespace Apollo
 	{
 	public:
 
+		static Vector4	ZERO;
+
 		Vector4():m_w(0.0f),m_x(0.0f),m_y(0.0f),m_z(0.0f){}	
 		Vector4(float x,float y,float z,float w):m_w(w),m_x(x),m_y(y),m_z(z){}
 			

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TextureResource.h"
+#include "Vector4.h"
 
 namespace Apollo
 {
@@ -16,6 +17,8 @@ namespace Apollo
 			DepthStencilViewComPtr dsv,
 			RenderTargetViewComPtr rtv);
 		virtual ~Texture2dDX11();
+
+		void	clear(ClearFlags clearFlags = ClearFlags::All,const Vector4& color = Vector4::ZERO,float depth = 1.0f,uint8_t stencil = 0);
 	
 		void	bind(UINT slotID,ShaderType shaderType, ShaderParameterType parameterType);
 
