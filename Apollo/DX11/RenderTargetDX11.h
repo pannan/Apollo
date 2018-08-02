@@ -40,13 +40,13 @@ namespace Apollo
 
 		void										attachStructuredBuffer(uint8_t slot,StructuredBufferDX11* structuredBuffer);
 
-		StructuredBufferDX11*		getStructuredBuffer(uint8_t slot);
+		StructuredBufferDX11*			getStructuredBuffer(uint8_t slot);
 
 		void										resize(int width, int height);
 
 		void										bind();
 
-		void										unBind();
+		void										unBind();	
 
 	protected:
 

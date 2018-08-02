@@ -51,3 +51,8 @@ void RenderTargetDX11::clear(ClearFlags clearFlags /* = ClearFlags::All */, cons
 		clear((AttachmentPoint)i,clearFlags,color,depth,stencil);
 	}
 }
+
+void RenderTargetDX11::attachStructuredBuffer(uint8_t slot,StructuredBufferDX11* structuredBuffer)
+{
+	m_structuredBufferList[slot] = structuredBuffer;
+}
