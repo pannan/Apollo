@@ -209,7 +209,7 @@ void HeightMapTerrain::createShader()
 
 	//render shader
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
-	m_vsShader->loadShaderFromFile(VertexShader,
+	m_vsShader->loadShaderFromFile(ShaderType::VertexShader,
 		"../bin/Assets/Shader/HeightTerrain.hlsl",
 		ShaderMacros(),
 		"VSMAIN",
@@ -220,7 +220,7 @@ void HeightMapTerrain::createShader()
 	m_vsShader->setStructuredBuffer("VertexNormalBuffer",m_vertexNormalRWStructBuffer);
 
 	m_psShader = ShaderDX11Ptr(new ShaderDX11());
-	m_psShader->loadShaderFromFile(PixelShader,
+	m_psShader->loadShaderFromFile(ShaderType::PixelShader,
 		"../bin/Assets/Shader/HeightTerrain.hlsl",
 		ShaderMacros(),
 		"PSMAIN",
@@ -234,7 +234,7 @@ void HeightMapTerrain::createShader()
 	//////////////////////////////cs shader////////////////////////////////////////////
 
 	m_computerTriangleNormalShader = ShaderDX11Ptr(new ShaderDX11());
-	m_computerTriangleNormalShader->loadShaderFromFile(ComputeShader,
+	m_computerTriangleNormalShader->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
 		ShaderMacros(),
 		"CS_ComputeTriangleNormal",
@@ -246,7 +246,7 @@ void HeightMapTerrain::createShader()
 	m_computerTriangleNormalShader->setStructuredBuffer("TriangleBuffer", m_TriangleRWStructBuffer);
 
 	m_initShareVertexShader = ShaderDX11Ptr(new ShaderDX11());
-	m_initShareVertexShader->loadShaderFromFile(ComputeShader,
+	m_initShareVertexShader->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
 		ShaderMacros(),
 		"CS_InitShareVertex",
@@ -255,7 +255,7 @@ void HeightMapTerrain::createShader()
 	m_initShareVertexShader->setStructuredBuffer("ShareVertexBuffer", m_shareVertexRWStructBuffer);
 
 	m_computerShareVertexNormal = ShaderDX11Ptr(new ShaderDX11());
-	m_computerShareVertexNormal->loadShaderFromFile(ComputeShader,
+	m_computerShareVertexNormal->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
 		ShaderMacros(),
 		"CS_ComputeShareVertex",
@@ -265,7 +265,7 @@ void HeightMapTerrain::createShader()
 	m_computerShareVertexNormal->setStructuredBuffer("ShareVertexBuffer", m_shareVertexRWStructBuffer);
 
 	m_computerVertexNormal = ShaderDX11Ptr(new ShaderDX11());
-	m_computerVertexNormal->loadShaderFromFile(ComputeShader,
+	m_computerVertexNormal->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/HeightMapNormalCS.hlsl",
 		ShaderMacros(),
 		"CS_ComputeVertexNormal",
@@ -317,7 +317,7 @@ void HeightMapTerrain::render()
 	m_mvpBuffer->set(m_camera->getViewProjMat().m_matrix, sizeof(Matrix4x4));
 	//m_vsShader->bin();
 	//m_psShader->bin();
-	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
+	m_renderState.bind();
 
 	m_terrainModel.draw();
 

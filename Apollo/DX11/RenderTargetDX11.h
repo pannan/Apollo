@@ -38,9 +38,9 @@ namespace Apollo
 
 		void										clear(ClearFlags clearFlags = ClearFlags::All, const Vector4& color = Vector4::ZERO,float depth = 1.0f, uint8_t stencil = 0);
 
-		void										attachStructuredBuffer(uint8_t slot,StructuredBufferDX11* structuredBuffer);
+		//void										attachStructuredBuffer(uint8_t slot,StructuredBufferDX11* structuredBuffer);
 
-		StructuredBufferDX11*			getStructuredBuffer(uint8_t slot);
+		//StructuredBufferDX11*		getStructuredBuffer(uint8_t slot) { return m_structuredBufferList[slot]; }
 
 		void										resize(int width, int height);
 
@@ -58,8 +58,10 @@ namespace Apollo
 
 		std::vector<Texture2dDX11*>			m_textureList;
 
-		std::vector<StructuredBufferDX11*>	m_structuredBufferList;
+		//std::vector<StructuredBufferDX11*>	m_structuredBufferList;
 
 	private:
 	};
+
+	typedef std::shared_ptr<RenderTargetDX11>	RenderTargetDX11Ptr;
 }

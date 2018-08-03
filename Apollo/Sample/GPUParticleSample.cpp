@@ -14,7 +14,7 @@ void GPUParticleSample::init()
 {
 	//创建insert shader
 	m_insertParticleCS = ShaderDX11Ptr(new ShaderDX11());
-	m_insertParticleCS->loadShaderFromFile(ComputeShader,
+	m_insertParticleCS->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/ParticleSystemInsertCS.hlsl",
 		ShaderMacros(),
 		"CSMAIN",
@@ -48,7 +48,7 @@ void GPUParticleSample::init()
 
 	//创建并初始化 particle update shader
 	m_updateParticleCS = ShaderDX11Ptr(new ShaderDX11());
-	m_updateParticleCS->loadShaderFromFile(ComputeShader,
+	m_updateParticleCS->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/ParticleSystemUpdateCS.hlsl",
 		ShaderMacros(),
 		"CSMAIN",
@@ -94,7 +94,7 @@ void GPUParticleSample::init()
 	//创建并初始化粒子渲染shader
 	//VS
 	m_renderParticleVS = ShaderDX11Ptr(new ShaderDX11());
-	m_renderParticleVS->loadShaderFromFile(VertexShader,
+	m_renderParticleVS->loadShaderFromFile(ShaderType::VertexShader,
 		"../bin/Assets/Shader/ParticleSystemRender.hlsl",
 		ShaderMacros(),
 		"VSMAIN",
@@ -104,7 +104,7 @@ void GPUParticleSample::init()
 
 	//GS
 	m_renderParticleGS = ShaderDX11Ptr(new ShaderDX11());
-	m_renderParticleGS->loadShaderFromFile(GeometryShader,
+	m_renderParticleGS->loadShaderFromFile(ShaderType::GeometryShader,
 		"../bin/Assets/Shader/ParticleSystemRender.hlsl",
 		ShaderMacros(),
 		"GSMAIN",

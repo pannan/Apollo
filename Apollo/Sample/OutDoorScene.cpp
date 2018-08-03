@@ -29,7 +29,7 @@ void OutDoorScene::init()
 	m_camera->setViewportHeight(800);
 
 	ShaderDX11Ptr vs = ShaderDX11Ptr(new ShaderDX11());
-	vs->loadShaderFromFile(VertexShader,
+	vs->loadShaderFromFile(ShaderType::VertexShader,
 	"../bin/Assets/Shader/Mesh.hlsl",
 	ShaderMacros(),
 	"VSMAIN",
@@ -54,7 +54,7 @@ void OutDoorScene::render()
 
 	m_matrixBuffer->set(&matrixBuffer, sizeof(MatrixBuffer));
 
-	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
+	m_renderState.bind();
 
 	RendererDX11::getInstance().clearDebugInfo();
 	m_modelScene.draw();

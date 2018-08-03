@@ -170,22 +170,22 @@ void ShaderParameterDX11::bind()
 		{
 			switch (m_shaderType)
 			{
-			case VertexShader:
+			case ShaderType::VertexShader:
 				RendererDX11::getInstance().getDeviceContex()->VSSetShaderResources(m_slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
 				break;
-			case TessellationControlShader:
+			case ShaderType::TessellationControlShader:
 				RendererDX11::getInstance().getDeviceContex()->HSSetShaderResources(m_slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
 				break;
-			case TessellationEvaluationShader:
+			case ShaderType::TessellationEvaluationShader:
 				RendererDX11::getInstance().getDeviceContex()->DSSetShaderResources(m_slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
 				break;
-			case GeometryShader:
+			case ShaderType::GeometryShader:
 				RendererDX11::getInstance().getDeviceContex()->GSSetShaderResources(m_slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
 				break;
-			case PixelShader:
+			case ShaderType::PixelShader:
 				RendererDX11::getInstance().getDeviceContex()->PSSetShaderResources(m_slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
 				break;
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetShaderResources(m_slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
 				break;
 			}
@@ -194,7 +194,7 @@ void ShaderParameterDX11::bind()
 		{
 			switch (m_shaderType)
 			{
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetUnorderedAccessViews(m_slotID, 1, m_unorderedAccessViewPtr.GetAddressOf(), nullptr);
 				break;
 			}
@@ -214,22 +214,22 @@ void ShaderParameterDX11::bind()
 
 			switch (m_shaderType)
 			{
-			case VertexShader:
+			case ShaderType::VertexShader:
 				RendererDX11::getInstance().getDeviceContex()->VSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case TessellationControlShader:
+			case ShaderType::TessellationControlShader:
 				RendererDX11::getInstance().getDeviceContex()->HSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case TessellationEvaluationShader:
+			case ShaderType::TessellationEvaluationShader:
 				RendererDX11::getInstance().getDeviceContex()->DSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case GeometryShader:
+			case ShaderType::GeometryShader:
 				RendererDX11::getInstance().getDeviceContex()->GSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case PixelShader:
+			case ShaderType::PixelShader:
 				RendererDX11::getInstance().getDeviceContex()->PSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetShaderResources(m_slotID, 1, srv);
 				break;
 			}
@@ -239,7 +239,7 @@ void ShaderParameterDX11::bind()
 			ID3D11UnorderedAccessView* uav[] = { m_unorderedAccessViewPtr.Get() };
 			switch (m_shaderType)
 			{
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetUnorderedAccessViews(m_slotID, 1, uav, nullptr);
 				break;
 			}
@@ -259,22 +259,22 @@ void ShaderParameterDX11::unBind()
 		{
 			switch (m_shaderType)
 			{
-			case VertexShader:
+			case ShaderType::VertexShader:
 				RendererDX11::getInstance().getDeviceContex()->VSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case TessellationControlShader:
+			case ShaderType::TessellationControlShader:
 				RendererDX11::getInstance().getDeviceContex()->HSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case TessellationEvaluationShader:
+			case ShaderType::TessellationEvaluationShader:
 				RendererDX11::getInstance().getDeviceContex()->DSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case GeometryShader:
+			case ShaderType::GeometryShader:
 				RendererDX11::getInstance().getDeviceContex()->GSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case PixelShader:
+			case ShaderType::PixelShader:
 				RendererDX11::getInstance().getDeviceContex()->PSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetShaderResources(m_slotID, 1, srv);
 				break;
 			}
@@ -283,7 +283,7 @@ void ShaderParameterDX11::unBind()
 		{
 			switch (m_shaderType)
 			{
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetUnorderedAccessViews(m_slotID, 1, uav, nullptr);
 				break;
 			}
@@ -302,22 +302,22 @@ void ShaderParameterDX11::unBind()
 		{
 			switch (m_shaderType)
 			{
-			case VertexShader:
+			case ShaderType::VertexShader:
 				RendererDX11::getInstance().getDeviceContex()->VSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case TessellationControlShader:
+			case ShaderType::TessellationControlShader:
 				RendererDX11::getInstance().getDeviceContex()->HSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case TessellationEvaluationShader:
+			case ShaderType::TessellationEvaluationShader:
 				RendererDX11::getInstance().getDeviceContex()->DSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case GeometryShader:
+			case ShaderType::GeometryShader:
 				RendererDX11::getInstance().getDeviceContex()->GSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case PixelShader:
+			case ShaderType::PixelShader:
 				RendererDX11::getInstance().getDeviceContex()->PSSetShaderResources(m_slotID, 1, srv);
 				break;
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetShaderResources(m_slotID, 1, srv);
 				break;
 			}
@@ -326,7 +326,7 @@ void ShaderParameterDX11::unBind()
 		{
 			switch (m_shaderType)
 			{
-			case ComputeShader:
+			case ShaderType::ComputeShader:
 				RendererDX11::getInstance().getDeviceContex()->CSSetUnorderedAccessViews(m_slotID, 1, uav, nullptr);
 				break;
 			}

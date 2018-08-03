@@ -294,6 +294,12 @@
     <ClInclude Include="Graphics\ClearRenderTargetPass.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\BasePass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\RenderState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -477,6 +483,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DX11\RenderTargetDX11.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\ClearRenderTargetPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\BasePass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

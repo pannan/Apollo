@@ -30,6 +30,8 @@ namespace Apollo
 
 		ID3D11DepthStencilView*	getDepthStencilView() { return m_depthStencilViewPtr.Get(); }
 
+		ID3D11RenderTargetView*	getRendertargetView() { return m_renderTargetViewPtr.Get(); }
+
 	protected:
 
 		DepthStencilViewComPtr			m_depthStencilViewPtr;

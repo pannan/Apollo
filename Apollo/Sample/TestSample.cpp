@@ -52,14 +52,14 @@ void TestSample::init()
 
 	//create shader
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
-	m_vsShader->loadShaderFromFile(VertexShader,
+	m_vsShader->loadShaderFromFile(ShaderType::VertexShader,
 		"../bin/Assets/Shader/TextureVS.hlsl",
 		ShaderMacros(),
 		"VSMAIN",
 		"vs_5_0");
 
 	m_psShader = ShaderDX11Ptr(new ShaderDX11());
-	m_psShader->loadShaderFromFile(PixelShader,
+	m_psShader->loadShaderFromFile(ShaderType::PixelShader,
 		"../bin/Assets/Shader/TexturePS.hlsl",
 		ShaderMacros(),
 		"PSMAIN",
@@ -72,7 +72,7 @@ void TestSample::init()
 	m_quadModel.addMaterial(material);
 
 	m_computerFetchColorToTextureShader = ShaderDX11Ptr(new ShaderDX11());
-	m_computerFetchColorToTextureShader->loadShaderFromFile(ComputeShader,
+	m_computerFetchColorToTextureShader->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/Test_CS.hlsl",
 		ShaderMacros(),
 		"CS_Color",
@@ -119,7 +119,7 @@ void TestSample::render()
 
 	//draw tex
 	//RenderStateDX11::getInstance().setRenderState();
-	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
+	m_renderState.bind();
 	//m_vsShader->bin();
 	//m_psShader->bin();
 	float bf[4] = { 1,1,1,1 };

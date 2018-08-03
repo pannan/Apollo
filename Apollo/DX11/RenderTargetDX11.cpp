@@ -13,13 +13,13 @@ RenderTargetDX11::RenderTargetDX11()
 	m_deviceContext = RendererDX11::getInstance().getDeviceContex();
 
 	m_textureList.resize((size_t)AttachmentPoint::NumAttachmentPoints);
-	m_structuredBufferList.resize(8);
+	//m_structuredBufferList.resize(8);
 
 	for (size_t i = 0; i < (size_t)AttachmentPoint::NumAttachmentPoints; ++i)
 		m_textureList[i] = nullptr;
 
-	for (size_t i = 0; i < 8; ++i)
-		m_structuredBufferList[i] = nullptr;
+	//for (size_t i = 0; i < 8; ++i)
+	//	m_structuredBufferList[i] = nullptr;
 }
 
 RenderTargetDX11::~RenderTargetDX11()
@@ -52,7 +52,61 @@ void RenderTargetDX11::clear(ClearFlags clearFlags /* = ClearFlags::All */, cons
 	}
 }
 
-void RenderTargetDX11::attachStructuredBuffer(uint8_t slot,StructuredBufferDX11* structuredBuffer)
+//void RenderTargetDX11::attachStructuredBuffer(uint8_t slot,StructuredBufferDX11* structuredBuffer)
+//{
+//	m_structuredBufferList[slot] = structuredBuffer;
+//}
+
+void RenderTargetDX11::resize(int width, int height)
 {
-	m_structuredBufferList[slot] = structuredBuffer;
+
+}
+
+void RenderTargetDX11::bind()
+{
+	ID3D11RenderTargetView* renderTargetViews[8];
+	UINT numRTVs = 0;
+
+	for (uint8_t i = 0; i < 8; i++)
+	{
+		Texture2dDX11* tex = m_textureList[i];
+		if (tex)
+		{
+			renderTargetViews[numRTVs++] = tex->getRendertargetView();
+		}
+	}
+
+	/*ID3D11UnorderedAccessView* uavViews[8];
+	UINT uavStartSlot = numRTVs;
+	UINT numUAVs = 0;
+
+	for (uint8_t i = 0; i < 8; i++)
+	{
+		StructuredBufferDX11* rwBuffer = m_structuredBufferList[i];
+		if (rwBuffer)
+		{
+			uavViews[numUAVs++] = rwbuffer->GetUnorderedAccessView();
+		}
+	}*/
+
+	ID3D11DepthStencilView* depthStencilView = nullptr;
+	Texture2dDX11* depthTexture = m_textureList[(uint8_t)AttachmentPoint::Depth];
+	Texture2dDX11* depthStencilTexture = m_textureList[(uint8_t)AttachmentPoint::DepthStencil];
+
+	if (depthTexture)
+	{
+		depthStencilView = depthTexture->getDepthStencilView();
+	}
+	else if (depthStencilTexture)
+	{
+		depthStencilView = depthStencilTexture->getDepthStencilView();
+	}
+
+	//m_deviceContext->OMSetRenderTargetsAndUnorderedAccessViews(numRTVs, renderTargetViews, depthStencilView, uavStartSlot, numUAVs, uavViews, nullptr);
+	m_deviceContext->OMSetRenderTargets(numRTVs, renderTargetViews, depthStencilView);
+}
+
+void RenderTargetDX11::unBind()
+{
+
 }

@@ -75,6 +75,8 @@ RenderStateDX11::RenderStateDX11()
 	m_rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	m_rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	m_rasterizerDesc.FrontCounterClockwise = false;
+
+	m_deviceContext = RendererDX11::getInstance().getDeviceContex();
 }
 
 void RenderStateDX11::createState()
@@ -93,13 +95,31 @@ RenderStateDX11::~RenderStateDX11()
 	SAFE_RELEASE(m_samplerState);
 }
 
-void RenderStateDX11::setRenderState(ID3D11DeviceContext* dc)
+void RenderStateDX11::bind()
 {
-	dc->RSSetScissorRects(1, &m_scissorRects);
-	dc->RSSetViewports(1, &m_viewports);
-	dc->RSSetState(m_rasterizerState);
-	dc->OMSetBlendState(m_blendState, m_blendFactor, m_sampleMask);
-	dc->OMSetDepthStencilState(m_depthStencilState, m_stencilRef); 
-	dc->PSSetSamplers(0, 1, &m_samplerState);
-	dc->IASetPrimitiveTopology(m_primitiveTopology);
+	m_deviceContext->RSSetScissorRects(1, &m_scissorRects);
+	m_deviceContext->RSSetViewports(1, &m_viewports);
+	m_deviceContext->RSSetState(m_rasterizerState);
+	m_deviceContext->OMSetBlendState(m_blendState, m_blendFactor, m_sampleMask);
+	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, m_stencilRef);
+	m_deviceContext->PSSetSamplers(0, 1, &m_samplerState);
+	m_deviceContext->IASetPrimitiveTopology(m_primitiveTopology);
+
+	if (m_renderTarget)
+		m_renderTarget->bind();
+}
+
+void RenderStateDX11::unBind()
+{
+
+}
+
+void RenderStateDX11::setShader(ShaderType type, ShaderDX11Ptr& shader)
+{
+	m_shaderList[(uint8_t)type] = shader;
+}
+
+ShaderDX11Ptr& RenderStateDX11::getShader(ShaderType type)
+{
+	return m_shaderList[(uint8_t)type];
 }

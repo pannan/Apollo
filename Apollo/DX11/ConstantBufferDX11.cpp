@@ -48,22 +48,22 @@ bool ConstantBufferDX11::bind(unsigned int id, ShaderType shaderType, ShaderPara
 
 	switch (shaderType)
 	{
-	case VertexShader:
+	case ShaderType::VertexShader:
 		RendererDX11::getInstance().getDeviceContex()->VSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case TessellationControlShader:
+	case ShaderType::TessellationControlShader:
 		RendererDX11::getInstance().getDeviceContex()->HSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case TessellationEvaluationShader:
+	case ShaderType::TessellationEvaluationShader:
 		RendererDX11::getInstance().getDeviceContex()->DSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case GeometryShader:
+	case ShaderType::GeometryShader:
 		RendererDX11::getInstance().getDeviceContex()->GSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case PixelShader:
+	case ShaderType::PixelShader:
 		RendererDX11::getInstance().getDeviceContex()->PSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case ComputeShader:
+	case ShaderType::ComputeShader:
 		RendererDX11::getInstance().getDeviceContex()->CSSetConstantBuffers(id, 1, pBuffers);
 		break;
 	default:
@@ -80,22 +80,22 @@ void ConstantBufferDX11::unBind(unsigned int id, ShaderType shaderType, ShaderPa
 
 	switch (shaderType)
 	{
-	case VertexShader:
+	case ShaderType::VertexShader:
 		RendererDX11::getInstance().getDeviceContex()->VSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case TessellationControlShader:
+	case ShaderType::TessellationControlShader:
 		RendererDX11::getInstance().getDeviceContex()->HSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case TessellationEvaluationShader:
+	case ShaderType::TessellationEvaluationShader:
 		RendererDX11::getInstance().getDeviceContex()->DSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case GeometryShader:
+	case ShaderType::GeometryShader:
 		RendererDX11::getInstance().getDeviceContex()->GSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case PixelShader:
+	case ShaderType::PixelShader:
 		RendererDX11::getInstance().getDeviceContex()->PSSetConstantBuffers(id, 1, pBuffers);
 		break;
-	case ComputeShader:
+	case ShaderType::ComputeShader:
 		RendererDX11::getInstance().getDeviceContex()->CSSetConstantBuffers(id, 1, pBuffers);
 		break;
 	default:

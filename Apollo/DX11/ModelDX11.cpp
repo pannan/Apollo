@@ -64,7 +64,7 @@ void ModelDX11::createFromSDKMeshFile(LPCWSTR fileName, ShaderDX11Ptr vsShader)
 		material.m_vs = vsShader;
 
 		material.m_ps = ShaderDX11Ptr(new ShaderDX11());
-		material.m_ps->loadShaderFromFile(PixelShader,
+		material.m_ps->loadShaderFromFile(ShaderType::PixelShader,
 			"../bin/Assets/Shader/Mesh.hlsl",
 			ShaderMacros(),
 			"PSMAIN",

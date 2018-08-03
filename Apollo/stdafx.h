@@ -125,15 +125,16 @@ typedef std::vector< Microsoft::WRL::ComPtr<ID3D11Query> > QueryBufferComPtr;
 
 typedef std::map< std::string, std::string > ShaderMacros;
 
-enum ShaderType
+enum class ShaderType : uint8_t
 {
-	UnknownShaderType = 0,
+	//UnknownShaderType = 0,
 	VertexShader,
 	TessellationControlShader,      // Hull Shader in DirectX
 	TessellationEvaluationShader,   // Domain Shader in DirectX
 	GeometryShader,
 	PixelShader,
 	ComputeShader,
+	ShaderTypeCount,
 };
 
 enum class ShaderParameterType

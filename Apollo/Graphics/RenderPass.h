@@ -4,6 +4,8 @@
 
 namespace Apollo
 {
+	class RenderState;
+
 	class RenderPass : public Visitor
 	{
 	public:
@@ -12,14 +14,14 @@ namespace Apollo
 
 		bool				getEnable() { return m_enable; }
 
-		virtual	void	preRender() = 0;
+		virtual	void	preRender(RenderState& renderState) {}
 
-		virtual	void render() = 0;
+		virtual	void render(RenderState& renderState) = 0;
 
-		virtual	void postRender() = 0;
+		virtual	void postRender(RenderState& renderState) {}
 
-		virtual void visit(Scene& scene) = 0;
-		virtual void visit(SceneNode& node) = 0;
+		virtual void visit(Scene& scene) {}
+		virtual void visit(SceneNode& node) {}
 		//virtual void Visit(Mesh& mesh) = 0;
 
 	protected:

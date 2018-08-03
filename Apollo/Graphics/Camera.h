@@ -107,4 +107,6 @@ namespace Apollo
 
 		Vector2		m_lastMousePos;
 	};
+
+	typedef std::shared_ptr<Camera> CameraPtr;
 }

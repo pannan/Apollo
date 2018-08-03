@@ -41,14 +41,14 @@ void ComputerShaderProcessTexture::init()
 	//Texture2dDX11Ptr srcTexPtr(srcTex2d);
 
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
-	m_vsShader->loadShaderFromFile(VertexShader,
+	m_vsShader->loadShaderFromFile(ShaderType::VertexShader,
 		"../bin/Assets/Shader/TextureVS.hlsl",
 		ShaderMacros(),
 		"VSMAIN",
 		"vs_5_0");
 
 	m_psShader = ShaderDX11Ptr(new ShaderDX11());
-	m_psShader->loadShaderFromFile(PixelShader,
+	m_psShader->loadShaderFromFile(ShaderType::PixelShader,
 		"../bin/Assets/Shader/TexturePS.hlsl",
 		ShaderMacros(),
 		"PSMAIN",
@@ -62,7 +62,7 @@ void ComputerShaderProcessTexture::init()
 	m_quadModel.addMaterial(material);
 
 	m_csShader = ShaderDX11Ptr(new ShaderDX11());
-	m_csShader->loadShaderFromFile(ComputeShader,
+	m_csShader->loadShaderFromFile(ShaderType::ComputeShader,
 		"../bin/Assets/Shader/InvertColorCS.hlsl",
 		ShaderMacros(),
 		"CSMAIN",
@@ -110,7 +110,7 @@ void ComputerShaderProcessTexture::render()
 
 	//draw tex
 	//RenderStateDX11::getInstance().setRenderState();
-	m_renderState.setRenderState(RendererDX11::getInstance().getDeviceContex());
+	m_renderState.bind();
 	//m_vsShader->bin();
 	//m_psShader->bin();
 	float bf[4] = { 1,1,1,1 };

@@ -106,7 +106,7 @@ std::string ShaderDX11::getLatestProfile(ShaderType type)
 
 	switch (type)
 	{
-	case VertexShader:
+	case ShaderType::VertexShader:
 		switch (featureLevel)
 		{
 		case D3D_FEATURE_LEVEL_11_1:
@@ -128,7 +128,7 @@ std::string ShaderDX11::getLatestProfile(ShaderType type)
 			break;
 		}
 		break;
-	case TessellationControlShader:
+	case ShaderType::TessellationControlShader:
 		switch (featureLevel)
 		{
 		case D3D_FEATURE_LEVEL_11_1:
@@ -137,7 +137,7 @@ std::string ShaderDX11::getLatestProfile(ShaderType type)
 			break;
 		}
 		break;
-	case TessellationEvaluationShader:
+	case ShaderType::TessellationEvaluationShader:
 		switch (featureLevel)
 		{
 		case D3D_FEATURE_LEVEL_11_1:
@@ -146,7 +146,7 @@ std::string ShaderDX11::getLatestProfile(ShaderType type)
 			break;
 		}
 		break;
-	case GeometryShader:
+	case ShaderType::GeometryShader:
 		switch (featureLevel)
 		{
 		case D3D_FEATURE_LEVEL_11_1:
@@ -161,7 +161,7 @@ std::string ShaderDX11::getLatestProfile(ShaderType type)
 			break;
 		}
 		break;
-	case PixelShader:
+	case ShaderType::PixelShader:
 		switch (featureLevel)
 		{
 		case D3D_FEATURE_LEVEL_11_1:
@@ -183,7 +183,7 @@ std::string ShaderDX11::getLatestProfile(ShaderType type)
 			break;
 		}
 		break;
-	case ComputeShader:
+	case ShaderType::ComputeShader:
 		switch (featureLevel)
 		{
 		case D3D_FEATURE_LEVEL_11_1:
@@ -310,22 +310,22 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 	switch (m_shaderType)
 	{
-	case VertexShader:
+	case ShaderType::VertexShader:
 		hr = pdevice->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
 		break;
-	case TessellationControlShader:
+	case ShaderType::TessellationControlShader:
 		hr = pdevice->CreateHullShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_hullShader.GetAddressOf());
 		break;
-	case TessellationEvaluationShader:
+	case ShaderType::TessellationEvaluationShader:
 		hr = pdevice->CreateDomainShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_domainShader.GetAddressOf());
 		break;
-	case GeometryShader:
+	case ShaderType::GeometryShader:
 		hr = pdevice->CreateGeometryShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_geometrySHader.GetAddressOf());
 		break;
-	case PixelShader:
+	case ShaderType::PixelShader:
 		hr = pdevice->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
 		break;
-	case ComputeShader:
+	case ShaderType::ComputeShader:
 		hr = pdevice->CreateComputeShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_computeShader.GetAddressOf());
 		break;
 	default:
@@ -362,7 +362,7 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 
 	//m_InputSemantics.clear();
 
-	if (m_shaderType == VertexShader)
+	if (m_shaderType == ShaderType::VertexShader)
 	{
 		UINT numInputParameters = shaderDescription.InputParameters;
 		std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;

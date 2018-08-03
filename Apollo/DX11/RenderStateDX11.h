@@ -1,8 +1,14 @@
 #pragma once
 
+#include "RenderState.h"
+#include "ShaderDX11.h"
+#include "RenderTargetDX11.h"
+#include "Camera.h"
+
 namespace Apollo
 {
-	class RenderStateDX11 
+
+	class RenderStateDX11 : public RenderState
 	{
 	public:
 
@@ -10,9 +16,23 @@ namespace Apollo
 
 		~RenderStateDX11();
 
-		void		setRenderState(ID3D11DeviceContext* dc);
+		virtual void		bind();
+
+		virtual void		unBind();
 
 		void		createState();
+
+		void		setShader(ShaderType type, ShaderDX11Ptr& shader);
+
+		ShaderDX11Ptr&		getShader(ShaderType type);
+
+		void		setRenderTarget(RenderTargetDX11Ptr& rtt) { m_renderTarget = rtt; }
+
+		RenderTargetDX11Ptr&		getRenderTarget() { return m_renderTarget; }
+
+		void		setCamera(CameraPtr& cam) { m_camera = cam; }
+
+		CameraPtr&	 getCamera() { return m_camera; }
 
 //	private:
 
@@ -30,7 +50,17 @@ namespace Apollo
 		D3D11_RASTERIZER_DESC	m_rasterizerDesc;
 		D3D11_BLEND_DESC			m_blendDesc;
 		D3D11_DEPTH_STENCIL_DESC	m_depthStencilDesc;
-		D3D11_SAMPLER_DESC		m_samplerDesc;
-	
+		D3D11_SAMPLER_DESC		m_samplerDesc;	
+
+	protected:
+
+		ID3D11DeviceContext*		m_deviceContext;
+
+		ShaderDX11Ptr				m_shaderList[(uint8_t)ShaderType::ShaderTypeCount];
+
+		RenderTargetDX11Ptr		m_renderTarget;
+
+		CameraPtr						m_camera;
+
 	};
 }

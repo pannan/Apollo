@@ -169,6 +169,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\miniz.h" />
     <ClInclude Include="Base\ofbx.h" />
     <ClInclude Include="Base\Query.h" />
+    <ClInclude Include="Base\RenderState.h" />
     <ClInclude Include="Base\Resource.h" />
     <ClInclude Include="Base\ResourceManager.h" />
     <ClInclude Include="Base\Singleton.h" />
@@ -196,6 +197,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\TextureCubeMapDX11.h" />
     <ClInclude Include="DX11\TextureDX11ResourceFactory.h" />
     <ClInclude Include="Graphics\AABB.h" />
+    <ClInclude Include="Graphics\BasePass.h" />
     <ClInclude Include="Graphics\Camera.h" />
     <ClInclude Include="Graphics\ClearRenderTargetPass.h" />
     <ClInclude Include="Graphics\Frustum.h" />
@@ -253,6 +255,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Base\ResourceManager.cpp" />
     <ClCompile Include="Base\Timer.cpp" />
     <ClCompile Include="DX11\BufferManagerDX11.cpp" />
+    <ClCompile Include="DX11\ClearRenderTargetPass.cpp" />
     <ClCompile Include="DX11\ConstantBufferDX11.cpp" />
     <ClCompile Include="DX11\GeometryDX11.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
@@ -272,6 +275,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureCubeMapDX11.cpp" />
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Graphics\AABB.cpp" />
+    <ClCompile Include="Graphics\BasePass.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\Frustum.cpp" />
     <ClCompile Include="Graphics\IRenderable.cpp" />
