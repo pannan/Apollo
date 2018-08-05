@@ -107,7 +107,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;.\ImGui;.\Math;.\Windows;.\Lib\freetype\include;.\UI;.\third_party;.\third_party\boost_context\include;.\third_party\DirectXTex\include;.\Graphics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;.\ImGui;.\Math;.\Windows;.\Lib\freetype\include;.\UI;.\third_party;.\third_party\boost_context\include;.\third_party\DirectXTex\include;.\Graphics;.\Scene;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -197,12 +197,10 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\TextureCubeMapDX11.h" />
     <ClInclude Include="DX11\TextureDX11ResourceFactory.h" />
     <ClInclude Include="Graphics\AABB.h" />
-    <ClInclude Include="Graphics\BasePass.h" />
     <ClInclude Include="Graphics\Camera.h" />
     <ClInclude Include="Graphics\ClearRenderTargetPass.h" />
     <ClInclude Include="Graphics\Frustum.h" />
     <ClInclude Include="Graphics\IRenderable.h" />
-    <ClInclude Include="Graphics\IScene.h" />
     <ClInclude Include="Graphics\RenderPass.h" />
     <ClInclude Include="Graphics\ScreenSpaceRenderPass.h" />
     <ClInclude Include="Graphics\SDKMesh.h" />
@@ -228,6 +226,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\SampleManager.h" />
     <ClInclude Include="Sample\TestSample.h" />
     <ClInclude Include="Scene\Scene.h" />
+    <ClInclude Include="Scene\SceneNode.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UI\AssetsDirectoryViewUI.h" />
@@ -275,10 +274,11 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureCubeMapDX11.cpp" />
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Graphics\AABB.cpp" />
-    <ClCompile Include="Graphics\BasePass.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\Frustum.cpp" />
     <ClCompile Include="Graphics\IRenderable.cpp" />
+    <ClCompile Include="Graphics\RenderPass.cpp" />
+    <ClCompile Include="Graphics\Scene.cpp" />
     <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp" />
     <ClCompile Include="Graphics\SDKMesh.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />

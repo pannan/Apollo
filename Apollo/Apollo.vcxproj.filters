@@ -165,9 +165,6 @@
     <ClInclude Include="Graphics\IRenderable.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\IScene.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\Task.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -294,10 +291,10 @@
     <ClInclude Include="Graphics\ClearRenderTargetPass.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\BasePass.h">
+    <ClInclude Include="Base\RenderState.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Base\RenderState.h">
+    <ClInclude Include="Scene\SceneNode.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -488,7 +485,10 @@
     <ClCompile Include="DX11\ClearRenderTargetPass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\BasePass.cpp">
+    <ClCompile Include="Graphics\Scene.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\RenderPass.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -21,6 +21,8 @@ namespace Apollo
 
 		uint16_t	getMaterialID() { return m_materialID; }
 
+		void			render();
+
 	protected:
 
 		uint32_t					m_indexStart;
