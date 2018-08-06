@@ -6,9 +6,12 @@
 namespace Apollo
 {
 	class RenderState;
+
 	class RenderPass// : public Visitor
 	{
 	public:
+
+		RenderPass(ScenePtr& scene, RenderState* renderState);
 
 		void				setEnable(bool enable) { m_enable = enable; }
 
@@ -31,5 +34,8 @@ namespace Apollo
 
 		ScenePtr		m_scene;
 
+		RenderState*	m_renderState;
 	};
+
+	typedef std::shared_ptr<RenderPass>	RenderPassPtr;
 }

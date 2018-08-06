@@ -42,6 +42,10 @@ void OutDoorScene::init()
 	m_renderState.m_depthStencilDesc.DepthEnable = true;
 	m_renderState.createState();
 
+	//create scene
+	m_scenePtr = ScenePtr(new Scene);
+
+	m_renderPassPtr = RenderPassPtr(new RenderPass)
 	//add renderalbe
 
 }

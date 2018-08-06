@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RenderState.h"
 #include "ShaderDX11.h"
 #include "RenderTargetDX11.h"
 #include "Camera.h"
@@ -8,7 +7,7 @@
 namespace Apollo
 {
 
-	class RenderStateDX11 : public RenderState
+	class RenderStateDX11
 	{
 	public:
 

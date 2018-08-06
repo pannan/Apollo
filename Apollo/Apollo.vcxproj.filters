@@ -303,7 +303,7 @@
     <ClInclude Include="Base\Visitor.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="RenderState.h">
+    <ClInclude Include="Base\RenderState.h">
       <Filter>Base</Filter>
     </ClInclude>
   </ItemGroup>

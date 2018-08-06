@@ -17,6 +17,10 @@ namespace Apollo
 
 		void		addMaterial(const MaterialDX11& mat) { m_materialList.push_back(mat); }
 
+		uint32_t	getSubMeshCount() { return m_subMeshList.size(); }
+
+		SubMeshDX11*		getSubMesh(uint32_t index) { return m_subMeshList[index]; }
+
 	protected:
 
 		void		loadMaterialResources(const MaterialDX11& material);

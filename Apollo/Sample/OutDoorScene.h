@@ -3,6 +3,9 @@
 #include "ModelDX11.h"
 #include "ConstantBufferDX11.h"
 #include "RenderStateDX11.h"
+#include "Scene.h"
+#include "RenderPass.h"
+
 namespace Apollo
 {
 	//class IRenderable;
@@ -28,6 +31,9 @@ namespace Apollo
 
 		RenderStateDX11 m_renderState;
 
+		ScenePtr				m_scenePtr;
+
+		RenderPassPtr		m_renderPassPtr;
 	//	std::vector<IRenderable*>		m_renderableList;
 
 	private:
