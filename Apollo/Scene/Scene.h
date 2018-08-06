@@ -20,6 +20,8 @@ namespace Apollo
 
 		virtual	void		render();
 
+		virtual	void		addRenderable(IRenderable* renderable);
+
 		//virtual void		accept(Visitor* visitor);
 
 	protected:

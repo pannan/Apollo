@@ -5,6 +5,7 @@ using namespace  Apollo;
 
 void IRenderable::setMaterialID(uint16_t id)
 {
+	m_materialID = id;
 	uint32_t temp = id;
 	//∞—µÕ16Œª«Â¡„
 	m_handle &= 0xffff0000;

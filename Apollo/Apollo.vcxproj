@@ -169,7 +169,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\miniz.h" />
     <ClInclude Include="Base\ofbx.h" />
     <ClInclude Include="Base\Query.h" />
-    <ClInclude Include="Base\RenderState.h" />
     <ClInclude Include="Base\Resource.h" />
     <ClInclude Include="Base\ResourceManager.h" />
     <ClInclude Include="Base\Singleton.h" />
@@ -191,6 +190,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\RenderTargetDX11.h" />
     <ClInclude Include="DX11\ShaderDX11.h" />
     <ClInclude Include="DX11\ShaderParameterDX11.h" />
+    <ClInclude Include="DX11\StructuredBufferDX11.h" />
     <ClInclude Include="DX11\SubMeshDX11.h" />
     <ClInclude Include="DX11\Texture2dConfigDX11.h" />
     <ClInclude Include="DX11\Texture2dDX11.h" />
@@ -218,6 +218,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Vector2.h" />
     <ClInclude Include="Math\Vector3.h" />
     <ClInclude Include="Math\Vector4.h" />
+    <ClInclude Include="RenderState.h" />
     <ClInclude Include="Sample\ComputerShaderProcessTexture.h" />
     <ClInclude Include="Sample\GPUParticleSample.h" />
     <ClInclude Include="Sample\HeightMapTerrain.h" />
@@ -225,7 +226,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\SampleBase.h" />
     <ClInclude Include="Sample\SampleManager.h" />
     <ClInclude Include="Sample\TestSample.h" />
-    <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="Scene\SceneNode.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -238,6 +238,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Windows\AssetsDirectoryManager.h" />
     <ClInclude Include="Windows\FileSystemWatcher.h" />
     <ClInclude Include="Windows\IWindowProc.h" />
+    <ClInclude Include="Windows\KeyCodes.h" />
     <ClInclude Include="Windows\RenderWindow.h" />
     <ClInclude Include="Windows\Win32RenderWindow.h" />
   </ItemGroup>
@@ -296,6 +297,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Sample\OutDoorScene.cpp" />
     <ClCompile Include="Sample\SampleManager.cpp" />
     <ClCompile Include="Sample\TestSample.cpp" />
+    <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

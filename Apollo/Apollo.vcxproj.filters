@@ -40,6 +40,12 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{8bfe0a21-3cb2-4791-be42-f3828f9986de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sample">
+      <UniqueIdentifier>{39ee117d-657e-4b32-a48f-08938dcb2c1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{cd881297-244b-48d4-ad2b-d8060b807da2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -171,131 +177,134 @@
     <ClInclude Include="DX11\RenderStateDX11.h">
       <Filter>Dx11</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\ScreenSpaceRenderPass.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\MaterialDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\GeometryDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\BufferManagerDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\RendererDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\GPUParticleSample.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\ShaderDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\ShaderParameterDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Base\Timer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\ConstantBufferDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\ComputerShaderProcessTexture.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\MeshDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Base\VertexStruct.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\HeightMapTerrain.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Camera.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix3x3.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Matrix4x4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector2.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector3.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Vector4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Base\EventManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Base\IEventListener.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\TestSample.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\SampleManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\SampleBase.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Quaternion.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\OutDoorScene.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\SDKMesh.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\SubMeshDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\ModelDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Base\Query.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="DX11\QueryDX11.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Math\Plane.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Frustum.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="Graphics\ClearRenderTargetPass.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\AABB.h">
-      <Filter>头文件</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="DX11\RenderTargetDX11.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="Graphics\Camera.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Base\Visitor.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\Scene.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="Graphics\Frustum.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\RenderPass.h">
-      <Filter>头文件</Filter>
+      <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\ClearRenderTargetPass.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="Graphics\ScreenSpaceRenderPass.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Base\RenderState.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="Graphics\SDKMesh.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix3x3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix4x4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Plane.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector2.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector3.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\ComputerShaderProcessTexture.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\GPUParticleSample.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\HeightMapTerrain.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\OutDoorScene.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\SampleBase.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\SampleManager.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\TestSample.h">
+      <Filter>Sample</Filter>
     </ClInclude>
     <ClInclude Include="Scene\SceneNode.h">
-      <Filter>头文件</Filter>
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Windows\KeyCodes.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\BufferManagerDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\ConstantBufferDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\GeometryDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\MaterialDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\MeshDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\ModelDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\QueryDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\RendererDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\RenderTargetDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\ShaderDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\ShaderParameterDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\StructuredBufferDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\SubMeshDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\EventManager.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\IEventListener.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Query.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Timer.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\VertexStruct.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Visitor.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderState.h">
+      <Filter>Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -383,113 +392,116 @@
     <ClCompile Include="DX11\RenderStateDX11.cpp">
       <Filter>Dx11</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\BufferManagerDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\RendererDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\GeometryDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample\GPUParticleSample.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\ShaderDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\ShaderParameterDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Base\Timer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\ConstantBufferDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\StructuredBufferDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\MeshDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample\HeightMapTerrain.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Camera.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="Math\Matrix4x4.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="Math\Matrix3x3.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Matrix4x4.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Vector3.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Vector4.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Base\EventManager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample\TestSample.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample\SampleManager.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Quaternion.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="Sample\OutDoorScene.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\SDKMesh.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\MaterialDX11.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="DX11\SubMeshDX11.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Sample</Filter>
     </ClCompile>
     <ClCompile Include="DX11\ModelDX11.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\MeshDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\MaterialDX11.cpp">
+      <Filter>Dx11</Filter>
     </ClCompile>
     <ClCompile Include="DX11\QueryDX11.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Dx11</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\IRenderable.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Frustum.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\AABB.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Plane.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="DX11\RendererDX11.cpp">
+      <Filter>Dx11</Filter>
     </ClCompile>
     <ClCompile Include="DX11\RenderTargetDX11.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Dx11</Filter>
     </ClCompile>
-    <ClCompile Include="DX11\ClearRenderTargetPass.cpp">
-      <Filter>源文件</Filter>
+    <ClCompile Include="DX11\ShaderParameterDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\ShaderDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\StructuredBufferDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\SubMeshDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\GeometryDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\ConstantBufferDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\BufferManagerDX11.cpp">
+      <Filter>Dx11</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Scene.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\AABB.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\TestSample.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Timer.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\SampleManager.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Camera.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\RenderPass.cpp">
-      <Filter>源文件</Filter>
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Frustum.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\IRenderable.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\SDKMesh.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Plane.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\GPUParticleSample.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\HeightMapTerrain.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\ClearRenderTargetPass.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\EventManager.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneNode.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
