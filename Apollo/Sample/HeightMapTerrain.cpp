@@ -226,10 +226,10 @@ void HeightMapTerrain::createShader()
 		"PSMAIN",
 		"ps_5_0");
 
-	MaterialDX11 material;
-	material.m_vs = m_vsShader;
-	material.m_ps = m_psShader;
-	m_terrainModel.addMaterial(material);
+	MaterialDX11* material = new MaterialDX11;
+	material->m_vs = m_vsShader;
+	material->m_ps = m_psShader;
+	m_terrainModel.addMaterial(MaterialPtr(material));
 
 	//////////////////////////////cs shader////////////////////////////////////////////
 

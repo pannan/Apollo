@@ -53,6 +53,10 @@ namespace Apollo
 
 	protected:
 
+		void		init();
+
+	protected:
+
 		ID3D11DeviceContext*		m_deviceContext;
 
 		ShaderDX11Ptr				m_shaderList[(uint8_t)ShaderType::ShaderTypeCount];

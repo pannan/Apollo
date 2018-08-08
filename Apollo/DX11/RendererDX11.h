@@ -4,6 +4,8 @@
 
 namespace Apollo
 {
+	class Texture2dDX11;
+
 	class RendererDX11 : public SingletonEx<RendererDX11>
 	{
 	public:
@@ -27,7 +29,11 @@ namespace Apollo
 
 		inline IDXGISwapChain*			getSwapChain() { return m_pSwapChain; }
 
-		inline ID3D11RenderTargetView*	getMainRTT() { return m_mainRenderTargetView; }
+		Texture2dDX11*						getMainRTT() { return m_mainBackBuffer; }
+
+		Texture2dDX11*						getMainDepthBuffer() { return m_mainDepthStencil; }
+
+		inline ID3D11RenderTargetView*	getMainRTTView() { return m_mainRenderTargetView; }
 
 		ID3D11DepthStencilView*				getMainDepthSteniclView();
 
@@ -54,6 +60,9 @@ namespace Apollo
 		ID3D11RenderTargetView*		m_mainRenderTargetView;
 
 		uint32_t									m_depthStencilHandle;
+
+		Texture2dDX11*						m_mainBackBuffer;
+		Texture2dDX11*						m_mainDepthStencil;
 
 		//debug info
 		uint32_t									m_drawCallCount;

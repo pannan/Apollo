@@ -306,6 +306,12 @@
     <ClInclude Include="Base\RenderState.h">
       <Filter>Base</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\RenderPipeline.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Material.h">
+      <Filter>Base\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -502,6 +508,9 @@
     </ClCompile>
     <ClCompile Include="SceneNode.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\RenderPipeline.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -5,6 +5,11 @@ using namespace Apollo;
 
 RenderStateDX11::RenderStateDX11()
 {
+	init();
+}
+
+void RenderStateDX11::init()
+{
 	m_scissorRects.left = 0.0f;
 	m_scissorRects.top = 0.0f;
 	m_scissorRects.bottom = 900;
@@ -26,13 +31,13 @@ RenderStateDX11::RenderStateDX11()
 	m_blendDesc.RenderTarget[0].BlendEnable = false;
 	m_blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 	m_blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	m_blendDesc.RenderTarget[0].BlendOp  = D3D11_BLEND_OP_ADD;
+	m_blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
 	m_blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
 	m_blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	m_blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	m_blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	m_blendState = nullptr;
-	
+
 	m_blendFactor[0] = m_blendFactor[1] = m_blendFactor[2] = m_blendFactor[3] = 1.0f;
 	m_sampleMask = 0xffffffff;
 	m_stencilRef = 0;
@@ -53,7 +58,7 @@ RenderStateDX11::RenderStateDX11()
 	m_depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	m_depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 	m_blendState = nullptr;
-	
+
 
 	//create sampler 
 	m_samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;// D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
@@ -67,7 +72,7 @@ RenderStateDX11::RenderStateDX11()
 	m_samplerDesc.MinLOD = 0.0f;
 	m_samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 	m_samplerState = nullptr;
-	
+
 	m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 

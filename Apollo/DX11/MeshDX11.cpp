@@ -165,6 +165,7 @@ void MeshDX11::drawSubMesh(uint32_t subMeshID)const
 	if (subMeshID >= m_subMeshList.size())
 		return;
 
+	bind();
 	const SubMeshDX11& subMesh = m_subMeshList[subMeshID];
 	RendererDX11::getInstance().drawIndexed(subMesh.m_indexCount, subMesh.m_indexStart, subMesh.m_vertexStart);	
 }

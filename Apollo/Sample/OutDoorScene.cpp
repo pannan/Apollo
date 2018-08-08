@@ -42,12 +42,28 @@ void OutDoorScene::init()
 	m_renderState.m_depthStencilDesc.DepthEnable = true;
 	m_renderState.createState();
 
+	//forward pass这里不需要设置rtt
+
 	//create scene
 	m_scenePtr = ScenePtr(new Scene);
 
-	m_renderPassPtr = RenderPassPtr(new RenderPass)
 	//add renderalbe
+	const uint32_t subMeshCount = m_modelScene.getSubMeshCount();
+	for (uint32_t i = 0; i < subMeshCount; ++i)
+	{
+		m_scenePtr->addRenderable(m_modelScene.getSubMesh(i));
+	}
 
+	const uint32_t materialCount = m_modelScene.getMaterialCount();
+	for (uint32_t i = 0; i < materialCount; ++i)
+	{
+		m_scenePtr->addMaterial(m_modelScene.getMaterial(i));
+	}
+
+	m_renderPassPtr = RenderPassPtr(new RenderPass(m_scenePtr, (RenderState*)(&m_renderState)));
+
+	m_renderPipelinePtr = RenderPipelinePtr(new RenderPipeline);
+	m_renderPipelinePtr->addRenderPass(m_renderPassPtr.get());
 }
 
 void OutDoorScene::render()
@@ -58,8 +74,9 @@ void OutDoorScene::render()
 
 	m_matrixBuffer->set(&matrixBuffer, sizeof(MatrixBuffer));
 
-	m_renderState.bind();
+	//m_renderState.bind();
 
 	RendererDX11::getInstance().clearDebugInfo();
-	m_modelScene.draw();
+	//m_modelScene.draw();
+	m_renderPipelinePtr->render((RenderState*)(&m_renderState));
 }

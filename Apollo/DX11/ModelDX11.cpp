@@ -54,25 +54,26 @@ void ModelDX11::createFromSDKMeshFile(LPCWSTR fileName, ShaderDX11Ptr vsShader)
 	uint32 numMaterials = sdkMesh.GetNumMaterials();
 	for (uint32 i = 0; i < numMaterials; ++i)
 	{
-		MaterialDX11 material;
-		SDKMESH_MATERIAL* mat = sdkMesh.GetMaterial(i);
+		MaterialDX11* material = new MaterialDX11;
+		SDKMESH_MATERIAL* meshMat = sdkMesh.GetMaterial(i);
 
-		material.m_albedoMap = mat->DiffuseTexture;// AnsiToWString(mat->DiffuseTexture);
-		material.m_normalMap = mat->NormalTexture;// AnsiToWString(mat->NormalTexture);
+		material->m_albedoMap = meshMat->DiffuseTexture;// AnsiToWString(mat->DiffuseTexture);
+		material->m_normalMap = meshMat->NormalTexture;// AnsiToWString(mat->NormalTexture);
 
 		//这里的vs可以同一个，不用每个都创建
-		material.m_vs = vsShader;
+		material->m_vs = vsShader;
 
-		material.m_ps = ShaderDX11Ptr(new ShaderDX11());
-		material.m_ps->loadShaderFromFile(ShaderType::PixelShader,
+		material->m_ps = ShaderDX11Ptr(new ShaderDX11());
+		material->m_ps->loadShaderFromFile(ShaderType::PixelShader,
 			"../bin/Assets/Shader/Mesh.hlsl",
 			ShaderMacros(),
 			"PSMAIN",
 			"ps_5_0");
 
-		loadMaterialResources(material);
+		loadMaterialResources(*material);
 
-		m_materialList.push_back(material);
+		MaterialPtr mat = MaterialPtr(material);
+		m_materialList.push_back(mat);
 	}
 
 	uint32 numMeshes = sdkMesh.GetNumMeshes();
@@ -113,8 +114,8 @@ void ModelDX11::draw()
 		if (subMesh->m_materialID != currentMaterialID)
 		{
 			currentMaterialID = subMesh->m_materialID;
-			const MaterialDX11& material = m_materialList[currentMaterialID];
-			material.bind();
+			const MaterialPtr& material = m_materialList[currentMaterialID];
+			material->bind();
 		}
 
 		if (subMesh->m_parent != currentMesh)

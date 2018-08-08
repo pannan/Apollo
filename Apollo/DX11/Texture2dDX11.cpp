@@ -4,11 +4,16 @@
 
 using namespace Apollo;
 
+Texture2dDX11::Texture2dDX11(const std::string& name) : TextureResource(name, 0, TextureType_2D)
+{
+	ZeroMemory(&m_tex2dDesc, sizeof(m_tex2dDesc));
+}
+
 Texture2dDX11::Texture2dDX11(const std::string& path,
 	uint32_t handle) :
 	TextureResource(path, handle, TextureType_2D)
 {
-
+	ZeroMemory(&m_tex2dDesc, sizeof(m_tex2dDesc));
 }
 
 Texture2dDX11::Texture2dDX11(	const std::string& path, 
@@ -54,4 +59,9 @@ void Texture2dDX11::bind(UINT slotID, ShaderType shaderType, ShaderParameterType
 void Texture2dDX11::unBind(UINT slotID, ShaderType shaderType, ShaderParameterType parameterType)
 {
 	
+}
+
+void Texture2dDX11::setRendertargetView(ID3D11RenderTargetView* rttView)
+{
+	m_renderTargetViewPtr = rttView;
 }

@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "RendererDX11.h"
 #include "Texture2dConfigDX11.h"
-#include "Texture2dDX11.h"
 #include "TextureDX11ResourceFactory.h"
+#include "Texture2dDX11.h"
+
 using namespace Apollo;
 using namespace std;
 
@@ -106,6 +107,11 @@ void RendererDX11::createMainRTT()
 	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer); 
 	m_pd3dDevice->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &m_mainRenderTargetView);
 	
+	//create main backbuffer
+	m_mainBackBuffer = new Texture2dDX11("Main BackBuffer");
+	m_mainBackBuffer->setTexture2D(pBackBuffer);
+	m_mainBackBuffer->setRendertargetView(m_mainRenderTargetView);
+
 	pBackBuffer->Release();
 }
 
@@ -121,11 +127,16 @@ void RendererDX11::createMainDepthStencil()
 	depthStencilConf.SetDepthBuffer(desc.Width, desc.Height);
 	m_depthStencilHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("MainDepthStencil", depthStencilConf);
 	m_pd3dDeviceContext->OMSetRenderTargets(1, &m_mainRenderTargetView, getMainDepthSteniclView());
+
+	//get main depthstencil
+	m_mainDepthStencil = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_depthStencilHandle);
 }
 
 void RendererDX11::release()
 {
 	SAFE_RELEASE(m_mainRenderTargetView);
+	SAFE_DELETE(m_mainBackBuffer);
+	//SAFE_DELETE(m_mainDepthStencil);由texurefactory负责释放
 	SAFE_RELEASE(m_pSwapChain);
 	SAFE_RELEASE(m_pd3dDeviceContext);
 

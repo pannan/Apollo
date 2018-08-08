@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MaterialDX11.h"
+#include "Material.h"
 
 namespace Apollo
 {
@@ -22,13 +22,14 @@ namespace Apollo
 
 		virtual	void		addRenderable(IRenderable* renderable);
 
+		virtual	void		addMaterial(MaterialPtr material) { m_materialList.push_back(material); }
 		//virtual void		accept(Visitor* visitor);
 
 	protected:
 
 		std::vector<IRenderable*>			m_visibleRenderableList;
 
-		std::vector<MaterialDX11Ptr>		m_materialList;
+		std::vector<MaterialPtr>				m_materialList;
 
 		uint16_t										m_currentRenderMaterial;
 

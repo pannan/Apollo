@@ -163,6 +163,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\IEventListener.h" />
     <ClInclude Include="Base\IResourceFactory.h" />
     <ClInclude Include="Base\LogManager.h" />
+    <ClInclude Include="Base\Material.h" />
     <ClInclude Include="Base\MaterialParse.h" />
     <ClInclude Include="Base\MaterialResource.h" />
     <ClInclude Include="Base\MaterialResourceFactory.h" />
@@ -203,6 +204,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Graphics\Frustum.h" />
     <ClInclude Include="Graphics\IRenderable.h" />
     <ClInclude Include="Graphics\RenderPass.h" />
+    <ClInclude Include="Graphics\RenderPipeline.h" />
     <ClInclude Include="Graphics\ScreenSpaceRenderPass.h" />
     <ClInclude Include="Graphics\SDKMesh.h" />
     <ClInclude Include="Graphics\Task.h" />
@@ -279,6 +281,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Graphics\Frustum.cpp" />
     <ClCompile Include="Graphics\IRenderable.cpp" />
     <ClCompile Include="Graphics\RenderPass.cpp" />
+    <ClCompile Include="Graphics\RenderPipeline.cpp" />
     <ClCompile Include="Graphics\Scene.cpp" />
     <ClCompile Include="Graphics\ScreenSpaceRenderPass.cpp" />
     <ClCompile Include="Graphics\SDKMesh.cpp" />

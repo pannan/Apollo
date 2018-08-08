@@ -5,7 +5,7 @@
 #include "RenderStateDX11.h"
 #include "Scene.h"
 #include "RenderPass.h"
-
+#include "RenderPipeline.h"
 namespace Apollo
 {
 	//class IRenderable;
@@ -35,6 +35,8 @@ namespace Apollo
 
 		RenderPassPtr		m_renderPassPtr;
 	//	std::vector<IRenderable*>		m_renderableList;
+
+		RenderPipelinePtr		m_renderPipelinePtr;
 
 	private:
 	};	  

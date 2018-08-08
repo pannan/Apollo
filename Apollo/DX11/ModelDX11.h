@@ -15,11 +15,15 @@ namespace Apollo
 
 		void		draw();
 
-		void		addMaterial(const MaterialDX11& mat) { m_materialList.push_back(mat); }
+		void		addMaterial(const MaterialPtr& mat) { m_materialList.push_back(mat); }
 
 		uint32_t	getSubMeshCount() { return m_subMeshList.size(); }
 
 		SubMeshDX11*		getSubMesh(uint32_t index) { return m_subMeshList[index]; }
+
+		uint32_t	getMaterialCount() { return m_materialList.size(); }
+
+		MaterialPtr&		getMaterial(uint32_t index) { return m_materialList[index]; }
 
 	protected:
 
@@ -32,7 +36,7 @@ namespace Apollo
 
 		std::vector<MeshDX11> m_meshList;
 
-		std::vector<MaterialDX11> m_materialList;
+		std::vector<MaterialPtr> m_materialList;
 
 		std::vector<SubMeshDX11*>		m_subMeshList;
 

@@ -11,6 +11,8 @@ namespace Apollo
 
 		friend class ShaderParameterDX11;
 
+		Texture2dDX11(const std::string& name);
+
 		Texture2dDX11(const std::string& path, uint32_t handle);
 
 		Texture2dDX11(const std::string& path, uint32_t handle, D3D11_TEXTURE2D_DESC desc, ID3D11Texture2D* texture2d,
@@ -25,6 +27,10 @@ namespace Apollo
 		void unBind(UINT slotID, ShaderType shaderType, ShaderParameterType parameterType);
 
 		void		setTexture2D(ID3D11Texture2D* tex) { m_tex2dDx11 = tex; tex->GetDesc(&m_tex2dDesc); }
+
+		void		setRendertargetView(ID3D11RenderTargetView* rttView);
+
+		void		setDepthStencilView(ID3D11DepthStencilView* depthView) { m_depthStencilViewPtr = depthView; }
 
 		ID3D11Texture2D*	getTexture2D() { return m_tex2dDx11.Get(); }
 

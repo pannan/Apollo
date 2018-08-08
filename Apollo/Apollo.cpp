@@ -283,7 +283,7 @@ int main(int, char**)
 		sampleManager.preRender();
 
 		// Rendering
-		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTT(), (float*)&clear_col);
+		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTTView(), (float*)&clear_col);
 		dx11Renderer.getDeviceContex()->ClearDepthStencilView(dx11Renderer.getMainDepthSteniclView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		ImGui::Render();
 

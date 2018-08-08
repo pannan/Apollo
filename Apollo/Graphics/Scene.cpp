@@ -35,7 +35,7 @@ void Scene::render()
 		if (materialID != currentMaterialID)
 		{
 			currentMaterialID = materialID;
-			const MaterialDX11Ptr& material = m_materialList[materialID];
+			const MaterialPtr& material = m_materialList[materialID];
 			material->bind();
 		}
 

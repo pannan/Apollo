@@ -11,17 +11,19 @@ namespace Apollo
 	{
 	public:
 
+		RenderPass();
+
 		RenderPass(ScenePtr& scene, RenderState* renderState);
 
 		void				setEnable(bool enable) { m_enable = enable; }
 
 		bool				getEnable() { return m_enable; }
 
-		virtual	void	preRender(RenderState& renderState);
+		virtual	void	preRender(RenderState* renderState);
 
-		virtual	void render(RenderState& renderState);
+		virtual	void render(RenderState* renderState);
 
-		virtual	void postRender(RenderState& renderState);
+		virtual	void postRender(RenderState* renderState);
 
 		//virtual void visit(Scene& scene) {}
 		//virtual void visit(SceneNode& node) {}

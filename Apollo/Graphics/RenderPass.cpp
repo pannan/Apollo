@@ -4,24 +4,29 @@
 
 using namespace Apollo;
 
+RenderPass::RenderPass()
+{
+
+}
+
 RenderPass::RenderPass(ScenePtr& scene, RenderState* renderState) : m_scene(scene), m_renderState(renderState)
 {
 
 }
 
-void RenderPass::preRender(RenderState& renderState)
+void RenderPass::preRender(RenderState* renderState)
 {
 	if (m_renderState)
 		m_renderState->bind();
 }
 
-void RenderPass::render(RenderState& renderState)
+void RenderPass::render(RenderState* renderState)
 {
 	if (m_scene)
 		m_scene->render();
 }
 
-void RenderPass::postRender(RenderState& renderState)
+void RenderPass::postRender(RenderState* renderState)
 {
 	if (m_renderState)
 		m_renderState->unBind();

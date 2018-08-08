@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Material.h"
 #include "ShaderDX11.h"
 
 namespace Apollo
 {
-	class MaterialDX11
+	class MaterialDX11 : public Material
 	{
 	public:
 
@@ -12,17 +13,13 @@ namespace Apollo
 
 		virtual ~MaterialDX11(){}
 
-		void			bind() const;
+		virtual	void		bind() const;
 
-		void			unBind() const;
+		virtual	void		unBind() const;
 
 
 		ShaderDX11Ptr		m_vs;
 		ShaderDX11Ptr		m_ps;
-
-		std::string					m_albedoMap;
-		std::string					m_normalMap;
-
 
 	private:
 	};
