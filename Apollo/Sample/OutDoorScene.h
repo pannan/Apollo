@@ -23,6 +23,10 @@ namespace Apollo
 
 	protected:
 
+		void			initDeferredPipeline();
+
+	protected:
+
 		Camera*					m_camera;
 
 		ModelDX11				m_modelScene;
@@ -36,7 +40,9 @@ namespace Apollo
 		RenderPassPtr		m_renderPassPtr;
 	//	std::vector<IRenderable*>		m_renderableList;
 
-		RenderPipelinePtr		m_renderPipelinePtr;
+		RenderPipelinePtr		m_forwardPipelinePtr;
+
+		RenderPipelinePtr		m_deferredPiplinePtr;
 
 	private:
 	};	  

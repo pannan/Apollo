@@ -14,6 +14,8 @@ RendererDX11::RendererDX11()
 	m_pd3dDeviceContext = nullptr;
 	m_pSwapChain = nullptr;
 	m_mainRenderTargetView = nullptr;
+	m_backBufferWidth = 0;
+	m_backBufferHeight = 0;
 }
 
 RendererDX11::~RendererDX11()
@@ -128,6 +130,8 @@ void RendererDX11::createMainDepthStencil()
 	m_depthStencilHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("MainDepthStencil", depthStencilConf);
 	m_pd3dDeviceContext->OMSetRenderTargets(1, &m_mainRenderTargetView, getMainDepthSteniclView());
 
+	m_backBufferWidth = desc.Width;
+	m_backBufferHeight = desc.Height;
 	//get main depthstencil
 	m_mainDepthStencil = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_depthStencilHandle);
 }

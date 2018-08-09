@@ -51,9 +51,13 @@ namespace Apollo
 
 		void						clearDebugInfo();
 
+		int						getBackBufferWidth() { return m_backBufferWidth; }
+
+		int						getBackBufferHeight() { return m_backBufferHeight; }
+
 	protected:
 
-		HWND									m_hWnd;
+		HWND										m_hWnd;
 		ID3D11Device*						m_pd3dDevice;
 		ID3D11DeviceContext*			m_pd3dDeviceContext;
 		IDXGISwapChain*					m_pSwapChain;
@@ -63,6 +67,9 @@ namespace Apollo
 
 		Texture2dDX11*						m_mainBackBuffer;
 		Texture2dDX11*						m_mainDepthStencil;
+
+		int											m_backBufferWidth;
+		int											m_backBufferHeight;
 
 		//debug info
 		uint32_t									m_drawCallCount;

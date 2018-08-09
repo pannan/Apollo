@@ -4,6 +4,8 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "RendererDX11.h"
+#include "Texture2dConfigDX11.h"
+#include "TextureDX11ResourceFactory.h"
 using namespace Apollo;
 
 struct MatrixBuffer
@@ -62,8 +64,25 @@ void OutDoorScene::init()
 
 	m_renderPassPtr = RenderPassPtr(new RenderPass(m_scenePtr, (RenderState*)(&m_renderState)));
 
-	m_renderPipelinePtr = RenderPipelinePtr(new RenderPipeline);
-	m_renderPipelinePtr->addRenderPass(m_renderPassPtr.get());
+	m_forwardPipelinePtr = RenderPipelinePtr(new RenderPipeline);
+	m_forwardPipelinePtr->addRenderPass(m_renderPassPtr.get());
+
+	initDeferredPipeline();
+}
+
+void OutDoorScene::initDeferredPipeline()
+{
+	Texture2dConfigDX11 texConfig;
+	texConfig.SetWidth(RendererDX11::getInstance().getBackBufferWidth());
+	texConfig.SetHeight(RendererDX11::getInstance().getBackBufferHeight());
+	texConfig.SetBindFlags(D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
+	texConfig.SetFormat(DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+	//´´½¨gbuffer rtt
+	//adelbo map
+	uint32_t adelboMapHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("GBuffer_Adelbo", texConfig);
+	//normal map
+	texConfig.SetFormat(DXGI_FORMAT_R16G16B16A16_FLOAT);
+	uint32_t normalMapHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("GBuffer_Adelbo", texConfig);
 }
 
 void OutDoorScene::render()
@@ -78,5 +97,5 @@ void OutDoorScene::render()
 
 	RendererDX11::getInstance().clearDebugInfo();
 	//m_modelScene.draw();
-	m_renderPipelinePtr->render((RenderState*)(&m_renderState));
+	m_forwardPipelinePtr->render((RenderState*)(&m_renderState));
 }
