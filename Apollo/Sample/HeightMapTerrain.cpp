@@ -181,12 +181,12 @@ void HeightMapTerrain::createShader()
 	subData.pSysMem = m_terrainPosBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3), false, false, &subData));
+	m_terrainVertexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3), false, false, false,&subData));
 
 	subData.pSysMem = m_terrainIndexBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_terrainIndexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_indexCount, sizeof(uint32_t), false, false, &subData));
+	m_terrainIndexStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_indexCount, sizeof(uint32_t), false, false, false,&subData));
 
 	//分配临时数据
 	uint32_t triangleCount = m_indexCount / 3;
@@ -196,11 +196,11 @@ void HeightMapTerrain::createShader()
 	subData.pSysMem = triangleBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_TriangleRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(triangleCount, sizeof(TriangleChunk), false, true, &subData));
+	m_TriangleRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(triangleCount, sizeof(TriangleChunk), false, true, false,&subData));
 
-	m_shareVertexRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(ShareVertex), false, true, nullptr));
+	m_shareVertexRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(ShareVertex), false, true, false,nullptr));
 
-	m_vertexNormalRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3), false, true, nullptr));
+	m_vertexNormalRWStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_vertexCount, sizeof(Vector3), false, true, false, nullptr));
 
 	SAFE_DELETE_ARRAY(triangleBuffer);
 

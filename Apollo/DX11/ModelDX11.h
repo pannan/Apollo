@@ -34,7 +34,7 @@ namespace Apollo
 		std::string							m_modelName;
 		std::string							m_modelPath;
 
-		std::vector<MeshDX11> m_meshList;
+		std::vector<MeshDX11Ptr> m_meshList;
 
 		std::vector<MaterialPtr> m_materialList;
 

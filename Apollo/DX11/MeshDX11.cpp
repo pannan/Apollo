@@ -97,7 +97,7 @@ void MeshDX11::createFromSDKMeshFile(SDKMesh& sdkMesh, uint32 meshIdx)
 	}
 }
 
-void MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t vertexCount, void* indexBuffer, 
+SubMeshDX11* MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t vertexCount, void* indexBuffer,
 															uint32_t indexCount, DXGI_FORMAT type /* = DXGI_FORMAT_R16_UINT */)
 {
 	//create vertex buffer
@@ -150,7 +150,10 @@ void MeshDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t ver
 	subMesh.m_vertexCount = vertexCount;
 	subMesh.m_vertexStart = 0;
 	subMesh.m_materialID = 0;
+	subMesh.m_subMeshID = 0;
+	subMesh.m_parent = this;
 	m_subMeshList.push_back(subMesh);
+	return &m_subMeshList[m_subMeshList.size() - 1];
 }
 
 void MeshDX11::bind()const

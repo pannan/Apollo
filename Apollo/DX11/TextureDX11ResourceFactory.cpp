@@ -86,6 +86,7 @@ TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, ui
 			Texture2dDX11* tex2d = new Texture2dDX11(path, handle);
 			ID3D11Texture2D* texdx11 = (ID3D11Texture2D*)resource;
 			tex2d->setTexture2D(texdx11);
+			tex2d->setShaderResourceView(srv);
 			return tex2d;
 		}
 		else
@@ -113,6 +114,8 @@ uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Te
 
 	DepthStencilViewComPtr			depthStencilView;
 	RenderTargetViewComPtr			renderTargetView;
+	ShaderResourceViewComPtr		shaderResourceView;
+	UnorderedAccessViewComPtr	unorderedAccessView;
 
 	D3D11_TEXTURE2D_DESC& desc = config.GetTextureDesc();
 	 if ( (desc.BindFlags & D3D11_BIND_DEPTH_STENCIL ) != 0 )
@@ -199,7 +202,85 @@ uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Te
             }
         }
 
-		TextureResourcePtr tex2dDX11 = TextureResourcePtr(new Texture2dDX11(name, handle, desc,tex2d, depthStencilView, renderTargetView));
+		//srv
+		if (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+			resourceViewDesc.Format = desc.Format;
+
+			if (desc.ArraySize > 1)
+			{
+				if (desc.SampleDesc.Count > 1)
+				{
+					resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
+					resourceViewDesc.Texture2DMSArray.FirstArraySlice = 0;
+					resourceViewDesc.Texture2DMSArray.ArraySize = desc.ArraySize;
+				}
+				else
+				{
+					resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+					resourceViewDesc.Texture2DArray.FirstArraySlice = 0;
+					resourceViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+					resourceViewDesc.Texture2DArray.MipLevels = desc.MipLevels;
+					resourceViewDesc.Texture2DArray.MostDetailedMip = 0;
+				}
+			}
+			else
+			{
+				if (desc.SampleDesc.Count > 1)
+				{
+					resourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+				}
+				else
+				{
+					resourceViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE2D;
+					resourceViewDesc.Texture2D.MipLevels = desc.MipLevels;
+					resourceViewDesc.Texture2D.MostDetailedMip = 0;
+				}
+			}
+
+			if (FAILED(RendererDX11::getInstance().getDevice()->CreateShaderResourceView(tex2d,
+				&resourceViewDesc, shaderResourceView.GetAddressOf())))
+			{
+				LogManager::getInstance().log("Failed to create texture resource view.");
+			}
+			else if (desc.MipLevels == 0)
+			{
+				RendererDX11::getInstance().getDeviceContex()->GenerateMips(shaderResourceView.Get());
+			}
+		}
+
+		//uav
+		if(desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS)
+		{
+			assert(desc.SampleDesc.Count == 1);
+
+			// Create a Shader resource view for the texture.
+			D3D11_UNORDERED_ACCESS_VIEW_DESC unorderedAccessViewDesc;
+			unorderedAccessViewDesc.Format = desc.Format;
+
+			if (desc.ArraySize > 1)
+			{
+				unorderedAccessViewDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+				unorderedAccessViewDesc.Texture2DArray.MipSlice = 0;
+				unorderedAccessViewDesc.Texture2DArray.FirstArraySlice = 0;
+				unorderedAccessViewDesc.Texture2DArray.ArraySize = desc.ArraySize;
+			}
+			else
+			{
+				unorderedAccessViewDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+				unorderedAccessViewDesc.Texture2D.MipSlice = 0;
+			}
+
+			if (FAILED(RendererDX11::getInstance().getDevice()->CreateUnorderedAccessView(tex2d,
+				&unorderedAccessViewDesc, unorderedAccessView.GetAddressOf())))
+			{
+				LogManager::getInstance().log("Failed to create unordered access view.");
+			}
+		}
+
+		TextureResourcePtr tex2dDX11 = TextureResourcePtr(new Texture2dDX11(	name, handle, desc,tex2d, depthStencilView, renderTargetView,
+																																	shaderResourceView,unorderedAccessView));
 
 	m_textureResourceList.push_back(tex2dDX11);
 

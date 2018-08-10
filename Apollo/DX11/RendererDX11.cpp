@@ -16,6 +16,7 @@ RendererDX11::RendererDX11()
 	m_mainRenderTargetView = nullptr;
 	m_backBufferWidth = 0;
 	m_backBufferHeight = 0;
+	m_mainBackBuffer = nullptr;
 }
 
 RendererDX11::~RendererDX11()
@@ -110,9 +111,10 @@ void RendererDX11::createMainRTT()
 	m_pd3dDevice->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &m_mainRenderTargetView);
 	
 	//create main backbuffer
-	m_mainBackBuffer = new Texture2dDX11("Main BackBuffer");
-	m_mainBackBuffer->setTexture2D(pBackBuffer);
-	m_mainBackBuffer->setRendertargetView(m_mainRenderTargetView);
+	//这里貌似不能保存backbuffer指针，导致下面release不干净，会有MISCELLANEOUS ERROR #19错误
+	//m_mainBackBuffer = new Texture2dDX11("Main BackBuffer");
+	//m_mainBackBuffer->setTexture2D(pBackBuffer);
+	//m_mainBackBuffer->setRendertargetView(m_mainRenderTargetView);
 
 	pBackBuffer->Release();
 }
@@ -134,6 +136,7 @@ void RendererDX11::createMainDepthStencil()
 	m_backBufferHeight = desc.Height;
 	//get main depthstencil
 	m_mainDepthStencil = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_depthStencilHandle);
+	pBackBuffer->Release();
 }
 
 void RendererDX11::release()

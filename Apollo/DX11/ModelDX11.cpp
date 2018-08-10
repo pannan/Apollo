@@ -77,18 +77,24 @@ void ModelDX11::createFromSDKMeshFile(LPCWSTR fileName, ShaderDX11Ptr vsShader)
 	}
 
 	uint32 numMeshes = sdkMesh.GetNumMeshes();
-	m_meshList.resize(numMeshes);
+	//m_meshList.resize(numMeshes);
 	for (uint32 meshIdx = 0; meshIdx < numMeshes; ++meshIdx)
-		m_meshList[meshIdx].createFromSDKMeshFile(sdkMesh,meshIdx);// Initialize(device, sdkMesh, meshIdx, generateTangentFrame);
+	{
+		MeshDX11Ptr mesh = MeshDX11Ptr(new MeshDX11);
+		mesh->createFromSDKMeshFile(sdkMesh, meshIdx);
+		m_meshList.push_back(mesh);
+		//m_meshList[meshIdx].createFromSDKMeshFile(sdkMesh, meshIdx);// Initialize(device, sdkMesh, meshIdx, generateTangentFrame);
+	}
+		
 
 	//add submesh list
 	for (size_t meshID = 0; meshID < m_meshList.size(); ++meshID)
 	{
-		const MeshDX11& mesh = m_meshList[meshID];
+		const MeshDX11Ptr& mesh = m_meshList[meshID];
 
-		for (size_t subMeshID = 0; subMeshID < mesh.m_subMeshList.size(); ++subMeshID)
+		for (size_t subMeshID = 0; subMeshID < mesh->m_subMeshList.size(); ++subMeshID)
 		{
-			const SubMeshDX11& subMesh = mesh.m_subMeshList[subMeshID];
+			const SubMeshDX11& subMesh = mesh->m_subMeshList[subMeshID];
 			m_subMeshList.push_back((SubMeshDX11*)(&subMesh));
 		}
 	}
@@ -99,9 +105,10 @@ void ModelDX11::createFromSDKMeshFile(LPCWSTR fileName, ShaderDX11Ptr vsShader)
 void ModelDX11::createFromMemory(void* vertexBuffer, int vertexSize, uint32_t vertexCount, void* indexBuffer,
 	uint32_t	indexCount, DXGI_FORMAT type)
 {
-	MeshDX11 mesh;
-	mesh.createFromMemory(vertexBuffer, vertexSize, vertexCount, indexBuffer, indexCount, type);
+	MeshDX11Ptr mesh = MeshDX11Ptr(new MeshDX11);
+	SubMeshDX11* subMesh = mesh->createFromMemory(vertexBuffer, vertexSize, vertexCount, indexBuffer, indexCount, type);
 	m_meshList.push_back(mesh);
+	m_subMeshList.push_back(subMesh);
 }
 
 void ModelDX11::draw()

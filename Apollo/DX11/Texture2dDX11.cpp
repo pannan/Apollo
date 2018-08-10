@@ -21,12 +21,16 @@ Texture2dDX11::Texture2dDX11(	const std::string& path,
 													D3D11_TEXTURE2D_DESC desc,
 													ID3D11Texture2D* texture2d,
 													DepthStencilViewComPtr dsv,
-													RenderTargetViewComPtr rtv):
+													RenderTargetViewComPtr rtv,
+													ShaderResourceViewComPtr srv,
+													UnorderedAccessViewComPtr uva):
 													TextureResource(path, handle, TextureType_2D),		
 													m_tex2dDesc(desc),
 													m_tex2dDx11(texture2d),
 													m_depthStencilViewPtr(dsv),
-													m_renderTargetViewPtr(rtv)
+													m_renderTargetViewPtr(rtv),
+													m_shaderResourceViewPtr(srv),
+													m_unorderedAccessViewPtr(uva)
 {
 
 }
@@ -54,11 +58,85 @@ void Texture2dDX11::clear(ClearFlags clearFlags,const Vector4& color /* = Vector
 
 void Texture2dDX11::bind(UINT slotID, ShaderType shaderType, ShaderParameterType parameterType)
 {
+	if (m_tex2dDx11)
+	{
+		if (parameterType == ShaderParameterType::Texture && m_shaderResourceViewPtr)
+		{
+			switch (shaderType)
+			{
+			case ShaderType::VertexShader:
+				RendererDX11::getInstance().getDeviceContex()->VSSetShaderResources(slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
+				break;
+			case ShaderType::TessellationControlShader:
+				RendererDX11::getInstance().getDeviceContex()->HSSetShaderResources(slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
+				break;
+			case ShaderType::TessellationEvaluationShader:
+				RendererDX11::getInstance().getDeviceContex()->DSSetShaderResources(slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
+				break;
+			case ShaderType::GeometryShader:
+				RendererDX11::getInstance().getDeviceContex()->GSSetShaderResources(slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
+				break;
+			case ShaderType::PixelShader:
+				RendererDX11::getInstance().getDeviceContex()->PSSetShaderResources(slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
+				break;
+			case ShaderType::ComputeShader:
+				RendererDX11::getInstance().getDeviceContex()->CSSetShaderResources(slotID, 1, m_shaderResourceViewPtr.GetAddressOf());
+				break;
+			}
+		}
+		else if (parameterType == ShaderParameterType::RWTexture && m_unorderedAccessViewPtr)
+		{
+			switch (shaderType)
+			{
+			case ShaderType::ComputeShader:
+				RendererDX11::getInstance().getDeviceContex()->CSSetUnorderedAccessViews(slotID, 1, m_unorderedAccessViewPtr.GetAddressOf(), nullptr);
+				break;
+			}
+		}
+	}	
 }
 
 void Texture2dDX11::unBind(UINT slotID, ShaderType shaderType, ShaderParameterType parameterType)
 {
-	
+	if (m_tex2dDx11)
+	{
+		ID3D11ShaderResourceView* srv[] = { nullptr };
+		ID3D11UnorderedAccessView* uav[] = { nullptr };
+
+		if (parameterType == ShaderParameterType::Texture && m_shaderResourceViewPtr)
+		{
+			switch (shaderType)
+			{
+			case ShaderType::VertexShader:
+				RendererDX11::getInstance().getDeviceContex()->VSSetShaderResources(slotID, 1, srv);
+				break;
+			case ShaderType::TessellationControlShader:
+				RendererDX11::getInstance().getDeviceContex()->HSSetShaderResources(slotID, 1, srv);
+				break;
+			case ShaderType::TessellationEvaluationShader:
+				RendererDX11::getInstance().getDeviceContex()->DSSetShaderResources(slotID, 1, srv);
+				break;
+			case ShaderType::GeometryShader:
+				RendererDX11::getInstance().getDeviceContex()->GSSetShaderResources(slotID, 1, srv);
+				break;
+			case ShaderType::PixelShader:
+				RendererDX11::getInstance().getDeviceContex()->PSSetShaderResources(slotID, 1, srv);
+				break;
+			case ShaderType::ComputeShader:
+				RendererDX11::getInstance().getDeviceContex()->CSSetShaderResources(slotID, 1, srv);
+				break;
+			}
+		}
+		else if (parameterType == ShaderParameterType::RWTexture && m_unorderedAccessViewPtr)
+		{
+			switch (shaderType)
+			{
+			case ShaderType::ComputeShader:
+				RendererDX11::getInstance().getDeviceContex()->CSSetUnorderedAccessViews(slotID, 1, uav, nullptr);
+				break;
+			}
+		}
+	}	
 }
 
 void Texture2dDX11::setRendertargetView(ID3D11RenderTargetView* rttView)

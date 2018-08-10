@@ -66,8 +66,8 @@ namespace Apollo
 
 		Texture2dDX11*							m_texture2dDX11;
 
-		ShaderResourceViewComPtr		m_shaderResourceViewPtr;
-		UnorderedAccessViewComPtr	m_unorderedAccessViewPtr;
+		//ShaderResourceViewComPtr		m_shaderResourceViewPtr;
+		//UnorderedAccessViewComPtr	m_unorderedAccessViewPtr;
 
 		//resource view
 		//bool													m_bUAV;

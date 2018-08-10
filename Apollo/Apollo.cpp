@@ -172,7 +172,6 @@ int main(int, char**)
 		UnregisterClass(_T("ImGui Example"), wc.hInstance);
 		return 1;
 	}
-
 	// Show the window
 	ShowWindow(hwnd, SW_SHOWDEFAULT);
 	UpdateWindow(hwnd);
@@ -200,11 +199,13 @@ int main(int, char**)
 	ImVec4 clear_col = ImColor(114, 144, 154);
 
 	ResourceManager resManager;
+	TextureDX11ResourceFactory textureFactroy;
+	dx11Renderer.createMainDepthStencil();
 	MaterialResourceFactory materialFactory;
 	HLSLResourceFactory hlslFactory;
 //	TextureResourceFactory textureFactroy;
-	TextureDX11ResourceFactory textureFactroy;
-	dx11Renderer.createMainDepthStencil();
+	
+	
 	AssetsDirectoryManager* directoryManager = new AssetsDirectoryManager;
 	directoryManager->init("..\\bin\\Assets");
 
@@ -282,6 +283,7 @@ int main(int, char**)
 
 		sampleManager.preRender();
 
+		//dx11Renderer.getDeviceContex()->OMSetRenderTargets(1, dx11Renderer.getMainRTTView(), dx11Renderer.getMainDepthSteniclView());
 		// Rendering
 		dx11Renderer.getDeviceContex()->ClearRenderTargetView(dx11Renderer.getMainRTTView(), (float*)&clear_col);
 		dx11Renderer.getDeviceContex()->ClearDepthStencilView(dx11Renderer.getMainDepthSteniclView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);

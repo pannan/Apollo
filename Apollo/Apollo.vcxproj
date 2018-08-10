@@ -191,6 +191,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\RenderStateDX11.h" />
     <ClInclude Include="DX11\RenderTargetDX11.h" />
     <ClInclude Include="DX11\ShaderDX11.h" />
+    <ClInclude Include="DX11\ShaderDX11Factory.h" />
     <ClInclude Include="DX11\ShaderParameterDX11.h" />
     <ClInclude Include="DX11\StructuredBufferDX11.h" />
     <ClInclude Include="DX11\SubMeshDX11.h" />

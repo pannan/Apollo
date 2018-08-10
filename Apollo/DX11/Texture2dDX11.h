@@ -17,7 +17,9 @@ namespace Apollo
 
 		Texture2dDX11(const std::string& path, uint32_t handle, D3D11_TEXTURE2D_DESC desc, ID3D11Texture2D* texture2d,
 			DepthStencilViewComPtr dsv,
-			RenderTargetViewComPtr rtv);
+			RenderTargetViewComPtr rtv,
+			ShaderResourceViewComPtr srv,
+			UnorderedAccessViewComPtr uva);
 		virtual ~Texture2dDX11();
 
 		void	clear(ClearFlags clearFlags = ClearFlags::All,const Vector4& color = Vector4::ZERO,float depth = 1.0f,uint8_t stencil = 0);
@@ -32,6 +34,8 @@ namespace Apollo
 
 		void		setDepthStencilView(ID3D11DepthStencilView* depthView) { m_depthStencilViewPtr = depthView; }
 
+		void		setShaderResourceView(ID3D11ShaderResourceView* srv) { m_shaderResourceViewPtr = srv; }
+
 		ID3D11Texture2D*	getTexture2D() { return m_tex2dDx11.Get(); }
 
 		ID3D11DepthStencilView*	getDepthStencilView() { return m_depthStencilViewPtr.Get(); }
@@ -42,6 +46,8 @@ namespace Apollo
 
 		DepthStencilViewComPtr			m_depthStencilViewPtr;
 		RenderTargetViewComPtr			m_renderTargetViewPtr;	
+		ShaderResourceViewComPtr		m_shaderResourceViewPtr;
+		UnorderedAccessViewComPtr	m_unorderedAccessViewPtr;
 
 		D3D11_TEXTURE2D_DESC			m_tex2dDesc;
 		Texture2DComPtr						m_tex2dDx11;

@@ -8,7 +8,7 @@ namespace Apollo
 
 		friend class ShaderParameterDX11;
 
-		StructuredBufferDX11(UINT count, UINT structsize, bool CPUWritable, bool GPUWritable, D3D11_SUBRESOURCE_DATA* pData);
+		StructuredBufferDX11(UINT count, UINT structsize, bool CPUWritable, bool GPUWritable, bool isAppendBuffer,D3D11_SUBRESOURCE_DATA* pData);
 		~StructuredBufferDX11();
 
 		// Bind the buffer for rendering.
@@ -41,9 +41,10 @@ namespace Apollo
 	private:
 
 		bool													m_bUAV;
+		bool													m_isAppendBuffer;
 		BufferComPtr									m_bufferComPtr;
-		//ShaderResourceViewComPtr				m_srcComPtr;
-		//UnorderedAccessViewComPtr			m_uavComPtr;
+		ShaderResourceViewComPtr			m_srcComPtr;
+		UnorderedAccessViewComPtr		m_uavComPtr;
 
 		UINT													m_elementCount;
 		UINT													m_elementSize;

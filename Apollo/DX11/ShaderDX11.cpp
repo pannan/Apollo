@@ -522,7 +522,6 @@ void ShaderDX11::unBind()
 	//这里不用做了
 	//1 是效率太低，去掉后场景fps 72->112
 	//2 现在的方式是渲染前多有状态都设置，没有默认状态一说，所以渲染完后不用设置
-	return;
 	for (ParameterMap::value_type value : m_shaderParameters)
 	{
 		value.second->unBind();

@@ -43,7 +43,7 @@ void GPUParticleSample::init()
 	InitialData.pSysMem = pData;
 	InitialData.SysMemPitch = 0;
 	InitialData.SysMemSlicePitch = 0;
-	m_currentParticelBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_particleCount, sizeof(Particle), false, false, &InitialData));
+	m_currentParticelBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_particleCount, sizeof(Particle), false, false, true,&InitialData));
 	m_insertParticleCS->setStructuredBuffer("CurrentSimulationState", m_currentParticelBuffer);
 
 	//创建并初始化 particle update shader
@@ -54,7 +54,7 @@ void GPUParticleSample::init()
 		"CSMAIN",
 		"cs_5_0");
 
-	m_nextParticleBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_particleCount, sizeof(Particle), false, false, &InitialData));
+	m_nextParticleBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_particleCount, sizeof(Particle), false, false, true,&InitialData));
 	m_insertParticleCS->setStructuredBuffer("CurrentSimulationState", m_currentParticelBuffer);
 	m_updateParticleCS->setStructuredBuffer("NewSimulationState", m_nextParticleBuffer);
 

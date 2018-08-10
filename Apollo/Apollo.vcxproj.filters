@@ -312,6 +312,9 @@
     <ClInclude Include="Base\Material.h">
       <Filter>Base\Material</Filter>
     </ClInclude>
+    <ClInclude Include="DX11\ShaderDX11Factory.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

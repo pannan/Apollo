@@ -37,7 +37,7 @@ void TestSample::init()
 	subData.pSysMem = m_colorBuffer;
 	subData.SysMemPitch = 0;
 	subData.SysMemSlicePitch = 0;
-	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3), false, false, &subData));
+	m_ColorStructBuffer = StructuredBufferDX11Ptr(new StructuredBufferDX11(m_terrainSize * m_terrainSize, sizeof(Vector3), false, false, false,&subData));
 
 	//create texture
 	Texture2dConfigDX11 tex2dConfig;
