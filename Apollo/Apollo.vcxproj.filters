@@ -515,5 +515,8 @@
     <ClCompile Include="Graphics\RenderPipeline.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="DX11\ShaderDX11Factory.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
