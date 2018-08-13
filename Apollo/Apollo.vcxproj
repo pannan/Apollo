@@ -181,6 +181,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\BufferManagerDX11.h" />
     <ClInclude Include="DX11\ConstantBufferDX11.h" />
     <ClInclude Include="DX11\GeometryDX11.h" />
+    <ClInclude Include="DX11\HLSLDX11Resource.h" />
     <ClInclude Include="DX11\imgui_impl_dx11.h" />
     <ClInclude Include="DX11\IResourceDX11.h" />
     <ClInclude Include="DX11\MaterialDX11.h" />
@@ -261,6 +262,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\ClearRenderTargetPass.cpp" />
     <ClCompile Include="DX11\ConstantBufferDX11.cpp" />
     <ClCompile Include="DX11\GeometryDX11.cpp" />
+    <ClCompile Include="DX11\HLSLDX11Resource.cpp" />
     <ClCompile Include="DX11\imgui_impl_dx11.cpp" />
     <ClCompile Include="DX11\MaterialDX11.cpp" />
     <ClCompile Include="DX11\MeshDX11.cpp" />

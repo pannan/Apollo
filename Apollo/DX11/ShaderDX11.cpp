@@ -221,138 +221,138 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 																const std::string& entryPoint, 
 																const std::string& profile)
 {
-	HRESULT hr;
-	const std::string pathName = /*"../bin/Assets/Shader/" +*/ fileName;
-	{
-		Microsoft::WRL::ComPtr<ID3DBlob> pShaderBlob;
-		Microsoft::WRL::ComPtr<ID3DBlob> pErrorBlob;
-
-		std::string _profile = profile;
-		if (profile == "latest")
-		{
-			_profile = getLatestProfile(shaderType);
-			if (_profile.empty())
-			{
-				LogManager::getInstance().log("Invalid shader type for feature level!");
-				return false;
-			}
-		}
-
-		std::vector<D3D_SHADER_MACRO> macros;
-		for (auto macro : shaderMacros)
-		{
-			// The macro definitions passed to this function only store temporary string objects.
-			// I need to copy the temporary strings into the D3D macro type 
-			// in order for it to persist outside of this for loop.
-			std::string name = macro.first;
-			std::string definition = macro.second;
-
-			char* c_name = new char[name.size() + 1];
-			char* c_definition = new char[definition.size() + 1];
-
-			strncpy_s(c_name, name.size() + 1, name.c_str(), name.size());
-			strncpy_s(c_definition, definition.size() + 1, definition.c_str(), definition.size());
-
-			macros.push_back({ c_name, c_definition });
-		}
-		macros.push_back({ 0, 0 });
-
-
-		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined( _DEBUG )
-		flags |= (D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION);
-#endif
-
-		
-		hr = D3DCompile((LPCVOID)source.c_str(), 
-									source.size(), 
-									pathName.c_str(), 
-									macros.data(), 
-									D3D_COMPILE_STANDARD_FILE_INCLUDE, 
-									entryPoint.c_str(), 
-									_profile.c_str(), 
-									flags, 
-									0, 
-									&pShaderBlob, 
-									&pErrorBlob);
-
-		// We're done compiling.. Delete the macro definitions.
-		for (D3D_SHADER_MACRO macro : macros)
-		{
-			delete[] macro.Name;
-			delete[] macro.Definition;
-		}
-		macros.clear();
-
-		if (FAILED(hr))
-		{
-			if (pErrorBlob)
-			{
-				//OutputDebugStringA(static_cast<char*>(pErrorBlob->GetBufferPointer()));
-				//ReportError(static_cast<char*>(pErrorBlob->GetBufferPointer()));
-				LogManager::getInstance().log(static_cast<char*>(pErrorBlob->GetBufferPointer()));
-			}
-			return false;
-		}
-
-		m_shaderBlob = pShaderBlob;
-	}
-
-	// After the shader recompiles, try to restore the shader parameters.
-	ParameterMap shaderParameters = m_shaderParameters;
-
-	// Destroy the last shader as we are now loading a new one.
-	release();
-
-	m_shaderType = shaderType;
-
-	ID3D11Device* pdevice = RendererDX11::getInstance().getDevice();
-
-	switch (m_shaderType)
-	{
-	case ShaderType::VertexShader:
-		hr = pdevice->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
-		break;
-	case ShaderType::TessellationControlShader:
-		hr = pdevice->CreateHullShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_hullShader.GetAddressOf());
-		break;
-	case ShaderType::TessellationEvaluationShader:
-		hr = pdevice->CreateDomainShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_domainShader.GetAddressOf());
-		break;
-	case ShaderType::GeometryShader:
-		hr = pdevice->CreateGeometryShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_geometrySHader.GetAddressOf());
-		break;
-	case ShaderType::PixelShader:
-		hr = pdevice->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
-		break;
-	case ShaderType::ComputeShader:
-		hr = pdevice->CreateComputeShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_computeShader.GetAddressOf());
-		break;
-	default:
-		LogManager::getInstance().log("Error Shader Type!");
-		break;
-	}
-
-	if (FAILED(hr))
-	{
-		LogManager::getInstance().log("Failed to create shader.");
-		return false;
-	}
-
-	// Reflect the parameters from the shader.
-	// Inspired by: http://members.gamedev.net/JasonZ/Heiroglyph/D3D11ShaderReflection.pdf
-	Microsoft::WRL::ComPtr<ID3D11ShaderReflection> pReflector;
-	hr = D3DReflect(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, &pReflector);
-
-	if (FAILED(hr))
-	{
-		LogManager::getInstance().log("Failed to reflect shader.");
-		return false;
-	}
+//	HRESULT hr;
+//	const std::string pathName = /*"../bin/Assets/Shader/" +*/ fileName;
+//	{
+//		Microsoft::WRL::ComPtr<ID3DBlob> pShaderBlob;
+//		Microsoft::WRL::ComPtr<ID3DBlob> pErrorBlob;
+//
+//		std::string _profile = profile;
+//		if (profile == "latest")
+//		{
+//			_profile = getLatestProfile(shaderType);
+//			if (_profile.empty())
+//			{
+//				LogManager::getInstance().log("Invalid shader type for feature level!");
+//				return false;
+//			}
+//		}
+//
+//		std::vector<D3D_SHADER_MACRO> macros;
+//		for (auto macro : shaderMacros)
+//		{
+//			// The macro definitions passed to this function only store temporary string objects.
+//			// I need to copy the temporary strings into the D3D macro type 
+//			// in order for it to persist outside of this for loop.
+//			std::string name = macro.first;
+//			std::string definition = macro.second;
+//
+//			char* c_name = new char[name.size() + 1];
+//			char* c_definition = new char[definition.size() + 1];
+//
+//			strncpy_s(c_name, name.size() + 1, name.c_str(), name.size());
+//			strncpy_s(c_definition, definition.size() + 1, definition.c_str(), definition.size());
+//
+//			macros.push_back({ c_name, c_definition });
+//		}
+//		macros.push_back({ 0, 0 });
+//
+//
+//		UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
+//#if defined( _DEBUG )
+//		flags |= (D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION);
+//#endif
+//
+//		
+//		hr = D3DCompile((LPCVOID)source.c_str(), 
+//									source.size(), 
+//									pathName.c_str(), 
+//									macros.data(), 
+//									D3D_COMPILE_STANDARD_FILE_INCLUDE, 
+//									entryPoint.c_str(), 
+//									_profile.c_str(), 
+//									flags, 
+//									0, 
+//									&pShaderBlob, 
+//									&pErrorBlob);
+//
+//		// We're done compiling.. Delete the macro definitions.
+//		for (D3D_SHADER_MACRO macro : macros)
+//		{
+//			delete[] macro.Name;
+//			delete[] macro.Definition;
+//		}
+//		macros.clear();
+//
+//		if (FAILED(hr))
+//		{
+//			if (pErrorBlob)
+//			{
+//				//OutputDebugStringA(static_cast<char*>(pErrorBlob->GetBufferPointer()));
+//				//ReportError(static_cast<char*>(pErrorBlob->GetBufferPointer()));
+//				LogManager::getInstance().log(static_cast<char*>(pErrorBlob->GetBufferPointer()));
+//			}
+//			return false;
+//		}
+//
+//		m_shaderBlob = pShaderBlob;
+//	}
+//
+//	// After the shader recompiles, try to restore the shader parameters.
+//	ParameterMap shaderParameters = m_shaderParameters;
+//
+//	// Destroy the last shader as we are now loading a new one.
+//	release();
+//
+//	m_shaderType = shaderType;
+//
+//	ID3D11Device* pdevice = RendererDX11::getInstance().getDevice();
+//
+//	switch (m_shaderType)
+//	{
+//	case ShaderType::VertexShader:
+//		hr = pdevice->CreateVertexShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
+//		break;
+//	case ShaderType::TessellationControlShader:
+//		hr = pdevice->CreateHullShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_hullShader.GetAddressOf());
+//		break;
+//	case ShaderType::TessellationEvaluationShader:
+//		hr = pdevice->CreateDomainShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_domainShader.GetAddressOf());
+//		break;
+//	case ShaderType::GeometryShader:
+//		hr = pdevice->CreateGeometryShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_geometrySHader.GetAddressOf());
+//		break;
+//	case ShaderType::PixelShader:
+//		hr = pdevice->CreatePixelShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
+//		break;
+//	case ShaderType::ComputeShader:
+//		hr = pdevice->CreateComputeShader(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), nullptr, m_computeShader.GetAddressOf());
+//		break;
+//	default:
+//		LogManager::getInstance().log("Error Shader Type!");
+//		break;
+//	}
+//
+//	if (FAILED(hr))
+//	{
+//		LogManager::getInstance().log("Failed to create shader.");
+//		return false;
+//	}
+//
+//	// Reflect the parameters from the shader.
+//	// Inspired by: http://members.gamedev.net/JasonZ/Heiroglyph/D3D11ShaderReflection.pdf
+//	//Microsoft::WRL::ComPtr<ID3D11ShaderReflection> pReflector;
+//	hr = D3DReflect(m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, &m_pReflector);
+//
+//	if (FAILED(hr))
+//	{
+//		LogManager::getInstance().log("Failed to reflect shader.");
+//		return false;
+//	}
 
 	// Query input parameters and build the input layout
 	D3D11_SHADER_DESC shaderDescription;
-	hr = pReflector->GetDesc(&shaderDescription);
+	hr = m_pReflector->GetDesc(&shaderDescription);
 
 	if (FAILED(hr))
 	{
@@ -371,7 +371,7 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 			D3D11_INPUT_ELEMENT_DESC inputElement;
 			D3D11_SIGNATURE_PARAMETER_DESC parameterSignature;
 
-			pReflector->GetInputParameterDesc(i, &parameterSignature);
+			m_pReflector->GetInputParameterDesc(i, &parameterSignature);
 
 			inputElement.SemanticName = parameterSignature.SemanticName;
 			inputElement.SemanticIndex = parameterSignature.SemanticIndex;
@@ -403,7 +403,7 @@ bool ShaderDX11::loadShaderFromString(	ShaderType shaderType,
 	for (UINT i = 0; i < shaderDescription.BoundResources; ++i)
 	{
 		D3D11_SHADER_INPUT_BIND_DESC bindDesc;
-		pReflector->GetResourceBindingDesc(i, &bindDesc);
+		m_pReflector->GetResourceBindingDesc(i, &bindDesc);
 		std::string resourceName = bindDesc.Name;
 
 		ShaderParameterType parameterType = ShaderParameterType::Invalid;

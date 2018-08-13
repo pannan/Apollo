@@ -13,9 +13,12 @@ namespace Apollo
 
 		}
 
-		~HLSLResource(){}
+		virtual ~HLSLResource(){}
 
 	protected:
+
+		ShaderType						m_shaderType;
+
 	private:
 
 		HLSLResource();

@@ -315,6 +315,9 @@
     <ClInclude Include="DX11\ShaderDX11Factory.h">
       <Filter>Dx11</Filter>
     </ClInclude>
+    <ClInclude Include="DX11\HLSLDX11Resource.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -516,6 +519,9 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="DX11\ShaderDX11Factory.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\HLSLDX11Resource.cpp">
       <Filter>Dx11</Filter>
     </ClCompile>
   </ItemGroup>

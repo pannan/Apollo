@@ -65,7 +65,8 @@ namespace Apollo
 		std::string							m_profile;
 		std::string							m_shaderFileName;
 
-		BlobComPtr						m_shaderBlob;
+		BlobComPtr						m_shaderBlob;		
+		Microsoft::WRL::ComPtr<ID3D11ShaderReflection> m_pReflector;
 
 		typedef std::map<std::string, ShaderParameterPtr > ParameterMap;
 		ParameterMap m_shaderParameters;
