@@ -1,5 +1,5 @@
 #pragma once
-
+#include "RenderPass.h"
 namespace Apollo
 {
 	class RenderPass;
@@ -9,13 +9,13 @@ namespace Apollo
 	{
 	public:
 
-		void				addRenderPass(RenderPass* renderPass) { m_renderPassList.push_back(renderPass); }
+		void				addRenderPass(RenderPassPtr renderPass) { m_renderPassList.push_back(renderPass); }
 
 		virtual	void	render(RenderState* renderState);
 
 	protected:
 
-		std::vector<RenderPass*>			m_renderPassList;
+		std::vector<RenderPassPtr>			m_renderPassList;
 
 	private:
 	};

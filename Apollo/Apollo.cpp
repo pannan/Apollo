@@ -27,6 +27,7 @@
 #include "Sample/TestSample.h"
 #include "KeyCodes.h"
 #include "Sample/SampleManager.h"
+#include "HLSLDX11Factory.h"
 
 using namespace Apollo;
 LogManager logManager;
@@ -203,6 +204,7 @@ int main(int, char**)
 	dx11Renderer.createMainDepthStencil();
 	MaterialResourceFactory materialFactory;
 	HLSLResourceFactory hlslFactory;
+	HLSLDX11Factory hlslDX11Factroy;
 //	TextureResourceFactory textureFactroy;
 	
 	

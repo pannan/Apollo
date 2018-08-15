@@ -6,6 +6,7 @@
 #include "RendererDX11.h"
 #include "Texture2dConfigDX11.h"
 #include "TextureDX11ResourceFactory.h"
+#include "ClearRenderTargetPass.h"
 using namespace Apollo;
 
 struct MatrixBuffer
@@ -65,7 +66,7 @@ void OutDoorScene::init()
 	m_renderPassPtr = RenderPassPtr(new RenderPass(m_scenePtr, (RenderState*)(&m_renderState)));
 
 	m_forwardPipelinePtr = RenderPipelinePtr(new RenderPipeline);
-	m_forwardPipelinePtr->addRenderPass(m_renderPassPtr.get());
+	m_forwardPipelinePtr->addRenderPass(m_renderPassPtr);
 
 	initDeferredPipeline();
 }
@@ -80,9 +81,20 @@ void OutDoorScene::initDeferredPipeline()
 	//´´½¨gbuffer rtt
 	//adelbo map
 	uint32_t adelboMapHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("GBuffer_Adelbo", texConfig);
+	Texture2dDX11* adelboTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(adelboMapHandle);
 	//normal map
 	texConfig.SetFormat(DXGI_FORMAT_R16G16B16A16_FLOAT);
 	uint32_t normalMapHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("GBuffer_Adelbo", texConfig);
+	Texture2dDX11* normalTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(normalMapHandle);
+
+	RenderTargetDX11Ptr GBufferPtr = RenderTargetDX11Ptr(new RenderTargetDX11);
+	GBufferPtr->attachTexture(AttachmentPoint::Color0, adelboTex);
+	GBufferPtr->attachTexture(AttachmentPoint::Color1, normalTex);
+
+	//add clear rtt pass
+	m_deferredPiplinePtr->addRenderPass(std::make_shared<ClearRenderTargetPass>(GBufferPtr));
+	m_deferredPiplinePtr->addRenderPass(m_renderPassPtr);
+	//add lightpass
 }
 
 void OutDoorScene::render()

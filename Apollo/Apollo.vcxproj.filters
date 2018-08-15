@@ -312,11 +312,14 @@
     <ClInclude Include="Base\Material.h">
       <Filter>Base\Material</Filter>
     </ClInclude>
-    <ClInclude Include="DX11\ShaderDX11Factory.h">
-      <Filter>Dx11</Filter>
-    </ClInclude>
     <ClInclude Include="DX11\HLSLDX11Resource.h">
       <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\HLSLDX11Factory.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DeferredRenderLightPass.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -518,10 +521,10 @@
     <ClCompile Include="Graphics\RenderPipeline.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="DX11\ShaderDX11Factory.cpp">
+    <ClCompile Include="DX11\HLSLDX11Resource.cpp">
       <Filter>Dx11</Filter>
     </ClCompile>
-    <ClCompile Include="DX11\HLSLDX11Resource.cpp">
+    <ClCompile Include="DX11\HLSLDX11Factory.cpp">
       <Filter>Dx11</Filter>
     </ClCompile>
   </ItemGroup>

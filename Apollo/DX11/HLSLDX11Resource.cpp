@@ -5,11 +5,108 @@
 
 using namespace Apollo;
 
+//// Inspired by: http://takinginitiative.net/2011/12/11/directx-1011-basic-shader-reflection-automatic-input-layout-creation/
+DXGI_FORMAT GetDXGIFormat(const D3D11_SIGNATURE_PARAMETER_DESC& paramDesc)
+{
+	DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+	if (paramDesc.Mask == 1) // 1 component
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32_FLOAT;
+		}
+		break;
+		}
+	}
+	else if (paramDesc.Mask <= 3) // 2 components
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32G32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32G32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32G32_FLOAT;
+		}
+		break;
+		}
+	}
+	else if (paramDesc.Mask <= 7) // 3 components
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32G32B32_FLOAT;
+		}
+		break;
+		}
+	}
+	else if (paramDesc.Mask <= 15) // 4 components
+	{
+		switch (paramDesc.ComponentType)
+		{
+		case D3D_REGISTER_COMPONENT_UINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32A32_UINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_SINT32:
+		{
+			format = DXGI_FORMAT_R32G32B32A32_SINT;
+		}
+		break;
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+		{
+			format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		}
+		break;
+		}
+	}
+
+	return format;
+}
+
+
 HLSLDX11Resource::HLSLDX11Resource(	ShaderType type, 
 																	const std::string& fileName, 
 																	const ShaderMacros& shaderMacros, 
 																	const std::string& entryPoint, 
-																	const std::string& profile)
+																	const std::string& profile) :
+																	m_shaderType(type),
+																	m_shaderFileName(fileName),
+																	m_entryPoint(entryPoint),
+																	m_profile(profile)
 {
 	loadShaderFromFile(type, fileName, shaderMacros, entryPoint, profile);
 }
@@ -265,6 +362,54 @@ bool HLSLDX11Resource::loadShaderFromString(ShaderType type,
 		return false;
 	}
 
+	if (FAILED(hr))
+	{
+		LogManager::getInstance().log("Failed to get shader description from shader reflector.");
+		return false;
+	}
+
+	//m_InputSemantics.clear();
+	
+
+	m_pReflector->GetDesc(&m_shaderDescription);
+	
+	if (m_shaderType == ShaderType::VertexShader)
+	{
+		UINT numInputParameters = m_shaderDescription.InputParameters;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements;
+		for (UINT i = 0; i < numInputParameters; ++i)
+		{
+			D3D11_INPUT_ELEMENT_DESC inputElement;
+			D3D11_SIGNATURE_PARAMETER_DESC parameterSignature;
+
+			m_pReflector->GetInputParameterDesc(i, &parameterSignature);
+
+			inputElement.SemanticName = parameterSignature.SemanticName;
+			inputElement.SemanticIndex = parameterSignature.SemanticIndex;
+			inputElement.InputSlot = 0;// i; // TODO: If using interleaved arrays, then the input slot should be 0.  If using packed arrays, the input slot will vary.
+			inputElement.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+			inputElement.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA; // TODO: Figure out how to deal with per-instance data? .. Don't. Just use structured buffers to store per-instance data and use the SV_InstanceID as an index in the structured buffer.
+			inputElement.InstanceDataStepRate = 0;
+			inputElement.Format = GetDXGIFormat(parameterSignature);
+
+			assert(inputElement.Format != DXGI_FORMAT_UNKNOWN);
+
+			inputElements.push_back(inputElement);
+
+			//m_InputSemantics.insert(SemanticMap::value_type(BufferBinding(inputElement.SemanticName, inputElement.SemanticIndex), i));
+		}
+
+		if (inputElements.size() > 0)
+		{
+			hr = pdevice->CreateInputLayout(inputElements.data(), (UINT)inputElements.size(), m_shaderBlob->GetBufferPointer(), m_shaderBlob->GetBufferSize(), m_inputLayoutPtr.GetAddressOf());
+			if (FAILED(hr))
+			{
+				LogManager::getInstance().log("Failed to create input layout.");
+				return false;
+			}
+		}
+	}
+
 	return true;
 }
 
@@ -298,4 +443,81 @@ bool HLSLDX11Resource::loadShaderFromFile(ShaderType shaderType,
 	result = loadShaderFromString(shaderType, source, fileName, shaderMacros, entryPoint, profile);
 
 	return result;
+}
+
+D3D11_SHADER_DESC& HLSLDX11Resource::getShaderDesc()
+{
+	return m_shaderDescription;
+}
+
+D3D11_SHADER_INPUT_BIND_DESC HLSLDX11Resource::getBindingDesc(int index)
+{
+	D3D11_SHADER_INPUT_BIND_DESC desc;
+	ZeroMemory(&desc, sizeof(D3D11_SHADER_INPUT_BIND_DESC));
+	if (m_pReflector)
+	{
+		m_pReflector->GetResourceBindingDesc(index, &desc);
+	}
+
+	return desc;
+}
+
+void HLSLDX11Resource::bind()
+{
+	ID3D11DeviceContext* deviceContext = RendererDX11::getInstance().getDeviceContex();
+	if (m_vertexShader.Get())
+	{
+		deviceContext->IASetInputLayout(m_inputLayoutPtr.Get());
+		deviceContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+	}
+	else if (m_hullShader)
+	{
+		deviceContext->HSSetShader(m_hullShader.Get(), nullptr, 0);
+	}
+	else if (m_domainShader)
+	{
+		deviceContext->DSSetShader(m_domainShader.Get(), nullptr, 0);
+	}
+	else if (m_geometrySHader)
+	{
+		deviceContext->GSSetShader(m_geometrySHader.Get(), nullptr, 0);
+	}
+	else if (m_pixelShader)
+	{
+		deviceContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+	}
+	else if (m_computeShader)
+	{
+		deviceContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
+	}
+}
+
+void HLSLDX11Resource::unBind()
+{
+	ID3D11DeviceContext* deviceContext = RendererDX11::getInstance().getDeviceContex();
+	if (m_vertexShader.Get())
+	{
+		deviceContext->IASetInputLayout(nullptr);
+		deviceContext->VSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_hullShader)
+	{
+		deviceContext->HSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_domainShader)
+	{
+		deviceContext->DSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_geometrySHader)
+	{
+		deviceContext->GSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_pixelShader)
+	{
+		deviceContext->PSSetShader(nullptr, nullptr, 0);
+	}
+	else if (m_computeShader)
+	{
+		deviceContext->CSSetShader(nullptr, nullptr, 0);
+	}
 }

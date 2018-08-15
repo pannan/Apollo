@@ -1,7 +1,7 @@
 #pragma once
 #include "ShaderParameterDX11.h"
 #include "Texture2dDX11.h"
-
+#include "HLSLDX11Resource.h"
 namespace Apollo
 {
 	class ShaderDX11
@@ -37,39 +37,21 @@ namespace Apollo
 
 		void		setTexture2d(std::string name, Texture2dDX11* tex2dDX11);
 
-		ID3DBlob*		getBlob() { return m_shaderBlob.Get(); }
+		//ID3DBlob*		getBlob() { return m_shaderBlob.Get(); }
 
 	protected:
 
 		ShaderParameterPtr		getShaderParameter(std::string name);
 
-		std::string				getLatestProfile(ShaderType type);
 
-		void						release();
+		void									release();
 
 	protected:
 
-		ShaderType						m_shaderType;
-
-		VSComPtr						m_vertexShader;
-		DSComPtr						m_domainShader;
-		HSComPtr						m_hullShader;
-		GSComPtr						m_geometrySHader;
-		PSComPtr						m_pixelShader;
-		CSComPtr						m_computeShader;
-		InputLayoutComPtr			m_inputLayoutPtr;
-
-
-		ShaderMacros					m_shaderMacros;
-		std::string							m_entryPoint;
-		std::string							m_profile;
-		std::string							m_shaderFileName;
-
-		BlobComPtr						m_shaderBlob;		
-		Microsoft::WRL::ComPtr<ID3D11ShaderReflection> m_pReflector;
-
 		typedef std::map<std::string, ShaderParameterPtr > ParameterMap;
 		ParameterMap m_shaderParameters;
+
+		HLSLDX11ResourcePtr	m_hlslResourcePtr;
 
 	private:
 	};

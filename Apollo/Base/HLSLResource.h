@@ -10,10 +10,13 @@ namespace Apollo
 
 		HLSLResource(const std::string& path,uint32_t handle) : Resource(path, handle)
 		{
-
 		}
 
 		virtual ~HLSLResource(){}
+
+		/*	virtual void bind() = 0;
+
+			virtual void unBind() = 0;*/
 
 	protected:
 

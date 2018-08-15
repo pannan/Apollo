@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "RenderPipeline.h"
-#include "RenderPass.h"
 
 using namespace Apollo;
 

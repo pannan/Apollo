@@ -1,13 +1,11 @@
 #pragma once
 
-#include "HLSLResource.h"
-
 namespace Apollo
 {
-	class HLSLDX11Resource : public HLSLResource
+	class HLSLDX11Resource// : public HLSLResource
 	{
 
-		friend class ShaderDX11Factory;
+		friend class HLSLDX11Factory;
 	public:
 
 		HLSLDX11Resource(ShaderType type,
@@ -16,7 +14,15 @@ namespace Apollo
 										const std::string& entryPoint,
 										const std::string& profile);
 
-		virtual ~HLSLDX11Resource();
+		~HLSLDX11Resource(){}
+
+		void bind();
+
+		void unBind();
+
+		D3D11_SHADER_DESC&	getShaderDesc();
+
+		D3D11_SHADER_INPUT_BIND_DESC getBindingDesc(int index);
 
 	protected:
 
@@ -36,6 +42,9 @@ namespace Apollo
 			const std::string& profile);
 
 		std::string				getLatestProfile(ShaderType type);
+
+		
+
 	private:
 
 		ShaderType						m_shaderType;
@@ -47,7 +56,7 @@ namespace Apollo
 		PSComPtr						m_pixelShader;
 		CSComPtr						m_computeShader;
 		InputLayoutComPtr			m_inputLayoutPtr;
-
+		D3D11_SHADER_DESC	m_shaderDescription;
 
 		ShaderMacros					m_shaderMacros;
 		std::string							m_entryPoint;
@@ -55,7 +64,6 @@ namespace Apollo
 		std::string							m_shaderFileName;
 
 		BlobComPtr						m_shaderBlob;
-		D3D11_SHADER_DESC	m_shaderDescription;
 		Microsoft::WRL::ComPtr<ID3D11ShaderReflection> m_pReflector;
 	};
 
