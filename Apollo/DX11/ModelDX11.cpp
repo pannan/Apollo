@@ -14,18 +14,21 @@ struct DepthSortAscendingLess
 	}
 };
 
-void ModelDX11::loadMaterialResources(const MaterialDX11& material)
+void ModelDX11::loadMaterialResources(MaterialDX11& material)
 {
+	ShaderDX11Ptr& forwardShader = material.m_ps[(uint8_t)RenderPipelineType::ForwardRender];
+	ShaderDX11Ptr& deferredShader = material.m_ps[(uint8_t)RenderPipelineType::DeferredRender];
 	if (!material.m_albedoMap.empty())
 	{
 		const std::string path = m_modelPath + material.m_albedoMap;
 		uint32_t texHandle = TextureDX11ResourceFactory::getInstance().createResource(path, material.m_albedoMap,"dds");
 		Texture2dDX11* albedoTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(texHandle);
 
-		if (material.m_ps && albedoTex)
-		{
-			material.m_ps->setTexture2d("DiffuseMap", albedoTex);
-		}
+		if (forwardShader && albedoTex)
+			forwardShader->setTexture2d("DiffuseMap", albedoTex);
+
+		if (deferredShader && albedoTex)
+			deferredShader->setTexture2d("DiffuseMap", albedoTex);
 	}
 
 	if (!material.m_normalMap.empty())
@@ -34,10 +37,11 @@ void ModelDX11::loadMaterialResources(const MaterialDX11& material)
 		uint32_t texHandle = TextureDX11ResourceFactory::getInstance().createResource(path, material.m_normalMap,"dds");
 		Texture2dDX11* normalTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(texHandle);
 
-		if (material.m_ps && normalTex)
-		{
-			material.m_ps->setTexture2d("normalMap", normalTex);
-		}
+		if (forwardShader && normalTex)
+			forwardShader->setTexture2d("normalMap", normalTex);
+
+		if (deferredShader && normalTex)
+			deferredShader->setTexture2d("normalMap", normalTex);
 	}
 }
 
@@ -63,9 +67,16 @@ void ModelDX11::createFromSDKMeshFile(LPCWSTR fileName, ShaderDX11Ptr vsShader)
 		//这里的vs可以同一个，不用每个都创建
 		material->m_vs = vsShader;
 
-		material->m_ps = ShaderDX11Ptr(new ShaderDX11());
-		material->m_ps->loadShaderFromFile(ShaderType::PixelShader,
+		material->m_ps[(uint8_t)RenderPipelineType::ForwardRender] = ShaderDX11Ptr(new ShaderDX11());
+		material->m_ps[(uint8_t)RenderPipelineType::ForwardRender]->loadShaderFromFile(ShaderType::PixelShader,
 			"../bin/Assets/Shader/Mesh.hlsl",
+			ShaderMacros(),
+			"PSMAIN",
+			"ps_5_0");
+
+		material->m_ps[(uint8_t)RenderPipelineType::DeferredRender] = ShaderDX11Ptr(new ShaderDX11());
+		material->m_ps[(uint8_t)RenderPipelineType::DeferredRender]->loadShaderFromFile(ShaderType::PixelShader,
+			"../bin/Assets/Shader/Deferred.hlsl",
 			ShaderMacros(),
 			"PSMAIN",
 			"ps_5_0");

@@ -166,4 +166,12 @@ enum class ClearFlags : uint8_t
 	DepthStencil = Depth | Stencil,
 	All = Color | Depth | Stencil,
 };
+
+enum class RenderPipelineType : uint8_t
+{
+	ForwardRender,
+	DeferredRender,
+	RenderPipelineCount
+};
+
 // TODO:  在此处引用程序需要的其他头文件

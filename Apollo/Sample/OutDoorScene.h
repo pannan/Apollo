@@ -35,9 +35,13 @@ namespace Apollo
 
 		RenderStateDX11 m_renderState;
 
+		RenderStateDX11 m_deferredGBufferRenderState;
+
 		ScenePtr				m_scenePtr;
 
 		RenderPassPtr		m_renderPassPtr;
+
+		RenderPassPtr		m_deferredGBufferPassPtr;
 	//	std::vector<IRenderable*>		m_renderableList;
 
 		RenderPipelinePtr		m_forwardPipelinePtr;

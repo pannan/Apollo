@@ -68,7 +68,7 @@ void TestSample::init()
 	m_psShader->setTexture2d("ColorMap00", uavTex);
 	MaterialDX11* material = new MaterialDX11;
 	material->m_vs = m_vsShader;
-	material->m_ps = m_psShader;
+	material->m_ps[(uint8_t)RenderPipelineType::ForwardRender] = m_psShader;
 	m_quadModel.addMaterial(MaterialPtr(material));
 
 	m_computerFetchColorToTextureShader = ShaderDX11Ptr(new ShaderDX11());

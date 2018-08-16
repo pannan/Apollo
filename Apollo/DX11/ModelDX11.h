@@ -27,7 +27,7 @@ namespace Apollo
 
 	protected:
 
-		void		loadMaterialResources(const MaterialDX11& material);
+		void		loadMaterialResources(MaterialDX11& material);
 
 	protected:
 

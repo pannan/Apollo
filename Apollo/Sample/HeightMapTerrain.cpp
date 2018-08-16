@@ -228,7 +228,7 @@ void HeightMapTerrain::createShader()
 
 	MaterialDX11* material = new MaterialDX11;
 	material->m_vs = m_vsShader;
-	material->m_ps = m_psShader;
+	material->m_ps[(uint8_t)RenderPipelineType::ForwardRender] = m_psShader;
 	m_terrainModel.addMaterial(MaterialPtr(material));
 
 	//////////////////////////////cs shader////////////////////////////////////////////

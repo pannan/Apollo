@@ -217,6 +217,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="ImGui\stb_rect_pack.h" />
     <ClInclude Include="ImGui\stb_textedit.h" />
     <ClInclude Include="ImGui\stb_truetype.h" />
+    <ClInclude Include="LightDefine.h" />
     <ClInclude Include="Math\Matrix3x3.h" />
     <ClInclude Include="Math\Matrix4x4.h" />
     <ClInclude Include="Math\Plane.h" />
@@ -283,6 +284,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Graphics\AABB.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
+    <ClCompile Include="Graphics\DeferredRenderLightPass.cpp" />
     <ClCompile Include="Graphics\Frustum.cpp" />
     <ClCompile Include="Graphics\IRenderable.cpp" />
     <ClCompile Include="Graphics\RenderPass.cpp" />

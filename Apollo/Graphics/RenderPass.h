@@ -30,13 +30,16 @@ namespace Apollo
 		//virtual void Visit(Mesh& mesh) = 0;
 
 	protected:
-	private:
 
 		bool				m_enable;
 
 		ScenePtr		m_scene;
 
 		RenderState*	m_renderState;
+
+	private:
+
+		
 	};
 
 	typedef std::shared_ptr<RenderPass>	RenderPassPtr;

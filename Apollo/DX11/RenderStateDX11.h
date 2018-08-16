@@ -33,6 +33,8 @@ namespace Apollo
 
 		CameraPtr&	 getCamera() { return m_camera; }
 
+		void		setRenderPipelineType(RenderPipelineType type) { m_renderPipelineType = type; }
+
 //	private:
 
 		D3D11_RECT						m_scissorRects;
@@ -64,6 +66,8 @@ namespace Apollo
 		RenderTargetDX11Ptr		m_renderTarget;
 
 		CameraPtr						m_camera;
+
+		RenderPipelineType		m_renderPipelineType;
 
 	};
 }

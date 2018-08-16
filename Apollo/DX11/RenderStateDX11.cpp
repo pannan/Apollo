@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RenderStateDX11.h"
 #include "RendererDX11.h"
+#include "MaterialDX11.h"
 using namespace Apollo;
 
 RenderStateDX11::RenderStateDX11()
@@ -81,6 +82,8 @@ void RenderStateDX11::init()
 	m_rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	m_rasterizerDesc.FrontCounterClockwise = false;
 
+	m_renderPipelineType = RenderPipelineType::ForwardRender;
+
 	m_deviceContext = RendererDX11::getInstance().getDeviceContex();
 }
 
@@ -109,6 +112,8 @@ void RenderStateDX11::bind()
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, m_stencilRef);
 	m_deviceContext->PSSetSamplers(0, 1, &m_samplerState);
 	m_deviceContext->IASetPrimitiveTopology(m_primitiveTopology);
+
+	MaterialDX11::s_currentRenderPipeline = m_renderPipelineType;
 
 	if (m_renderTarget)
 		m_renderTarget->bind();

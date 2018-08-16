@@ -321,6 +321,9 @@
     <ClInclude Include="Graphics\DeferredRenderLightPass.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="LightDefine.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -526,6 +529,9 @@
     </ClCompile>
     <ClCompile Include="DX11\HLSLDX11Factory.cpp">
       <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DeferredRenderLightPass.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

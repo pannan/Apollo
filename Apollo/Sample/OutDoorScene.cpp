@@ -91,8 +91,12 @@ void OutDoorScene::initDeferredPipeline()
 	GBufferPtr->attachTexture(AttachmentPoint::Color0, adelboTex);
 	GBufferPtr->attachTexture(AttachmentPoint::Color1, normalTex);
 
+	m_deferredPiplinePtr = RenderPipelinePtr(new RenderPipeline);
 	//add clear rtt pass
 	m_deferredPiplinePtr->addRenderPass(std::make_shared<ClearRenderTargetPass>(GBufferPtr));
+
+	m_deferredGBufferRenderState.setRenderPipelineType(RenderPipelineType::DeferredRender);
+	m_deferredGBufferPassPtr = RenderPassPtr(new RenderPass(m_scenePtr, (RenderState*)(&m_deferredGBufferRenderState)));
 	m_deferredPiplinePtr->addRenderPass(m_renderPassPtr);
 	//add lightpass
 }
