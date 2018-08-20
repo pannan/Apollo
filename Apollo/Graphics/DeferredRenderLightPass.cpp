@@ -22,8 +22,12 @@ void DeferredRenderLightPass::preRender(RenderState* renderState)
 
 void DeferredRenderLightPass::render(RenderState* renderState)
 {
-	if (m_scene)
-		m_scene->render();
+	/*if (m_scene)
+		m_scene->render();*/
+	for each (LightPtr light in m_lightList)
+	{
+
+	}
 }
 
 void DeferredRenderLightPass::postRender(RenderState* renderState)

@@ -15,6 +15,8 @@ namespace Apollo
 		
 		void Identity();
 
+		Matrix4x4 inverse();
+
 		//判断是否是正交矩阵
 		bool isOrthogonal();
 

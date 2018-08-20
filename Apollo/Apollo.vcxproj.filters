@@ -318,10 +318,10 @@
     <ClInclude Include="DX11\HLSLDX11Factory.h">
       <Filter>Dx11</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\DeferredRenderLightPass.h">
+    <ClInclude Include="LightDefine.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="LightDefine.h">
+    <ClInclude Include="Graphics\DeferredRenderLightPass.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
