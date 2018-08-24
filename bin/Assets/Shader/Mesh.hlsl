@@ -35,7 +35,7 @@ float4 PSMAIN(in VS_OUTPUT input) : SV_Target
 {
 	float3 lightDir = normalize(float3(1,1,1));
 	float3 normal = normalize(input.normal);
-	float diffuseLighting = dot(normal, lightDir);
+	float diffuseLighting = saturate(dot(normal, lightDir));
 	float3 diffuseColor = pow(DiffuseMap.Sample(TexSampler, input.uv0).rgb,2.2f);
 	//return float4(normal, 1);
 	float3 srgb = pow(diffuseLighting * diffuseColor, 1.0f/2.2f);
