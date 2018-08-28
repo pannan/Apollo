@@ -7,6 +7,8 @@
 #include "Texture2dConfigDX11.h"
 #include "TextureDX11ResourceFactory.h"
 #include "ClearRenderTargetPass.h"
+#include "DeferredRenderLightPass.h"
+#include "VertexStruct.h"
 using namespace Apollo;
 
 struct MatrixBuffer
@@ -87,18 +89,51 @@ void OutDoorScene::initDeferredPipeline()
 	uint32_t normalMapHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("GBuffer_Adelbo", texConfig);
 	Texture2dDX11* normalTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(normalMapHandle);
 
-	RenderTargetDX11Ptr GBufferPtr = RenderTargetDX11Ptr(new RenderTargetDX11);
-	GBufferPtr->attachTexture(AttachmentPoint::Color0, adelboTex);
-	GBufferPtr->attachTexture(AttachmentPoint::Color1, normalTex);
+	RenderTargetDX11Ptr GBufferRTTPtr = RenderTargetDX11Ptr(new RenderTargetDX11);
+	GBufferRTTPtr->attachTexture(AttachmentPoint::Color0, adelboTex);
+	GBufferRTTPtr->attachTexture(AttachmentPoint::Color1, normalTex);
 
 	m_deferredPiplinePtr = RenderPipelinePtr(new RenderPipeline);
 	//add clear rtt pass
-	m_deferredPiplinePtr->addRenderPass(std::make_shared<ClearRenderTargetPass>(GBufferPtr));
+	m_deferredPiplinePtr->addRenderPass(std::make_shared<ClearRenderTargetPass>(GBufferRTTPtr));
 
 	m_deferredGBufferRenderState.setRenderPipelineType(RenderPipelineType::DeferredRender);
 	m_deferredGBufferPassPtr = RenderPassPtr(new RenderPass(m_scenePtr, (RenderState*)(&m_deferredGBufferRenderState)));
-	m_deferredPiplinePtr->addRenderPass(m_renderPassPtr);
+	m_deferredPiplinePtr->addRenderPass(m_deferredGBufferPassPtr);
 	//add lightpass
+	m_deferredLightingPassPtr = RenderPassPtr(new DeferredRenderLightPass(m_scenePtr, (RenderState*)(&m_deferredGBufferRenderState)));
+	m_deferredPiplinePtr->addRenderPass(m_deferredLightingPassPtr);
+}
+
+void OutDoorScene::initQuadMesh()
+{
+	MaterialDX11* material = new MaterialDX11;
+	material->m_vs = ShaderDX11Ptr(new ShaderDX11());
+	material->m_vs->loadShaderFromFile(ShaderType::VertexShader,
+		"../bin/Assets/Shader/DeferredLighting.hlsl",
+		ShaderMacros(),
+		"VSMAIN",
+		"vs_5_0");
+	material->m_ps[(uint8_t)RenderPipelineType::DeferredRender] = ShaderDX11Ptr(new ShaderDX11());
+	material->m_ps[(uint8_t)RenderPipelineType::DeferredRender]->loadShaderFromFile(ShaderType::PixelShader,
+		"../bin/Assets/Shader/DeferredLighting.hlsl",
+		ShaderMacros(),
+		"PSMAIN",
+		"vs_5_0");
+
+	Vertex_Pos_UV0 data[4];
+	data[0].pos = Vector3(-1, 1, 0);
+	data[0].uv0 = Vector2(0, 0);
+	data[1].pos = Vector3(1, 1, 0);
+	data[1].uv0 = Vector2(1, 0);
+	data[2].pos = Vector3(1, -1, 0);
+	data[2].uv0 = Vector2(1, 1);
+	data[3].pos = Vector3(-1, -1, 0);
+	data[3].uv0 = Vector2(0, 1);
+	uint16_t index[6] = { 0,1,2,2,3,0 };
+	m_deferredLightingQuadModel.createFromMemory(data, sizeof(Vertex_Pos_UV0), 4, index, 6);
+
+	m_deferredLightingQuadModel.addMaterial(MaterialPtr(material));
 }
 
 void OutDoorScene::render()
@@ -110,8 +145,9 @@ void OutDoorScene::render()
 	m_matrixBuffer->set(&matrixBuffer, sizeof(MatrixBuffer));
 
 	//m_renderState.bind();
-
+	//似乎应该把renderstate放到renderpass里
 	RendererDX11::getInstance().clearDebugInfo();
 	//m_modelScene.draw();
-	m_forwardPipelinePtr->render((RenderState*)(&m_renderState));
+	//m_forwardPipelinePtr->render((RenderState*)(&m_renderState));
+	m_deferredPiplinePtr->render((RenderState*)(&m_renderState));
 }

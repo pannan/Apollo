@@ -512,9 +512,6 @@
     <ClCompile Include="Sample\HeightMapTerrain.cpp">
       <Filter>Sample</Filter>
     </ClCompile>
-    <ClCompile Include="DX11\ClearRenderTargetPass.cpp">
-      <Filter>Dx11</Filter>
-    </ClCompile>
     <ClCompile Include="Base\EventManager.cpp">
       <Filter>Base</Filter>
     </ClCompile>
@@ -531,6 +528,9 @@
       <Filter>Dx11</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\DeferredRenderLightPass.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\ClearRenderTargetPass.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>

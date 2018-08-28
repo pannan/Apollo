@@ -25,6 +25,8 @@ namespace Apollo
 
 		void			initDeferredPipeline();
 
+		void			initQuadMesh();
+
 	protected:
 
 		Camera*					m_camera;
@@ -42,11 +44,14 @@ namespace Apollo
 		RenderPassPtr		m_renderPassPtr;
 
 		RenderPassPtr		m_deferredGBufferPassPtr;
+		RenderPassPtr		m_deferredLightingPassPtr;
 	//	std::vector<IRenderable*>		m_renderableList;
 
 		RenderPipelinePtr		m_forwardPipelinePtr;
 
 		RenderPipelinePtr		m_deferredPiplinePtr;
+
+		ModelDX11					m_deferredLightingQuadModel;
 
 	private:
 	};	  

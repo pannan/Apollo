@@ -261,7 +261,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Base\ResourceManager.cpp" />
     <ClCompile Include="Base\Timer.cpp" />
     <ClCompile Include="DX11\BufferManagerDX11.cpp" />
-    <ClCompile Include="DX11\ClearRenderTargetPass.cpp" />
     <ClCompile Include="DX11\ConstantBufferDX11.cpp" />
     <ClCompile Include="DX11\GeometryDX11.cpp" />
     <ClCompile Include="DX11\HLSLDX11Factory.cpp" />
@@ -284,6 +283,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Graphics\AABB.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
+    <ClCompile Include="Graphics\ClearRenderTargetPass.cpp" />
     <ClCompile Include="Graphics\DeferredRenderLightPass.cpp" />
     <ClCompile Include="Graphics\Frustum.cpp" />
     <ClCompile Include="Graphics\IRenderable.cpp" />
