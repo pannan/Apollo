@@ -148,6 +148,6 @@ void OutDoorScene::render()
 	//似乎应该把renderstate放到renderpass里
 	RendererDX11::getInstance().clearDebugInfo();
 	//m_modelScene.draw();
-	//m_forwardPipelinePtr->render((RenderState*)(&m_renderState));
-	m_deferredPiplinePtr->render((RenderState*)(&m_renderState));
+	m_forwardPipelinePtr->render((RenderState*)(&m_renderState));
+	//m_deferredPiplinePtr->render((RenderState*)(&m_renderState));
 }

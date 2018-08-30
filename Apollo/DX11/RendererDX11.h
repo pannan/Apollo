@@ -55,6 +55,10 @@ namespace Apollo
 
 		int						getBackBufferHeight() { return m_backBufferHeight; }
 
+		void						setMainBackBuffer();
+
+		void						clearMainBackBuffer();
+
 	protected:
 
 		HWND										m_hWnd;

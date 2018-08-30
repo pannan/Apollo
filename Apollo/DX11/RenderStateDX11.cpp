@@ -85,6 +85,11 @@ void RenderStateDX11::init()
 	m_renderPipelineType = RenderPipelineType::ForwardRender;
 
 	m_deviceContext = RendererDX11::getInstance().getDeviceContex();
+
+	m_rasterizerState = nullptr;
+	m_blendState = nullptr;
+	m_depthStencilState = nullptr;
+	m_samplerState = nullptr;
 }
 
 void RenderStateDX11::createState()

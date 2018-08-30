@@ -76,19 +76,6 @@ void RenderTargetDX11::bind()
 		}
 	}
 
-	/*ID3D11UnorderedAccessView* uavViews[8];
-	UINT uavStartSlot = numRTVs;
-	UINT numUAVs = 0;
-
-	for (uint8_t i = 0; i < 8; i++)
-	{
-		StructuredBufferDX11* rwBuffer = m_structuredBufferList[i];
-		if (rwBuffer)
-		{
-			uavViews[numUAVs++] = rwbuffer->GetUnorderedAccessView();
-		}
-	}*/
-
 	ID3D11DepthStencilView* depthStencilView = nullptr;
 	Texture2dDX11* depthTexture = m_textureList[(uint8_t)AttachmentPoint::Depth];
 	Texture2dDX11* depthStencilTexture = m_textureList[(uint8_t)AttachmentPoint::DepthStencil];
