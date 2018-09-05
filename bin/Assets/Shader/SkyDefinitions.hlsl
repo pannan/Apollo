@@ -56,6 +56,15 @@ const Luminance kcd_per_square_meter = kcd / m2;
 #define Power float
 #define LuminousPower float
 
+#define TransmittanceTexture sampler2D
+#define AbstractScatteringTexture sampler3D
+#define ReducedScatteringTexture sampler3D
+#define ScatteringTexture sampler3D
+#define ScatteringDensityTexture sampler3D
+#define IrradianceTexture sampler2D
+
+SamplerState	TransmittanceTexture_Sampler;
+
 /*
 大气层参数
 
@@ -94,7 +103,7 @@ struct AtmosphereParameters
 	IrradianceSpectrum solar_irradiance;
 	// The sun's angular radius. Warning: the implementation uses approximations
 	// that are valid only if this angle is smaller than 0.1 radians.
-	//太阳角度半径。Warming:这个执行近似的，只有当角度小于0.1弧度时有效。
+	//太阳角度半径。Warming:这是个近似值，只有当角度小于0.1弧度时有效。
 	Angle sun_angular_radius;
 	//地心到大气层底部边界的距离
 	Length bottom_radius;

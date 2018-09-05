@@ -38,13 +38,13 @@ Length SafeSqrt(Area a)
 从上面可以推导出T(p,q) = T(p,i) / T(q,i)
 另外，p，q和q，p之间的透过率相同  T(p,q) = T(q,p)
 
-因此，为了计算任意两点的透视率，需要满足知道在大气层里点X和在大气层边缘上点i之间的透视率。
+因此，为了计算任意两点的透射率，需要满足知道在大气层里点X和在大气层边缘上点i之间的透射率。
 （
-这里的意思是，要知道在大气层里任意两点p，q之间的透视率T(p,q)，需要知道沿着p，q发射射线得到和大气层边缘交点i，这样计算T(p,i)T(q,i)
+这里的意思是，要知道在大气层里任意两点p，q之间的透射率T(p,q)，需要知道沿着p，q发射射线得到和大气层边缘交点i，这样计算T(p,i)T(q,i)
 就可以计算T(p,q) = T(p,i) / T(q,i)
 ）
 
-透视率值依赖两个参数，点到地球中心的半径r=||op||和视线和向量op之间的夹角（view zenith angle）的cos值。
+透射率值依赖两个参数，点到地球中心的半径r=||op||和视线和向量op之间的夹角（view zenith angle）的cos值。
 mu = cos(a) = op * pi / （||op|| * ||pi||) = dot(op,pi)（dot需要归一化向量）
 
 为了计算这个，首先要计算长度||pi||，并且需要知道线段[p,i]是否和地面相交
@@ -58,7 +58,7 @@ mu = cos(a) = op * pi / （||op|| * ||pi||) = dot(op,pi)（dot需要归一化向量）
 d * sin(view zenith angle)=线段[p,i]在xz屏幕的长度
 r + d *mu= 线段[O,i]投影到[O,p]的长度
 
-由于i是在一个圆上，所以可以计算[O,i]的长度为：
+由于i是在一个圆上，所以可以计算[O,i]的长度平方为：
 pow(d*sqrt(1 - mu * mu),2) + pow(r + d*mu,2) = 
 d*d * (1 - mu*mu) + r*r + d*d * mu*mu + 2 * r * d * mu = 
 d*d - d*d * mu*mu + r*r + d*d + d*d * mu*mu + 2 * r * d * mu =
@@ -114,7 +114,7 @@ bool RayIntersectGround(in AtmosphereParameters atmopshere, Length r, Number mu)
 Beer-Lambert law
 T = exp(-r)
 r : optical depth（光学深度）
-我们现在可以计算p和i之间的透视率。根据Beer-Lambert law，会涉及沿着线段[p,i]上的空气分子的密度的数值积分，以及气溶胶密度的数值积分和
+我们现在可以计算p和i之间的透射率。根据Beer-Lambert law，会涉及沿着线段[p,i]上的空气分子的密度的数值积分，以及气溶胶密度的数值积分和
 吸收光（比如臭氧）的空气分子的密度的数值积分。当线段[p,i]不和地面相交时，这个3个积分有一样的形式（exp(-r)），它们可以再接下来的一些辅助
 函数（使用trapezoidal rule）的帮助下进行数值计算。
 */
@@ -156,7 +156,7 @@ Length ComputeOpticalLengthToTopAtmosphereBoundary(in AtmosphereParameters atmos
 }
 
 /*
-p和i之间的透视率现在很容易计算了（我们继续假设线段没有和地面相交）
+p和i之间的透射率现在很容易计算了（我们继续假设线段没有和地面相交）
 */
 DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundary(in AtmosphereParameters atmosphere, Length r, Number mu)
 {
@@ -177,23 +177,24 @@ DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundary(in AtmosphereP
 预计算
 extrapolated：推断
 {
-在数学中，外推是在原始观察范围之外，根据与另一个变量的关系估计变量的值的过程。 
+在数学中，推断是在原始观察范围之外，根据与另一个变量的关系估计变量的值的过程。 
 它类似于插值，它在已知观测值之间产生估计值，但是外推会受到更大的不确定性和产生无意义结果的更高风险。
 }
 
 上述函数的评估成本很高，计算单次和多次散射需要很多的评估。
-幸运的是函数只依赖两个参数并且什么平滑（应该是值函数没有高频形状）
+幸运的是函数只依赖两个参数并且十分平滑（应该是值函数没有高频形状）
 我们可以在一个2d纹理里预计算来优化评估
 
 这样我们需要在函数参数(r,mu)和纹理坐标(u,v)之间做一个映射，反之也然，
 因为这些参数不具有一致的单位和值范围。
-即使是这种情况，在大小为n的纹理中以间隔[0,1]储存函数f将在0.5/n，1.5/n，......(n - 0.5)/n采样函数
+即使是这种情况，在大小为n的纹理中以间隔[0,1]储存函数f将在0.5/n，1.5/n，......(n - 0.5)/nd点上采样函数
 因为纹理采样时在texels的中心（所以从0.5开始，以1为间隔）。
 因此，在纹理的边界（0和1）只能给出我们推断的函数值（extrapolated function values）。
 【上面的意思我理解是：因为前面的采样时从0.5开始，(n-0.5)/n结束，所以在纹理的边界
 0和1是没有采样的，所以只能通过推断（插值）来获得值】
 
-为了避免这种情况，我们需要在纹理元素0的中心储存f(0)（而不是f(0.5)）
+为了避免这种情况，
+我们需要在texels(纹理元素)0的中心储存f(0)（而不是f(0.5)）,
 在纹理元素n-1的中心储存f(1)（而不是f((n-0.5)/n)）。
 可以通过以下的映射来完成:
 从值x[0,1]到纹理坐标u[0.5/n,(n - 0.5)/n] 和它的inverse
@@ -228,26 +229,43 @@ dmin	|			            ------------
 			P									           -------------- 
             |													----------				
  	-------------------------								--------
-                              ----------------e---						 ------
-		       			                     ------------							 i-------
-					      			                      ----------						------ 大气层
+            |                 ----------------e---						 ------
+		    | 			                     ------------							 i-------
+		   O		      			                      ----------地面						------ 大气层
 								
 										
 
 上面所示：
-点p代表相交
+d_min = ||Ot||
+d_max = ||pi|| = ||pe|| + ||ei||
+p代表相机
+O是地心
+t是[O,p]延长线和大气层顶部边缘的交点
+e是view ray和地面相切的点
+i是veiw ray和大气层相交的点
+r是p到O的距离：||Op||
+
 view ray和大气层相交的最短距离是 ||pt||
 view ray和大气层相交的最长距离是||pe|| + ||ei||
-||pe|| = p
-||ei|| = H
-点e是view ray和地面相切的点
-i是veiw ray和大气层相交的点
 
-dmin = rtop - r
-dmax = k + H
+||pe|| = K
+||ei|| = H
+
+dmin = rtop - r =  ||Ot|| - r
+dmax = K + H
 我们映射mu到一个范围为[0,1]的值Xmu
 
 有了这些定义，我们映射(r,mu)到纹理坐标(u,v)可以如下执行:
+【
+一些思考：
+一下情况是p在大气层里的情况：
+从上面可知，因为d_max是view ray在于地面相切的射线与大气层边缘相交的距离
+所以当p刚好在地面，也就是r = 地球半径时，与地面相交的view ray是水平的
+也就是mu = 0时，d最大
+但是当r逐渐增大，view ray与地面相切时,mu会 < 0
+当p点在大气层顶部边缘时，Ope,Oei组成两个相同等腰三角形
+这时d_max是最大的
+ 】
 */
 
 float2 GetTransmittanceTextureUvFromRMu(in AtmosphereParameters atmosphere, Length r, Number mu)
@@ -262,7 +280,7 @@ float2 GetTransmittanceTextureUvFromRMu(in AtmosphereParameters atmosphere, Leng
 	Length H = sqrt(atmosphere.top_radius * atmosphere.top_radius - atmosphere.bottom_radius * atmosphere.bottom_radius);
 	
 	//同理(O,p,e)组成一个直角三角形，斜边为[O,p]
-	//k = ||Oe|| = sqrt(||Op||*||Op|| - ||Oe||*||Oe||)
+	//k = ||pe|| = sqrt(||Op||*||Op|| - ||Oe||*||Oe||)
 	//而||Op|| = r
 	//||Oe|| = atmosphere.bottom_radius
 	Length K = sqrt(r * r - atmosphere.bottom_radius * atmosphere.bottom_radius);
@@ -271,6 +289,14 @@ float2 GetTransmittanceTextureUvFromRMu(in AtmosphereParameters atmosphere, Leng
 	Length d_min = atmosphere.top_radius - r;
 	Length d_max = H + K;
 	Number x_mu = (d - d_min) / (d_max - d_min);
+	/*
+	这里的x_r不是直接用r来表示，而是用K/H
+	当r = 地球半径时,K = 0 所以 x_r = 0
+	当r = 大气层半径时,从上面总结知道
+	Ope,Oei组成两个相同等腰三角形，也就是||pe|| = ||ei||
+	而||pe|| = K , ||ei|| = H
+	所以x_r = 1
+	*/
 	Number x_r = K / H;
 
 	Number u = GetTextureCoordFromUnitRange(x_mu, TRANSMITTANCE_TEXTURE_WIDTH);
@@ -296,7 +322,7 @@ void GetRMuFromTransmittanceTextureUv(in AtmosphereParameters atmosphere, in flo
 	mu = ClampCosine(mu);
 }
 
-//现在可以用一个函数预计算透视率纹理
+//现在可以用一个函数预计算透射率纹理
 DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundaryTexture(in AtmosphereParameters atmosphere, in float2 uv)
 {
 	const float2 TRANSMITTANCE_TEXTURE_SIZE = float2(TRANSMITTANCE_TEXTURE_WIDTH, TRANSMITTANCE_TEXTURE_HEIGHT);
@@ -305,3 +331,82 @@ DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundaryTexture(in Atmo
 	GetRMuFromTransmittanceTextureUv(atmosphere, gl_frag_coord / TRANSMITTANCE_TEXTURE_SIZE, r, mu);
 	return ComputeTransmittanceToTopAtmosphereBoundary(atmosphere, r, mu);
 }
+
+/*
+查找
+在上面预计算纹理的帮助下，我们现在可以用单次纹理查询得到点和顶部大气层边界的透射率（假设view ray没有和地面相交）
+*/
+DimensionlessSpectrum GetTransmittanceToTopAtmosphereBoundary(in AtmosphereParameters atmosphere,
+	in TransmittanceTexture transmittance_texture, Length r, Number mu)
+{
+	float2 uv = GetTransmittanceTextureUvFromRMu(atmosphere, r, mu);
+	return DimensionlessSpectrum(transmittance_texture.Sample(TransmittanceTexture_Sampler, uv));
+}
+
+/*
+				----------
+		-----         |        ------
+-----					|					--i----
+----                  | cos(a)   q            ------atmosphere
+		------      p
+			| ------ |-------
+	---	|			|      -----
+-----		r			|           -----
+--			|			|                 -------earth
+	-----------   O
+由上面推导的，在p高度为r，沿着view ray距离为d的点q到地心的距离：
+rd = ||Oq|| = sqrt(d*d + 2*d*mu*r + r*r)
+mud = oq*pi /||oq||*||pi|| = (r*mu + d) / rd
+
+现在我们需要知道在q点的r和mu: rd , mud
+mud是向量[O,q]和[p,i]的夹角
+我们假设pi是归一化向量，那么
+||oq||*||pi|| = ||Oq||
+oq*pi = oq在向量[p,i]上的投影
+我们假设oq在[p,i]上的投影点为k
+那么Okq组成一个直角三角形，斜边为[O,q],那么得到
+oq*pi = r*mu + d,最后得到
+mud = oq*pi /||oq||*||pi|| = (r*mu + d) / rd
+
+
+得到在大气层里任意两点p和q之间的透射率只需要两次纹理查询
+重温:
+T(p,i) = T(p,q) * T(q,i)
+T(p,q) = T(p,i) / T(q,i)
+我们继续假设线段[p,q]不和地面相交
+*/
+
+DimensionlessSpectrum GetTransmittance(in AtmosphereParameters atmosphere, in TransmittanceTexture transmittance_texture,
+	Length r, Number mu, Length d, bool ray_r_mu_intersects_ground)
+{
+	Length r_d = ClampRadius(atmosphere, sqrt(d*d + 2 * r*mu*d + r*r));
+	Number mu_d = ClampCosine((r * mu + d) / r_d);
+
+	if (ray_r_mu_intersects_ground)
+	{
+		Number Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, -mu);
+		Number Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, -mu_d);
+		Number Tpq = Tpi / Tqi;
+		return min(Tpq, DimensionlessSpectrum(1.0));
+	}
+	else
+	{
+		Number Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, mu);
+		Number Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, mu_d);
+		Number Tpq = Tpi / Tqi;
+		return min(Tpq, DimensionlessSpectrum(1.0));
+	}
+}
+
+/*
+r和mu定义的射线和地面相交时ray_r_mu_intersects_ground为true。
+我们在这里不会用RayIntersectsGround来计算它，由于有限的精度和浮点数操作的rounding error，当射线十分接近地平线时结果可能错误。
+并且调用者一般来说有更健壮的方法知道射线是否和地面相交（见下面）
+
+最终，我们需要在大气层里一点和太阳之间的透射率。
+太阳不是一个点光源，这是整个太阳圆盘上透射率的积分。
+在这里我们认为整个圆盘上的透射率是不变的，除了在地平线以下，这时透射率为0。
+作为结果，到太阳的透射率可以用GetTransmittanceToTopAtmosphereBoundary计算，并称以在地平线上太阳的部分。
+
+
+*/
