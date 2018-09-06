@@ -70,7 +70,7 @@ d*d + 2 *r *d * mu + r*r
 根据pow((a + b),2) = a*a + 2 * a * b + b*b
 pow(d + r*mu,2) = d*d + 2*d*r*mu + r*r*mu*mu
 
-d*d + 2*r*d*mu + r*r = 
+d*d + 2*r*d*mu + r*r = R*R ->
 pow(d + r*mu,2) - r*r*mu*mu + r*r = R*R
 pow(d + r*mu,2) = R*R + r*r*mu*mu - r*r
 d + r*mu = sqrt(R*R + r*r*mu*mu - r*r)
@@ -399,6 +399,7 @@ DimensionlessSpectrum GetTransmittance(in AtmosphereParameters atmosphere, in Tr
 }
 
 /*
+计算到太阳的透射率
 r和mu定义的射线和地面相交时ray_r_mu_intersects_ground为true。
 我们在这里不会用RayIntersectsGround来计算它，由于有限的精度和浮点数操作的rounding error，当射线十分接近地平线时结果可能错误。
 并且调用者一般来说有更健壮的方法知道射线是否和地面相交（见下面）
@@ -406,7 +407,117 @@ r和mu定义的射线和地面相交时ray_r_mu_intersects_ground为true。
 最终，我们需要在大气层里一点和太阳之间的透射率。
 太阳不是一个点光源，这是整个太阳圆盘上透射率的积分。
 在这里我们认为整个圆盘上的透射率是不变的，除了在地平线以下，这时透射率为0。
-作为结果，到太阳的透射率可以用GetTransmittanceToTopAtmosphereBoundary计算，并称以在地平线上太阳的部分。
-
-
+作为结果，到太阳的透射率可以用GetTransmittanceToTopAtmosphereBoundary计算，并乘以在地平线上太阳的部分。
+= ~表示“约等于”
+Fraction的变化从当太阳天顶角度Rs大于地平线天顶角度Rh加上太阳角度半径As的0，到Rs小于Rh - As的1。
+等价的，它的变化从当mu_s = cos(Rs) < cos(Rh + As) = ~ cos(Rh) - As*sin(Rh)时的0，
+到mu_s > cos(Rh - As) =~ cos(Rh) + As*sin(Rh)时的1
+在这之间，太阳圆盘可见部分的近似于smoothstep(这可以通过绘制圆形段的面积作为其sagitta的函数来验证)。
+因此，因为sin(Rh) = rbotttom / r,我们可以用下面的函数近似的表示到太阳的透射率：
 */
+DimensionlessSpectrum GetTransmittanceToSun(in AtmosphereParameters atmosphere, in TransmittanceTexture transmittance_texture,
+	Length r, Number mu_s)
+{
+	//sin_theta_h = sin(Rh)
+	//在地面上有一点p，有||op|| = r,
+	//从P点向地面做切线，切点为e,||oe|| = rbottom = 地球半径
+	//oep组成直角三角形，直角为oep,斜边为[o,p]
+	//Rh为[pe]和[p,o的夹角]
+	// sin(Rh) = ||oe|| / ||po|| = rbottom / r	
+	Number sin_theta_h = atmosphere.bottom_radius / r;
+	Number cos_theta_h = -sqrt(max(1.0 - sin_theta_h * sin_theta_h), 0.0);
+	
+
+	/*
+	Rs:太阳天顶角
+	Rh:地平线天顶角
+	As:太阳的角度半径，就也是太阳半径对应的角度
+	由前面知：
+	当太阳完全在地平线之下时，有
+	Rs > Rh + As  -> 
+	cos(Rs) < cos(Rh +Ａs)　＝～cos(Rh) - As*sin(Rh) ->
+	cos(Rs) < cos(Rh) - As*sin(Rh) ->
+	cos(Rs) - cos(Rh) < -As*sin(Rh)
+	也就是当cos(Rs) - cos(Rh) 小于 -As*sin(Rh)时，太阳完全在地平线之下（Fraction = 0）
+	同理：
+	当太阳完全在地平线之上时：
+	Rs < Rh - As ->
+	cos(Rs) > cos(Rh - As) ->
+	cos(Rs) > cos(Rh) + As*sin(Rh) ->
+	cos(Rs) - cos(Rh) > As*sin(Rh)
+	也就是当cos(Rs) - cos(Rh) 大于 As*sin(Rh)时，太阳完全在地平线之上（Fraction = 1）
+	Fraction = 0 :cos(Rs) - cos(Rh) < -As*sin(Rh)
+	Fraction = 1: cos(Rs) - cos(Rh) > As*sin(Rh)
+	上面是Fraction在<0 和 >1的范围，
+	Fraction在[0,1]时，符号取反,得：
+	 -As*sin(Rh) <= cos(Rs) - cos(Rh) <= As*sin(Rh)
+	 smoothstep(-As*sin(Rh),As*sin(Rh),cos(Rs) - cos(Rh))
+	*/
+	Number sin_theat_h_sun_angular = sin_theta_h * atmosphere.sun_angular_radius;
+	Number Fraction = smoothstep(-sin_theat_h_sun_angular, sin_theat_h_sun_angular, mu_s - cons_theta_h);
+	DimensionlessSpectrum TransmittanceToSun = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, mu_s);
+
+	return TransmittanceToSun * Fraction;
+}
+
+/*
+单次散射
+
+单次散射辐射是在大气中恰好一次散射事件之后从太阳到达某些点的光（这可能是由于空气分子或气溶胶粒子;我们排除了来自地面的反射，它单独计算）。
+以下部分描述了我们如何计算它，如何将它存储在预先计算的纹理中，以及我们如何读取它。
+
+计算
+
+考虑在达到点p之前，太阳光在点q被空气分子散射的情况（对气溶胶用"Mie"替换“Rayleigh”）
+
+				----------
+	-----          |        ------
+ -----			 |					--i----
+----				 | cos(a)   q            ------atmosphere
+		------    p
+		 | ------ |-------
+ ---	 |			|      -----
+-----	r			|           -----
+--		|			|                 -------earth
+-----------   O
+
+达到p点的radiance的生成：
+在大气层顶部的太阳irradiance
+太阳和q之间的透射率（一分部顶部大气层太阳光达到q（内散射？））
+在q点的Rayleigh散射系数（从任何方向，被散射到q点的光（外散射？））
+Rayleigh相位函数（在q点被散射到[q,p]方向上的光）
+q和p之间的透射率（在q点沿着[q,p]到达p点的光）
+
+Ws表示太阳的方向，是单位向量 ||Ws|| = 1
+r = ||op||
+d = ||pq||
+mu = (op*pq) / r*d
+mu_s = (op*Ws) / (||op||*||Ws||) = (op*Ws) / r 
+v = (pq * Ws) / (||pq||*||Ws||) = (pq * Ws) / d
+
+在q点的r和mu_s
+rq = ||oq|| = sqrt(d*d + 2*d*r*mu + r*r);(上面推导过)
+mu_sd = (oq * Ws) / (||oq|| * ||Ws||) ,因为oq = op + pq ->
+mu_sd = ((op + pq) * Ws) / rd = (op*Ws + pq*Ws) / rd = (r*mu_s + d*v) / rd
+
+RayLeigh和Mie单次散射可以像下面这样计算（我们忽略太阳irradiance和相位函数，还有在大气层底部的散射系数，为了效率我们之后加入它们）
+*/
+//下面的nu是上面的v
+void ComputeSingleScattingIntegrand(in AtmosphereParameters atmosphere, in TransmittanceTexture transmittance_texture,
+	Length r, Number mu, Number mu_s, Number nu, Length d,bool ray_r_mu_intersects_ground,
+	out DimensionlessSpectrum rayleigh,out DimensionlessSpectrum mie)
+{
+	Length r_d = ClampRadius(atmosphere, sqrt(d*d + 2 * d*r*mu + r*r));
+	Number mu_s_d = ClampCosine((r*mu_s + nu*d) / r_d);
+
+	//p,q之间的透射率
+	DimensionlessSpectrum Tpq = GetTransmittance(atmosphere, transmittance_texture, r, mu, d, ray_r_mu_intersects_ground);
+	//q和太阳之间的透射率
+	DimensionlessSpectrum Tsun_q = GetTransmittanceToSun(atmosphere, transmittance_texture, r_d, mu_s_d);
+
+	//太阳到q,然后q到p的透射率
+	DimensionlessSpectrum Tsun_q_p = Tsun_q * Tpq;
+
+	rayleigh = Tsun_q_p * GetProfileDensity(atmosphere.rayleigh_density, r_d - atmosphere.bottom_radius);
+	mie = Tsun_q_p * GetProfileDensity(atmosphere.mie_density, r_d - atmosphere.bottom_radius);
+}
