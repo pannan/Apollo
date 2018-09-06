@@ -103,7 +103,7 @@ d = sqrt( Rb*Rb + r*r * (mu*mu - 1)) - r*mu
 由此我们推导出
 */
 
-bool RayIntersectGround(in AtmosphereParameters atmopshere, Length r, Number mu)
+bool RayIntersectsGround(in AtmosphereParameters atmopshere, Length r, Number mu)
 {
 	//只有当mu <0才可能和地面相交
 	return mu < 0.0 && atmopshere.bottom_radius * atmopshere.bottom_radius + r*r * (mu*mu - 1.0) >= 0.0;
@@ -520,4 +520,71 @@ void ComputeSingleScattingIntegrand(in AtmosphereParameters atmosphere, in Trans
 
 	rayleigh = Tsun_q_p * GetProfileDensity(atmosphere.rayleigh_density, r_d - atmosphere.bottom_radius);
 	mie = Tsun_q_p * GetProfileDensity(atmosphere.mie_density, r_d - atmosphere.bottom_radius);
+}
+
+/*
+在完成一次散射后，太阳光从方向W达到p。（也就是视线方向view ray为W,dot(W,op) = mu,这里op归一化了）
+散射发生在p和half-line[p,W)和最近的大气层边界交点i之间的任意点q。（线段[p,i]之间的任意点q）
+因此，在p点方向W上的单次散射radiance是在线段p和i上所有点q到p的单次散射radiance的积分。
+为了计算它，我们首先需要||pi||长度
+*/
+
+Length DistanceToNearestAtmosphereBoundary(in AtmosphereParameters atmosphere, Length r, Number mu, bool ray_r_mu_intersects_ground)
+{
+	if (ray_r_mu_intersects_ground)
+		return DistanceToBottomAtmosphereBoundary(atmosphere, r, mu);
+	else
+		return DistanceToTopAtmosphereBoundary(atmosphere, r, mu);
+}
+
+/*
+单次散射的积分
+*/
+
+void ComputeSingleScatteringin(in AtmosphereParameters atmosphere, in TransmittanceTexture transmittance_texture,
+	Length r, Number mu, Number mu_s, Number nu,bool ray_r_mu_intersects_ground,
+	out IrradianceSpectrum rayleigh,out IrradianceSpectrum mie)
+{
+	//数值积分的间隔数（采样数）
+	const int SAMPLE_COUNT = 50;
+	//采样点的间隔长度
+	Length dx = DistanceToNearestAtmosphereBoundary(atmosphere, r, mu, ray_r_mu_intersects_ground) / Number(SAMPLE_COUNT);
+
+	DimensionlessSpectrum raylegh_sum = DimensionlessSpectrum(0.0);
+	DimensionlessSpectrum mie_sum = DimensionlessSpectrum(0.0);
+
+	for (int i = 0; i <= SAMPLE_COUNT; ++i)
+	{
+		Length d_i = Number(i) * dx;
+
+		DimensionlessSpectrum rayleigh_i;
+		DimensionlessSpectrum mie_i;
+
+		ComputeSingleScatteringIntegrand(atmosphere, transmittance_texture, r, mu, mu_s, nu, d_i, ray_r_mu_interescts_ground, rayleigh_i, mie_i);
+
+		//采样权重(trapezoidla rule)
+		Number weight_i = (i == 0) || (i == SAMPLE_COUNT) ? 0.5 : 1.0;
+		rayleigh_sum += rayleigh_i * weight_i;
+		mie_sum += mie_i * weight_i;
+	}
+
+	rayleigh = rayleigh_sum * dx * atmosphere.solar_irradiance * atmosphere.rayleigh_scattering;
+	mie = mie_sum * dx * atmosphere.solar_irradiance * atmosphere.mie_scattering;
+}
+
+/*
+现在我们把在ComputeSingleScatteringIntegrand中忽略的太阳irradiance和散射参数加上，
+但是没有相位函数，为了更好的角度精度我们在render time时再加。
+*/
+
+InverseSolidAngle RayleighPhaseFunction(Number nu)
+{
+	InverseSolidAngle k = 3.0 / (16.0 * PI * sr);
+	return k * (1.0 + nu*nu);
+}
+
+InverseSolidAngle MiePhaseFunction(Number g, Number nu)
+{
+	InverseSolidAngle k = 3.0 / (8.0 * PI * sr) * (1.0 - g*g) / (2.0 + g*g);
+	return k * (1.0 = nu*nu) / pow(1.0 + g*g - 2.0*g*nu, 1.5);
 }
