@@ -510,16 +510,16 @@ void ComputeSingleScattingIntegrand(in AtmosphereParameters atmosphere, in Trans
 	Length r_d = ClampRadius(atmosphere, sqrt(d*d + 2 * d*r*mu + r*r));
 	Number mu_s_d = ClampCosine((r*mu_s + nu*d) / r_d);
 
-	//p,q之间的透射率
-	DimensionlessSpectrum Tpq = GetTransmittance(atmosphere, transmittance_texture, r, mu, d, ray_r_mu_intersects_ground);
+	//q到p的透射率
+	DimensionlessSpectrum T_q_p = GetTransmittance(atmosphere, transmittance_texture, r, mu, d, ray_r_mu_intersects_ground);
 	//q和太阳之间的透射率
-	DimensionlessSpectrum Tsun_q = GetTransmittanceToSun(atmosphere, transmittance_texture, r_d, mu_s_d);
+	DimensionlessSpectrum T_sun_q = GetTransmittanceToSun(atmosphere, transmittance_texture, r_d, mu_s_d);
 
 	//太阳到q,然后q到p的透射率
-	DimensionlessSpectrum Tsun_q_p = Tsun_q * Tpq;
+	DimensionlessSpectrum T_sun_q_p = T_sun_q * T_q_p;
 
-	rayleigh = Tsun_q_p * GetProfileDensity(atmosphere.rayleigh_density, r_d - atmosphere.bottom_radius);
-	mie = Tsun_q_p * GetProfileDensity(atmosphere.mie_density, r_d - atmosphere.bottom_radius);
+	rayleigh = T_sun_q_p * GetProfileDensity(atmosphere.rayleigh_density, r_d - atmosphere.bottom_radius);
+	mie = T_sun_q_p * GetProfileDensity(atmosphere.mie_density, r_d - atmosphere.bottom_radius);
 }
 
 /*
@@ -588,3 +588,119 @@ InverseSolidAngle MiePhaseFunction(Number g, Number nu)
 	InverseSolidAngle k = 3.0 / (8.0 * PI * sr) * (1.0 - g*g) / (2.0 + g*g);
 	return k * (1.0 = nu*nu) / pow(1.0 + g*g - 2.0*g*nu, 1.5);
 }
+
+/*
+预计算
+
+ComputeSingleScattering函数的评估成本十分高，而计算多次散射需要很多次的评估。
+因此我们希望预计算到纹理，这个需要映射函数的4个参数到纹理坐标。
+假设现在我们有个4D纹理，我们需要定义一个从(r,mu,mu_s,v)到纹理坐标(u,v,w,z)的映射。
+下面的执行函数早我们的纹理里定义，有一些小的改进。
+
+.mu的映射考虑到最近大气层边界的最小距离，映射mu到完整的[0,1]间隔（最初的映射没有覆盖全[0,1]间隔）
+.mu_s的映射比论文里的更通用（原始纹理里的映射使用了一个为大气层情况选择的特殊常数）。
+ 它基于到顶部大气层边界的距离（对太阳ray来说），就像mu的映射，只使用一个特殊参数（可配置的）。
+  就像原始定义的，它会在靠近地平线时增加采样。
+*/
+
+float4 GetScatteringTextureUvwzFromRMuMuSNu(in AtmosphereParameters atmosphere, Length r, Number mu,
+	Number mu_s, Number nu, bool ray_r_mu_intersects_ground)
+{
+	//在大气层中一点p对地球做切线，切点e，切线和大气层交点为i,地心为O，Ope为直角三角形，斜边为Op
+	//H = ||ei||= sqrt(||Oi||*||Oi|| - ||Oe||*||Oe||) = sqrt(top_radius * top_radius - bottom_radius * bottom_radius)
+	Length H = sqrt(atmosphere.top_radius * atmosphere.top_radius - atmosphere.bottom_radius * atmosphere.bottom_radius);
+
+	//K = ||pe||= sqrt(||Op||*||Op|| - ||Oe||*||Oe||) = sqrt(r * r - bottom_radius * bottom_radius)
+	Length K = sqrt(r*r - atmosphere.bottom_radius * atmosphere.bottom_radius);
+	
+	Number u_r = GetTextureCoordFromUnitRange(K / H, SCATTERING_TEXTURE_R_SIZE);
+
+	//对ray(r,mu)和地面的二次方程的判别（see RayIntersectsGround）
+	Number discriminant = atmosphere.bottom_radius * atmosphere.bottom_radius + r*r*(mu*mu - 1.0);
+	Number n_mu;
+	if (ray_r_mu_intersects_ground)
+	{
+		//ray(r,mu)到地面的距离，对所有mu的最小和最大值，通过ray(r,-1)和ray(r,m_horizon)获得
+		//当前ray(r,mu)和地面相交的d
+		//这里有点不明白，d = sqrt(discriminant) - r*mu，但是这里为什么要是-sqrt(discriminant) - r*mu
+		//【这里为符号可能和mu有关，因为只有ray和Op角度为大于90度，才能和地面相交。也就是mu<0】
+		Length d = -sqrt(discriminant) - r * mu;
+		Length d_min = r - atmosphere.bottom_radius;
+		Length d_max = K;
+
+		//这里不是映射到[0,1]而是[0,0.5]，因为另一半要留给不和地面相交的情况
+		u_mu = 0.5 - 0.5 * GetTextureCoordFromUnitRange(d_max == d_min ? 0.0 : (d - d_min) / (d_max - d_min), SCATTERING_TEXTURE_MU_SIZE / 2);
+	}
+	else
+	{
+		//ray(r,mu)和顶部大气层的距离，低所有mu的最小最大值，通过ray(r,1)和ray(r,mu_horizon)获得
+		//这里的sqrt(discriminant)符号为正，因为mu>0?,但是不和地面相交也可能mu < 0
+		//由于是求和顶部大气层交点距离，所有dis = top_radius*top_radius + r*r*(mu*mu - 1.0)
+		//H*H = top_radius*top_radius - bottom_radius*bottom_radius
+		//discriminant + H * H = bottom_radius*bottom_radius + r*r(mu*mu - 1) + H*H = top_radius*top_radius + r*r*(mu*mu - 1.0)
+		Length d = sqrt(discriminant + H * H) - r*mu;
+		Length d_min = atmosphere.top_radius - r;
+		Length d_max = K + H;
+		u_mu = 0.5 + 0.5 * GetTextureCoordFromUnitRange((d - d_min) / (d_max - d_min), SCATTERING_TEXTURE_MU_SIZE / 2);
+	}
+
+	//计算u_mu_s
+	//当前mu_s，在地面一点到大气层的距离
+	Length d_s = DistanceToTopAtmosphereBoundary(atmosphere, atmosphere.bottom_radius, mu_s);
+	//ray(bottom_radius,mu_s)最小最大是 min:ray(bottom,cos(0)),max:ray(bottom,cos(90))
+	Length d_min_s = atmosphere.top_radius - atmosphere.bottom_radius;
+	Length d_max_s = H;
+	Number a = (d_s - d_min_s) / (d_max_s - d_min_s);
+	Number A = -2.0 * atmosphere.mu_s_min * atmosphere.bottom_radius / (d_max_s - d_min_s);
+	Number u_mu_s = GetTextureCoordFromUnitRange(max(1.0 - a / A, 0.0) / (1.0 + a), SCATTERING_TEXTURE_MU_S_SIZE);
+	Number u_nu = (nu + 1.0) / 2.0;
+
+	return float4(u_nu, u_mu_s, u_mu, u_r);
+}
+
+//逆过程
+void GetRMuMuSNuFromScatteringTextureUvwz(in AtmosphereParameters atmosphere, in float4 uvwz,
+	out Length r, out Length mu, out Length mu_s, out Length nu,
+	out bool ray_r_mu_intersects_ground)
+{
+	Length H = sqrt(atmosphere.top_radius * atmosphere.top_radius - atmosphere.bottom_radius * atmosphere.bottom_radius);
+	Length K = H * GetUnitRangeFromTextureCoord(uvwz.w,SCATTERING_TEXTURE_R_SIZE);
+
+	if (uvwz.z < 0.5)
+	{
+		//ray(r,mu)到地面的距离，对所有mu的最小和最大值，通过ray(r,-1)和ray(r,m_horizon)获得
+		Length d_min = r - atmosphere.bottom_radius;
+		Length d_max = K;
+		Length d = d_min + (d_max - d_min) * GetUnitRangeFromTextureCoord(1.0 - 2.0 * uvwz.z, SCATTERING_TEXTURE_MU_SIZE / 2);
+		mu = d == 0.0 ? Number(-1.0) : ClampCosine(-(K * K + d * d) / (2.0 * r * d));
+		ray_r_mu_intersects_ground = true;
+	}
+	else
+	{
+		//ray(r,mu)和顶部大气层的距离，低所有mu的最小最大值，通过ray(r,1)和ray(r,mu_horizon)获得
+		Length d_min = atmosphere.top_radius - r;
+		Length d_max = K + H;
+		Length d = d_min + (d_max - d_min) * GetUnitRangeFromTextureCoord(
+			2.0 * uvwz.z - 1.0, SCATTERING_TEXTURE_MU_SIZE / 2);
+		mu = d == 0.0 ? Number(1.0) : ClampCosine((H * H - K * K - d * d) / (2.0 * r * d));
+		ray_r_mu_intersects_ground = false;
+	}
+
+	Number x_mu_s = GetUnitRangeFromTextureCoord(uvwz.y, SCATTERING_TEXTURE_MU_S_SIZE);
+	Length d_min_s = atmosphere.top_radius - atmosphere.bottom_radius;
+	Length d_max_s = H;
+	Number A = -2.0 * atmosphere.mu_s_min * atmosphere.bottom_radius / (d_max_s - d_min_s);
+	Number a = (A - x_mu_s * A) / (1.0 + x_mu_s * A);
+	Length d = d_min_s + min(a, A) * (d_max_s - d_min_s);
+	mu_s = d == 0.0 ? Number(1.0) : ClampCosine((H * H - d * d) / (2.0 * atmosphere.bottom_radius * d));
+
+	nu = ClampCosine(uvwz.x * 2.0 - 1.0);
+}
+
+/*
+我们上面假设的4D纹理现实中并不存在。因此我们需要进一步在3D和4D纹理之间映射。
+下面的函数展开一个3D坐标到一个4D纹理坐标（r,mu,mu_s,v）。
+它是通过从x坐标"unpacking"两个坐标来实现。注意我们是怎么样在最后clamp v的。
+这是因为v不是完全的独立，它的值范围有赖于mu和mu_s（这可以从zenith,view,sun direction的笛卡尔坐标来计算mu,mu_s,v看出来）
+之前的函数隐含地假设这一点（如果不遵守此约束，它们的断言可能会被打破）
+*/
