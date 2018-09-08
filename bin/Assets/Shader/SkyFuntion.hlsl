@@ -704,3 +704,57 @@ void GetRMuMuSNuFromScatteringTextureUvwz(in AtmosphereParameters atmosphere, in
 这是因为v不是完全的独立，它的值范围有赖于mu和mu_s（这可以从zenith,view,sun direction的笛卡尔坐标来计算mu,mu_s,v看出来）
 之前的函数隐含地假设这一点（如果不遵守此约束，它们的断言可能会被打破）
 */
+void GetRMuMuSNuFromScatteringTextureFragCoord(in AtmosphereParameters atmosphere, in float3 fragCoord,
+	out Length r, out Length mu, out Length mu_s, out Length nu, out bool ray_r_mu_intersects_ground)
+{
+	const float4 SCATTERING_TEXTURE_SIZE = float4(SCATTERING_TEXTURE_NU_SIZE - 1,
+																					SCATTERING_TEXTURE_MU_S_SIZE,
+																					SCATTERING_TEXTURE_MU_SIZE,
+																					SCATTERING_TEXTURE_R_SIZE);
+	/*
+	fragcoord范围是[0,width]不是[0,1]
+	在这里需要把nu和mu_s两维映射成一维
+	比如一个2D纹理x,y [with,height]映射成1D纹理 x[width * height]
+	2d->1d  frag_coord_x = y * width + x 
+	1d->2d y = frag_coord_x / width ; x = frag_coord_x % width
+	在这里，width = SCATTERING_TEXTURE_MU_S_SIZE
+	*/
+	Number frag_coord_nu = floor(fragCoord.x / Number(SCATTERING_TEXTURE_MU_S_SIZE));
+	Number frag_coord_mu_s = mod(fragCoord.x, Number(SCATTERING_TEXTURE_MU_S_SIZE));
+	float4 uvwz = float4(frag_coord_nu, frag_coord_mu_s, fragCoord.y, fragCoord.z) / SCATTERING_TEXTURE_SIZE;
+
+	GetRMuMuSNuFromScatteringTextureUvwz(atmosphere,uvwz,r,mu,mu_s,nu,ray_r_mu_intersects_ground);
+
+	//在给定mu，mu_s的情况下，Clamp nu到它的有效值范围
+	Number v0 = sqrt((1.0 - mu*mu) * (1.0 - mu_s*mu_s));
+	nu = clamp(nu, mu*mu_s - v0, mu*mu_s + v0);
+}
+
+//有了这个映射，我们可以写一个预计算单次散射的函数
+void ComputeSingleScatteringTexture(in AtmosphereParameters atmosphere, in TransmittanceTexture transmittance_texture, in float3 fragCoord,
+	out IrradianceSpectrum rayleigh, out IrradianceSpectrum mie)
+{
+	Length r;
+	Number mu;
+	Number mu_s;
+	Number nu;
+	bool ray_r_mu_intersects_ground;
+
+	GetRMuMuSNuFromScatteringTextureFragCoord(atmosphere,fragCoord,r,mu,mu_s,nu,ray_r_mu_intersects_ground);
+
+	ComputeSingleScattering(atmosphere, transmittance_texture, r, mu, mu_s, nu, ray_r_mu_intersects_ground, rayleigh, mie);
+}
+
+/*
+在上面预计算纹理的帮助下，我们现在可以用两次纹理查询得到一个点和最近的大气层边界之间的散射
+（我们需要两个3D纹理的双线性插值来模拟一个4D纹理查询；我们使用在GetRMuMuSNuFromScatteringTextureFragCoord中
+定义的映射的逆过程来计算3D纹理坐标）
+*/
+
+AbstractSpectrum GetScattering(in AtmosphereParameters atmosphere, in AbstractScatteringTexture scattering_texture,
+	Length r, Number mu, Number mu_s, Number nu, bool ray_r_mu_intersects_ground)
+{
+	float4 uvwz GetScatteringTextureUvwzFromRMuMuSNu(atmosphere, r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+
+	Number text
+}
