@@ -231,6 +231,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\OutDoorScene.h" />
     <ClInclude Include="Sample\SampleBase.h" />
     <ClInclude Include="Sample\SampleManager.h" />
+    <ClInclude Include="Sample\SkySample.h" />
     <ClInclude Include="Sample\TestSample.h" />
     <ClInclude Include="Scene\SceneNode.h" />
     <ClInclude Include="stdafx.h" />
@@ -306,6 +307,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Sample\HeightMapTerrain.cpp" />
     <ClCompile Include="Sample\OutDoorScene.cpp" />
     <ClCompile Include="Sample\SampleManager.cpp" />
+    <ClCompile Include="Sample\SkySample.cpp" />
     <ClCompile Include="Sample\TestSample.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -324,6 +324,9 @@
     <ClInclude Include="Graphics\DeferredRenderLightPass.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Sample\SkySample.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -532,6 +535,9 @@
     </ClCompile>
     <ClCompile Include="Graphics\ClearRenderTargetPass.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\SkySample.cpp">
+      <Filter>Sample</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
