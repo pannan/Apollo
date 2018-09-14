@@ -1,6 +1,7 @@
 #pragma once
 #include "MaterialDX11.h"
 #include "SubMeshDX11.h"
+
 namespace Apollo
 {
 	class MeshDX11
@@ -26,6 +27,8 @@ namespace Apollo
 		void			setPrimitiveType(D3D11_PRIMITIVE_TOPOLOGY type) { m_ePrimType = type; }
 
 		void			bind()const;
+
+	
 
 	protected:
 

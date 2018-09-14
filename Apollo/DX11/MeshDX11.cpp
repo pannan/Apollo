@@ -6,6 +6,7 @@
 #include "MaterialDX11.h"
 #include "TextureDX11ResourceFactory.h"
 #include "CharacterTools.h"
+
 using namespace Apollo;
 
 MeshDX11::MeshDX11()

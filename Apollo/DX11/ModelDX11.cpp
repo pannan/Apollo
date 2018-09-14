@@ -4,6 +4,8 @@
 #include "CharacterTools.h"
 #include "TextureDX11ResourceFactory.h"
 #include "MaterialDX11.h"
+#include "VertexStruct.h"
+
 using namespace Apollo;
 
 struct DepthSortAscendingLess
@@ -162,4 +164,25 @@ void ModelDX11::draw()
 
 	//	}
 	//}
+}
+
+ModelDX11*	ModelDX11::createFullScreenQuadModel()
+{
+	Vertex_Pos_UV0 data[4];
+	data[0].pos = Vector3(-1, 1, 0);
+	data[0].uv0 = Vector2(0, 0);
+	data[1].pos = Vector3(1, 1, 0);
+	data[1].uv0 = Vector2(1, 0);
+	data[2].pos = Vector3(1, -1, 0);
+	data[2].uv0 = Vector2(1, 1);
+	data[3].pos = Vector3(-1, -1, 0);
+	data[3].uv0 = Vector2(0, 1);
+
+	//m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0),4);
+
+	uint16_t index[6] = { 0,1,2,2,3,0 };
+
+	ModelDX11* model = new ModelDX11;
+	model->createFromMemory(data, sizeof(Vertex_Pos_UV0), 4, index, 6);
+	return model;
 }

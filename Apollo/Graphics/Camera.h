@@ -49,7 +49,7 @@ namespace Apollo
 			m_viewportHeight = height;
 		}
 
-		const Matrix4x4&	getProjMat() const
+		Matrix4x4&	getProjMat() 
 		{
 			return m_projectMatrix;
 		}
@@ -59,7 +59,7 @@ namespace Apollo
 			return m_viewProjMatrix;
 		}
 
-		const Matrix4x4&	getViewMat() const
+		Matrix4x4&	getViewMat() 
 		{
 			return m_viewMatrix;
 		}
@@ -72,7 +72,7 @@ namespace Apollo
 
 		const Vector3&	getDirection() { return m_camLookDir; }
 
-		const Vector3&  getPosition() { return m_cameraPos; }
+		Vector3&  getPosition() { return m_cameraPos; }
 
 		void setposition(const Vector3& pos) { m_cameraPos = pos; }
 

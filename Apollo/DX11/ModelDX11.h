@@ -25,6 +25,8 @@ namespace Apollo
 
 		MaterialPtr&		getMaterial(uint32_t index) { return m_materialList[index]; }
 
+		static ModelDX11*	createFullScreenQuadModel();
+
 	protected:
 
 		void		loadMaterialResources(MaterialDX11& material);

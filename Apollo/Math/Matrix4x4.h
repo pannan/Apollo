@@ -2,6 +2,7 @@
 
 #include "Vector4.h"
 #include "Vector3.h"
+
 namespace Apollo
 {
 	class Matrix4x4
