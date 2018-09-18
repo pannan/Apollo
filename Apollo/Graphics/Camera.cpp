@@ -101,8 +101,8 @@ namespace Apollo
 	void Camera::updateProjMatrix()
 	{
 		/*
-		透视效果：根据等比三角形，在viewspace的点Pv(x,y,z,1)投影到画板上为Ps(x,y,d)(d为画板到camera的距离)->Psy / d = Pvy / Pvz -> Psy = Pvy * (d / Pvz);
-		所以最后在屏幕上的坐标为 Ps(Pvx * (d / Pvz),Pvy * (d / Pvz),d,1)。现在我的得到的是一个除以w的齐次坐标系，我们每个分量除以d/Pvz得到 (Pvx,Pvy,Pvz,Pvz/d)
+		透视效果：根据等比三角形，在viewspace的点Pv(x,y,z,1)投影到画板上为Ps(x,y,d)(d为画板到camera的距离)->Ps.y / d = Pv.y / Pv.z -> Ps.y = Pv.y * (d / Pv.z);
+		所以最后在屏幕上的坐标为 Ps(Pv.x * (d / Pv.z),Pv.y * (d / Pv.z),d,1)。现在我的得到的是一个除以w的齐次坐标系，我们每个分量除以d/Pv.z得到 (Pv.x,Pv.y,Pv.z,Pv.z/d)
 		因为齐次坐标(x,y,z,w)->(x/w,y/w,z/w,1),所以透视矩阵为
 		1 0 0 0
 		0 1 0 0

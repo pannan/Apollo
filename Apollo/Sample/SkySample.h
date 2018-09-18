@@ -12,10 +12,12 @@ namespace Apollo
 
 	struct  GlobalParameters
 	{
-		Vector3		eyePosition;
-		Matrix4x4	inverseViewMatrix;
-		Matrix4x4	inverseProjMatrix;
-		float				expand;
+		Vector3		eyeWorldSpacePosition;
+		Vector3		eyeEarthSpacePosition;
+		//float4x4	inverseViewMatrix;
+		//float4x4	inverseProjMatrix;
+		Matrix4x4 inverseViewProjMatrix;
+		Vector2		expand;
 	};
 
 	struct AtmosphereParameters
@@ -40,6 +42,8 @@ namespace Apollo
 	protected:
 
 		void		initQuadMesh();
+
+		void		test();
 
 	private:
 

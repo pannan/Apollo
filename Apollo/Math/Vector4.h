@@ -39,6 +39,14 @@ namespace Apollo
 		{
 			return Vector4(m_x / f,m_y / f,m_z / f,m_w / f);
 		}
+
+		void operator /= (float f) 
+		{
+			m_x /= f;
+			m_y /= f;
+			m_z /= f;
+			m_w /= f;			
+		}
 		
 		float m_x;
 		float m_y;

@@ -1,10 +1,12 @@
 
 cbuffer GlobalParameters : register(b0)
 {
-	float3		eyePosition;
-	float4x4	inverseViewMatrix;
-	float4x4	inverseProjMatrix;
-	float			expand;
+	float3		eyeWorldSpacePosition;
+	float3		eyeEarthSpacePosition;
+	//float4x4	inverseViewMatrix;
+	//float4x4	inverseProjMatrix;
+	float4x4 inverseViewProjMatrix;
+	float2		expand;
 }
 
 cbuffer AtmosphereParameters 
@@ -30,11 +32,18 @@ struct VS_OUTPUT
 
 inline float3 UVToCameraRay(float2 uv)
 {
-	float4 cameraRay = float4(uv * 2.0 - 1.0, 1.0, 1.0);
-	cameraRay = mul(inverseProjMatrix, cameraRay);
-	cameraRay = cameraRay / cameraRay.w;
+	uv.y = 1.0f - uv.y;
+	float4 worldSpacePos = float4(uv * 2.0 - 1.0, 1.0, 1.0);
+	//cameraRay = mul(inverseProjMatrix, cameraRay);
+	//cameraRay = cameraRay / cameraRay.w;
+	//cameraRay = mul(inverseViewMatrix, cameraRay);
+	//return mul((float3x3)inverseViewMatrix, cameraRay.xyz);
+	worldSpacePos = mul(worldSpacePos, inverseViewProjMatrix);
+	worldSpacePos = worldSpacePos / worldSpacePos.w;
 
-	return mul((float3x3)inverseViewMatrix, cameraRay.xyz);
+	float3 viewRay = normalize(worldSpacePos.xyz - eyeWorldSpacePosition);
+
+	return viewRay;
 }
 
 VS_OUTPUT VSMAIN(in VS_INPUT input)
@@ -48,11 +57,11 @@ VS_OUTPUT VSMAIN(in VS_INPUT input)
 
 float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 {
-	float r = length(eyePosition);	//eyeToEarthCenterDistance
-	float3  earthCenterToEyeDirection = eyePosition / r;
+	float r = length(eyeEarthSpacePosition);	//eyeToEarthCenterDistance
+	float3  earthCenterToEyeDirection = eyeEarthSpacePosition / r;
 	input.eyeDirection = normalize(input.eyeDirection);
 	float mu = dot(earthCenterToEyeDirection, input.eyeDirection);
-	//return float4(input.eyeDirection, 1);
+	return float4(input.eyeDirection, 1);
 	/*
 	在ray(r,mu)方向上距离d的一点可以定义为:r_d(r + mu*d,d * sqrt(1 - mu*mu))
 	假设r_d = R:由 x*x + y*y = R*R得

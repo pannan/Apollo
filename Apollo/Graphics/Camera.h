@@ -54,7 +54,7 @@ namespace Apollo
 			return m_projectMatrix;
 		}
 
-		const Matrix4x4&	getViewProjMat() const
+		Matrix4x4&	getViewProjMat() 
 		{
 			return m_viewProjMatrix;
 		}
