@@ -140,7 +140,7 @@ void OutDoorScene::render()
 {
 	m_camera->updateViewProjMatrix();
 	MatrixBuffer matrixBuffer;
-	matrixBuffer.MVPMatrix = m_camera->getViewProjMat();
+	matrixBuffer.MVPMatrix = m_camera->getViewProjMat().transposition();
 
 	m_matrixBuffer->set(&matrixBuffer, sizeof(MatrixBuffer));
 

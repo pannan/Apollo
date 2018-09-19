@@ -27,7 +27,7 @@ SampleManager::~SampleManager()
 
 void SampleManager::init()
 {
-	m_currentSample = new SkySample;// OutDoorScene;
+	m_currentSample =  new SkySample;//new OutDoorScene;//
 	m_currentSample->init();
 	m_sampleList.push_back(m_currentSample);
 }

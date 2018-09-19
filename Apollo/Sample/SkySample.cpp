@@ -48,7 +48,7 @@ void SkySample::init()
 
 	m_renderState.createState();
 
-	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * PI / 180.0f);
+	m_camera = new Camera(Vector3(4000, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * PI / 180.0f);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
 
@@ -125,7 +125,7 @@ void SkySample::test()
 {
 	Matrix4x4 viewProjMat = m_camera->getViewProjMat();
 	Matrix4x4 inverseViewProjMat = m_camera->getViewProjMat().inverse();
-	Vector4 originPos = Vector4(-0.5, 0, 0.5, 1.0);
+	Vector4 originPos = Vector4(100, -100, 111, 1.0);
 	//Vector4 worldPos = originPos * inverseViewProjMat;
 	//worldPos /= worldPos.m_w;
 	Vector4 viewPos = originPos * m_camera->getProjMat().inverse();
@@ -135,14 +135,15 @@ void SkySample::test()
 
 
 	XMMATRIX  inMat;
-	memcpy(&inMat, viewProjMat.m_matrix, sizeof(Matrix4x4));
+	Matrix4x4 tansMat = viewProjMat.transposition();
+	memcpy(&inMat, tansMat.m_matrix, sizeof(Matrix4x4));
 
 	XMVECTOR det = XMMatrixDeterminant(inMat);
 	XMMATRIX E = XMMatrixInverse(&det, inMat);
 
 	Matrix4x4 inverseViewProjMat2;
 	memcpy(&inverseViewProjMat2, &E, sizeof(XMMATRIX));
-
+	inverseViewProjMat2 = inverseViewProjMat2.transposition();
 	Vector4 worldPos2 = originPos * inverseViewProjMat2;
 	worldPos2 /= worldPos2.m_w;
 
@@ -156,6 +157,82 @@ void SkySample::test()
 
 		Vector4 clipPos = projPos / projPos.m_w;*/
 
+
+		Vector4  clipPos(-0.5, 0, 0.5, 1);
+		Matrix4x4 projMat = m_camera->getProjMat();
+		/*
+		project matrix
+		1		0		0		0
+		0		B		0		0
+		0		0		C		A
+		0		0		D		1
+
+		这里的z不用除以w
+		*/
+		//z*C + D = z` ->z = (z` - D) / C
+		float z = (clipPos.m_z - projMat.m_matrix[3][2]) / projMat.m_matrix[2][2];
+		//x / (z*A) = x` -> x = x` * z*A;
+		float x = clipPos.m_x * z * projMat.m_matrix[2][3];
+		
+		//y*B/(z*A) = y` -> y = y` * (z*A) / B
+		float y = clipPos.m_y * z * projMat.m_matrix[2][3] / projMat.m_matrix[1][1];
+
+	int ii = 0;
+}
+
+void test2()
+{
+	XMVECTOR eyePos;
+	eyePos.m128_f32[0] = 400;
+	eyePos.m128_f32[1] = 100;
+	eyePos.m128_f32[2] = -150;
+	eyePos.m128_f32[3] = 0;
+
+	XMVECTOR lookAt;
+	lookAt.m128_f32[0] = 0;
+	lookAt.m128_f32[1] = 0;
+	lookAt.m128_f32[2] = 0;
+	lookAt.m128_f32[3] = 0;
+
+	XMVECTOR upDir;
+	upDir.m128_f32[0] = 0;
+	upDir.m128_f32[1] = 1;
+	upDir.m128_f32[2] = 0;
+	upDir.m128_f32[3] = 0;
+	XMMATRIX viewMat = XMMatrixLookAtLH(eyePos, lookAt, upDir);
+
+	XMMATRIX projMat = XMMatrixPerspectiveFovLH(90 * PI / 180.0f, 1280.0f / 800.0f, 0.001, 5000);
+	XMMATRIX viewProjMat = XMMatrixMultiply(viewMat,projMat);
+
+	XMVECTOR det = XMMatrixDeterminant(viewProjMat);
+	XMMATRIX inverseMat = XMMatrixInverse(&det, viewProjMat);
+	det = XMMatrixDeterminant(projMat);
+	XMMATRIX inverseProjMat = XMMatrixInverse(&det, projMat);
+
+	XMVECTOR pos;
+	pos.m128_f32[0] = 1;
+	pos.m128_f32[1] = 0.0;
+	pos.m128_f32[2] = 0.5;
+	pos.m128_f32[3] = 1.0;
+
+	XMVECTOR pos2 = XMVector4Transform(pos ,inverseMat);
+	pos2 /= pos2.m128_f32[3];
+
+	XMVECTOR pos3 = XMVector4Transform(pos, inverseProjMat);
+	pos3 /= pos3.m128_f32[3];
+
+	//XMVECTOR pos;
+	pos.m128_f32[0] = 250;
+	pos.m128_f32[1] = 50;
+	pos.m128_f32[2] = 0;
+	pos.m128_f32[3] = 1.0;
+
+	XMVECTOR pos4 = XMVector4Transform(pos, viewProjMat);
+	pos4 /= pos4.m128_f32[3];
+
+	pos4 = XMVector4Transform(pos, inverseMat);
+	pos4 /= pos4.m128_f32[3];
+
 	int ii = 0;
 }
 
@@ -163,15 +240,27 @@ void SkySample::render()
 {
 	m_camera->updateViewProjMatrix();
 	test();
+
+	test2();
 	m_renderState.bind();
 
 	ZeroMemory(&m_globalParameters, sizeof(GlobalParameters));
-	m_globalParameters.eyeWorldSpacePosition = m_camera->getPosition();// (m_camera->getPosition() * 0.001f + Vector3(0.0, m_atmosphereParameters.bottom_radius, 0.0f));
-	m_globalParameters.eyeEarthSpacePosition = (m_camera->getPosition() * 0.001f + Vector3(0.0, m_atmosphereParameters.bottom_radius, 0.0f));
+	Vector3 worldPosVec3 = m_camera->getPosition();
+	Vector3 earthSpacePosVec3 = (m_camera->getPosition() * 0.001f + Vector3(0.0, m_atmosphereParameters.bottom_radius, 0.0f));
+	m_globalParameters.eyeWorldSpacePosition = Vector4(worldPosVec3.m_x, worldPosVec3.m_y, worldPosVec3.m_z, 1.0f);
+	m_globalParameters.eyeEarthSpacePosition = Vector4(earthSpacePosVec3.m_x, earthSpacePosVec3.m_y, earthSpacePosVec3.m_z, 1.0f);
 	//m_globalParameters.inverseViewMatrix = m_camera->getViewMat().inverse();
 	//m_globalParameters.inverseProjMatrix = m_camera->getProjMat().inverse();
-	m_globalParameters.inverseViewProjMatrix = m_camera->getViewProjMat().inverse();
-	m_globalParameters.expand = Vector2(0, 0);
+	m_globalParameters.inverseViewProjMatrix = m_camera->getViewProjMat().transposition().inverse();
+	m_globalParameters.inverseViewMatrix = m_camera->getViewMat().inverse();
+	//memcpy(m_globalParameters.projMat, m_camera->getProjMat().m_matrix, sizeof(Matrix4x4));
+	Matrix4x4 projMat = m_camera->getProjMat();
+	m_globalParameters.projMat[0] = Vector4(projMat.m_matrix[0][0], projMat.m_matrix[0][1], projMat.m_matrix[0][2], projMat.m_matrix[0][3]);
+	m_globalParameters.projMat[1] = Vector4(projMat.m_matrix[1][0], projMat.m_matrix[1][1], projMat.m_matrix[1][2], projMat.m_matrix[1][3]);
+	m_globalParameters.projMat[2] = Vector4(projMat.m_matrix[2][0], projMat.m_matrix[2][1], projMat.m_matrix[2][2], projMat.m_matrix[2][3]);
+	m_globalParameters.projMat[3] = Vector4(projMat.m_matrix[3][0], projMat.m_matrix[3][1], projMat.m_matrix[3][2], projMat.m_matrix[3][3]);
+	//m_globalParameters.projMat = m_camera->getProjMat();
+
 	m_globalParametersBuffer->set(&m_globalParameters, sizeof(GlobalParameters));
 
 	m_quadModelPtr->draw();

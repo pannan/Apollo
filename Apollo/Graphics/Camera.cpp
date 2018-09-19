@@ -158,16 +158,22 @@ namespace Apollo
 		//zMapping.m_matrix[3][2] *= tan(m_xVIewAngle * 0.5f);
 
 		Matrix4x4 finalProject;
-		finalProject.m_matrix[2][3] = 1.0f / tan(m_xVIewAngle * 0.5f);
-		finalProject.m_matrix[1][1] = getAspectRatio();
-		finalProject.m_matrix[2][2] = 1.0f / zLenght;
-		finalProject.m_matrix[3][2] = -m_nearClipDis / zLenght;
+		/*
+		1		0		0		0
+		0		B		0		0
+		0		0		C		A
+		0		0		D		1
+		*/
+		finalProject.m_matrix[2][3] = 1.0f / tan(m_xVIewAngle * 0.5f);		//A
+		finalProject.m_matrix[1][1] = getAspectRatio();								//B
+		finalProject.m_matrix[2][2] = 1.0f / zLenght;									//C
+		finalProject.m_matrix[3][2] = -m_nearClipDis / zLenght;				//D
 
-		Matrix4x4 tempMaat = mat1 * mat2;
-		Vector4 vv(1, 1, 50, 1);
-		Vector4 vvv = vv * tempMaat;
-		Vector4 v = vvv * zMapping;
-		v = vv * finalProject;
+		//Matrix4x4 tempMaat = mat1 * mat2;
+		//Vector4 vv(1, 1, 50, 1);
+		//Vector4 vvv = vv * tempMaat;
+		//Vector4 v = vvv * zMapping;
+		//v = vv * finalProject;
 
 		m_projectMatrix = finalProject;//tempMaat * zMapping;
 	}

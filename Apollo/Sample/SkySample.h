@@ -12,12 +12,13 @@ namespace Apollo
 
 	struct  GlobalParameters
 	{
-		Vector3		eyeWorldSpacePosition;
-		Vector3		eyeEarthSpacePosition;
+		Vector4		eyeWorldSpacePosition;
+		Vector4		eyeEarthSpacePosition;
 		//float4x4	inverseViewMatrix;
 		//float4x4	inverseProjMatrix;
 		Matrix4x4 inverseViewProjMatrix;
-		Vector2		expand;
+		Matrix4x4	inverseViewMatrix;
+		Vector4	projMat[4];
 	};
 
 	struct AtmosphereParameters

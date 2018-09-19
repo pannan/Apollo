@@ -1,12 +1,13 @@
 
 cbuffer GlobalParameters : register(b0)
 {
-	float3		eyeWorldSpacePosition;
-	float3		eyeEarthSpacePosition;
+	float4		eyeWorldSpacePosition;
+	float4		eyeEarthSpacePosition;
 	//float4x4	inverseViewMatrix;
 	//float4x4	inverseProjMatrix;
-	float4x4 inverseViewProjMatrix;
-	float2		expand;
+	float4x4		inverseViewProjMatrix;
+	float4x4		inverseViewMatrix;
+	float4		projMat[4];
 }
 
 cbuffer AtmosphereParameters 
@@ -38,12 +39,27 @@ inline float3 UVToCameraRay(float2 uv)
 	//cameraRay = cameraRay / cameraRay.w;
 	//cameraRay = mul(inverseViewMatrix, cameraRay);
 	//return mul((float3x3)inverseViewMatrix, cameraRay.xyz);
-	worldSpacePos = mul(worldSpacePos, inverseViewProjMatrix);
+	//worldSpacePos = mul(inverseViewProjMatrix, worldSpacePos);
+	worldSpacePos = mul(worldSpacePos,inverseViewProjMatrix);
 	worldSpacePos = worldSpacePos / worldSpacePos.w;
 
-	float3 viewRay = normalize(worldSpacePos.xyz - eyeWorldSpacePosition);
+	float3 viewRay = normalize(worldSpacePos.xyz - eyeWorldSpacePosition.xyz);
 
 	return viewRay;
+}
+
+inline float3 UVToCameraRay2(float2 uv)
+{
+	uv.y = 1.0f - uv.y;
+	float4 clipPos = float4(uv * 2.0 - 1.0, 0.5, 1.0);
+
+	float3 ray;
+	ray.z = (clipPos.z - projMat[3].z) / projMat[2].z;
+	ray.x = clipPos.x * ray.z * projMat[2].w;
+	ray.y = clipPos.y * ray.z * projMat[2].w / projMat[1].y;
+	ray = normalize(ray);
+	ray = mul(inverseViewMatrix, float4(ray,0));
+	return ray;
 }
 
 VS_OUTPUT VSMAIN(in VS_INPUT input)
@@ -51,17 +67,17 @@ VS_OUTPUT VSMAIN(in VS_INPUT input)
 	VS_OUTPUT output;
 
 	output.position = float4(input.position.xyz, 1.0);
-	output.eyeDirection = UVToCameraRay(input.uv);
+	output.eyeDirection = UVToCameraRay2(input.uv);
 	return output;
 }
 
 float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 {
-	float r = length(eyeEarthSpacePosition);	//eyeToEarthCenterDistance
-	float3  earthCenterToEyeDirection = eyeEarthSpacePosition / r;
+	float r = length(eyeEarthSpacePosition.xyz);	//eyeToEarthCenterDistance
+	float3  earthCenterToEyeDirection = eyeEarthSpacePosition.xyz / r;
 	input.eyeDirection = normalize(input.eyeDirection);
 	float mu = dot(earthCenterToEyeDirection, input.eyeDirection);
-	return float4(input.eyeDirection, 1);
+	//return float4(input.eyeDirection, 1);
 	/*
 	在ray(r,mu)方向上距离d的一点可以定义为:r_d(r + mu*d,d * sqrt(1 - mu*mu))
 	假设r_d = R:由 x*x + y*y = R*R得

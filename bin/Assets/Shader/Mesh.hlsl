@@ -25,7 +25,8 @@ VS_OUTPUT VSMAIN( in VS_INPUT input )
 {
 	VS_OUTPUT output;
 	
-	output.position = mul(MVPMatrix, float4(input.position,1));
+	//output.position = mul(MVPMatrix, float4(input.position,1));
+	output.position = mul(float4(input.position, 1),MVPMatrix);
 	output.uv0 = input.uv0;
 	output.normal = mul(worldMatrix, float4(input.normal, 0)).xyz;
 	return output;
