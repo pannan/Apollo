@@ -1,13 +1,11 @@
 
 cbuffer GlobalParameters : register(b0)
 {
-	float4		eyeWorldSpacePosition;
-	float4		eyeEarthSpacePosition;
-	//float4x4	inverseViewMatrix;
-	//float4x4	inverseProjMatrix;
+	float4			eyeWorldSpacePosition;
+	float4			eyeEarthSpacePosition;
 	float4x4		inverseViewProjMatrix;
 	float4x4		inverseViewMatrix;
-	float4		projMat[4];
+	float4			projMat[4];
 }
 
 cbuffer AtmosphereParameters 
@@ -35,11 +33,6 @@ inline float3 UVToCameraRay(float2 uv)
 {
 	uv.y = 1.0f - uv.y;
 	float4 worldSpacePos = float4(uv * 2.0 - 1.0, 1.0, 1.0);
-	//cameraRay = mul(inverseProjMatrix, cameraRay);
-	//cameraRay = cameraRay / cameraRay.w;
-	//cameraRay = mul(inverseViewMatrix, cameraRay);
-	//return mul((float3x3)inverseViewMatrix, cameraRay.xyz);
-	//worldSpacePos = mul(inverseViewProjMatrix, worldSpacePos);
 	worldSpacePos = mul(worldSpacePos,inverseViewProjMatrix);
 	worldSpacePos = worldSpacePos / worldSpacePos.w;
 
@@ -70,6 +63,23 @@ VS_OUTPUT VSMAIN(in VS_INPUT input)
 	output.eyeDirection = UVToCameraRay2(input.uv);
 	return output;
 }
+
+/*
+在每个点，被散射到和入射方向成a度的光的比例由散射系数Bs和相位函数P得到。
+
+对于空气分子，使用rayleigh模型
+Bray_s(h,y) = (8*pow(PI,3) * pow(n*n - 1,2))/(3*N*pow(y,4)) * exp(-h/Hr)   //rayleigh散射系数
+P = 3/(16*PI) * (1 + mu*mu)
+
+h = r - bottom_radius
+y = 波长
+n = 空气的index of refraction
+N = 在海平面的空气密度
+Hr = 8km是如果密度均匀时的大气层厚度
+
+Bray_s(h,y)变量有两个，h和y
+原始论文使用一个特殊常数表示在海拔为0
+*/
 
 float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 {

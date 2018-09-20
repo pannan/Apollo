@@ -13,6 +13,7 @@ SampleManager::SampleManager()
 {
 	m_gpuFrameTimes = 0.0f;
 	m_query = new QueryDX11(Query::QueryType::Timer, 2);
+	m_cameraAltitude = 0.0f;
 }
 
 SampleManager::~SampleManager()
@@ -64,7 +65,8 @@ void SampleManager::debugOverlay()
 
 	static bool g_overLayShow = true;
 	ImGui::SetNextWindowPos(ImVec2(400, 0));
-	if (!ImGui::Begin("Example: Fixed Overlay", &g_overLayShow, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings))
+	if (!ImGui::Begin("Example: Fixed Overlay", &g_overLayShow, ImVec2(0, 0), 0.3f, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
+																																	ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings))
 	{
 		ImGui::End();
 		return;
@@ -80,5 +82,9 @@ void SampleManager::debugOverlay()
 	ImGui::Text("Camera Forward: (%.1f,%.1f,%.1f)", forward.m_x, forward.m_y, forward.m_z);
 	ImGui::Text("Camera RightDir: (%.1f,%.1f,%.1f)", rightDir.m_x, rightDir.m_y, rightDir.m_z);
 	ImGui::Text("GPU Times: (%.1f)", m_gpuFrameTimes);
+
+	ImGui::SliderFloat("Camera Altitude", &m_cameraAltitude, 0.0, 1000000.0f);
+	camPos.m_y = m_cameraAltitude;
+	cam->setposition(camPos);
 	ImGui::End();
 }

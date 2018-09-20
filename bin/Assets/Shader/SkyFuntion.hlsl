@@ -145,7 +145,7 @@ Length ComputeOpticalLengthToTopAtmosphereBoundary(in AtmosphereParameters atmos
 		//当前采样点到地心的距离
 		//根据||pi|| * ||pi|| + 2 * r * mu * ||pi|| + r*r = R * R ->R = sqrt(d*d + 2*r*d*mu + r*r)
 		Length r_i = sqrt(d_i*d_i + 2 * d_i*mu*r + r*r);
-		//当前采样点的密度（用大气层底部的密度来除得到一个无量纲的数(指没有单位的物流量)）
+		//当前采样点的密度（用大气层底部的密度来除得到一个无量纲的数(指没有单位的物理量)）
 		Number y_i = GetProfileDensity(profile, r_i - atmosphere.bottom_radius);
 		//采样权重
 		Number weight_i = i == 0 || i == SAMPLE_COUNT ? 0.5 : 1.0;

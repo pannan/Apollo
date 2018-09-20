@@ -36,6 +36,7 @@ namespace Apollo
 		QueryDX11*			m_query;
 
 		float				m_gpuFrameTimes;
+		float				m_cameraAltitude;		//µ¥Î»Ã×
 
 	private:
 	};
