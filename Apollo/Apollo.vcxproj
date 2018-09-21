@@ -87,7 +87,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NOMINMAX;_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;.\ImGui;.\Math;.\Windows;.\Lib\freetype\include;.\UI;.\third_party;.\third_party\boost_context\include;.\third_party\DirectXTex\include;.\Graphics;.\Sample;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\DX11;.\ImGUI;.\Base;.\ImGui;.\Math;.\Windows;.\Lib\freetype\include;.\UI;.\third_party;.\third_party\boost_context\include;.\third_party\DirectXTex\include;.\Graphics;.\Sample;.\Environment;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -200,6 +200,8 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\Texture2dDX11.h" />
     <ClInclude Include="DX11\TextureCubeMapDX11.h" />
     <ClInclude Include="DX11\TextureDX11ResourceFactory.h" />
+    <ClInclude Include="Environment\Atmosphere\Constants.h" />
+    <ClInclude Include="Environment\Atmosphere\Definitions.h" />
     <ClInclude Include="Graphics\AABB.h" />
     <ClInclude Include="Graphics\Camera.h" />
     <ClInclude Include="Graphics\ClearRenderTargetPass.h" />
@@ -218,6 +220,14 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="ImGui\stb_textedit.h" />
     <ClInclude Include="ImGui\stb_truetype.h" />
     <ClInclude Include="LightDefine.h" />
+    <ClInclude Include="Math\Dimensional\angle.h" />
+    <ClInclude Include="Math\Dimensional\binary_function.h" />
+    <ClInclude Include="Math\Dimensional\function.h" />
+    <ClInclude Include="Math\Dimensional\matrix.h" />
+    <ClInclude Include="Math\Dimensional\scalar.h" />
+    <ClInclude Include="Math\Dimensional\scalar_function.h" />
+    <ClInclude Include="Math\Dimensional\ternary_function.h" />
+    <ClInclude Include="Math\Dimensional\vector.h" />
     <ClInclude Include="Math\Matrix3x3.h" />
     <ClInclude Include="Math\Matrix4x4.h" />
     <ClInclude Include="Math\Plane.h" />
@@ -296,6 +306,14 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="Math\Dimensional\angle_test.cc" />
+    <ClCompile Include="Math\Dimensional\binary_function_test.cc" />
+    <ClCompile Include="Math\Dimensional\function_test.cc" />
+    <ClCompile Include="Math\Dimensional\matrix_test.cc" />
+    <ClCompile Include="Math\Dimensional\scalar_function_test.cc" />
+    <ClCompile Include="Math\Dimensional\scalar_test.cc" />
+    <ClCompile Include="Math\Dimensional\ternary_function_test.cc" />
+    <ClCompile Include="Math\Dimensional\vector_test.cc" />
     <ClCompile Include="Math\Matrix3x3.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />
     <ClCompile Include="Math\Plane.cpp" />

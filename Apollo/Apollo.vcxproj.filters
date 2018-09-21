@@ -46,6 +46,15 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{cd881297-244b-48d4-ad2b-d8060b807da2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Environment">
+      <UniqueIdentifier>{ac8df54c-8b62-43ae-978d-dc1c050c07fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Environment\Atmosphere">
+      <UniqueIdentifier>{9e5a3939-1929-4290-8885-c760166aa988}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Dimensional">
+      <UniqueIdentifier>{a072f138-b783-4e51-a730-ad732c2c4ea8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -327,6 +336,36 @@
     <ClInclude Include="Sample\SkySample.h">
       <Filter>Sample</Filter>
     </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Constants.h">
+      <Filter>Environment\Atmosphere</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Definitions.h">
+      <Filter>Environment\Atmosphere</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\angle.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\binary_function.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\function.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\matrix.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\scalar.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\scalar_function.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\ternary_function.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Dimensional\vector.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -538,6 +577,30 @@
     </ClCompile>
     <ClCompile Include="Sample\SkySample.cpp">
       <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\angle_test.cc">
+      <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\binary_function_test.cc">
+      <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\function_test.cc">
+      <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\matrix_test.cc">
+      <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\scalar_function_test.cc">
+      <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\scalar_test.cc">
+      <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\ternary_function_test.cc">
+      <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\vector_test.cc">
+      <Filter>Math\Dimensional</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
