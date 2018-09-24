@@ -105,7 +105,7 @@ struct AtmosphereParameters
 	// that are valid only if this angle is smaller than 0.1 radians.
 	//太阳角度半径。Warming:这是个近似值，只有当角度小于0.1弧度时有效。
 	Angle sun_angular_radius;
-	//地心到大气层底部边界的距离
+	//地心到大气层底部边界的距离,在这里是地球半径
 	Length bottom_radius;
 	//地心到大气层顶部边界的距离
 	Length top_radius;
@@ -170,5 +170,9 @@ struct AtmosphereParameters
 	// must be precomputed (for maximum precision, use the smallest Sun zenith
 	// angle yielding negligible sky light radiance values. For instance, for the
 	// Earth case, 102 degrees is a good choice - yielding mu_s_min = -0.2).
+	/*
+	必须预先计算大气散射的最大太阳天顶角的余弦
+	（为了获得最大精度，使用最小的太阳天顶角产生可忽略不计的天光辐射值。例如，对于地球情况，102度是一个不错的选择 - 产生mu_s_min = -0.2）。
+	*/
 	Number mu_s_min;
 };
