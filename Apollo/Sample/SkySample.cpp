@@ -48,7 +48,7 @@ void SkySample::init()
 
 	m_renderState.createState();
 
-	m_camera = new Camera(Vector3(4000, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * PI / 180.0f);
+	m_camera = new Camera(Vector3(4000, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
 
@@ -201,7 +201,7 @@ void test2()
 	upDir.m128_f32[3] = 0;
 	XMMATRIX viewMat = XMMatrixLookAtLH(eyePos, lookAt, upDir);
 
-	XMMATRIX projMat = XMMatrixPerspectiveFovLH(90 * PI / 180.0f, 1280.0f / 800.0f, 0.001, 5000);
+	XMMATRIX projMat = XMMatrixPerspectiveFovLH(90 * _PI / 180.0f, 1280.0f / 800.0f, 0.001, 5000);
 	XMMATRIX viewProjMat = XMMatrixMultiply(viewMat,projMat);
 
 	XMVECTOR det = XMMatrixDeterminant(viewProjMat);

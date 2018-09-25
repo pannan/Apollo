@@ -55,6 +55,9 @@
     <Filter Include="Math\Dimensional">
       <UniqueIdentifier>{a072f138-b783-4e51-a730-ad732c2c4ea8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Environment\Atmosphere\Reference">
+      <UniqueIdentifier>{2c2fbbf7-30bd-4c62-b1aa-c8051e73f0ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -339,9 +342,6 @@
     <ClInclude Include="Environment\Atmosphere\Constants.h">
       <Filter>Environment\Atmosphere</Filter>
     </ClInclude>
-    <ClInclude Include="Environment\Atmosphere\Definitions.h">
-      <Filter>Environment\Atmosphere</Filter>
-    </ClInclude>
     <ClInclude Include="Math\Dimensional\angle.h">
       <Filter>Math\Dimensional</Filter>
     </ClInclude>
@@ -365,6 +365,15 @@
     </ClInclude>
     <ClInclude Include="Math\Dimensional\vector.h">
       <Filter>Math\Dimensional</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Definitions.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Reference\Definitions.h">
+      <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Reference\Functions.h">
+      <Filter>Environment\Atmosphere\Reference</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -578,29 +587,14 @@
     <ClCompile Include="Sample\SkySample.cpp">
       <Filter>Sample</Filter>
     </ClCompile>
-    <ClCompile Include="Math\Dimensional\angle_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Dimensional\binary_function_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Dimensional\function_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Dimensional\matrix_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Dimensional\scalar_function_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Dimensional\scalar_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\Dimensional\ternary_function_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Dimensional\vector_test.cc">
       <Filter>Math\Dimensional</Filter>
     </ClCompile>
+    <ClCompile Include="Environment\Atmosphere\Reference\Functions.cpp">
+      <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Environment\Atmosphere\Functions.hlsl" />
   </ItemGroup>
 </Project>

@@ -35,7 +35,7 @@
 #include <string>
 #include <vector>
 
-#include "math/scalar.h"
+#include "Dimensional/scalar.h"
 
 namespace dimensional {
 

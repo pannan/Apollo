@@ -117,7 +117,6 @@ inline constexpr Angle operator*(const Number lhs, const Angle rhs) {
 }
 
 constexpr double PI = 3.14159265358979323846;
-
 constexpr Angle rad = Angle::Unit();
 constexpr Angle pi = PI * rad;
 constexpr Angle deg = pi / 180.0;

@@ -41,7 +41,7 @@ namespace Apollo
 	void Quaternion::createFromAxisAngle(const float &in_x, const float &in_y, const float &in_z, const float &in_degrees)
 	{
 
-		float angle = float((in_degrees / 180.0f) * PI);
+		float angle = float((in_degrees / 180.0f) * _PI);
 		float result = float(sin(angle/2.0f));
 		m_w = float(cos(angle/2.0f));
 

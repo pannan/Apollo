@@ -262,6 +262,7 @@ inline constexpr Scalar<-U1, -U2, -U3, -U4, -U5> operator/(
   return Scalar<-U1, -U2, -U3, -U4, -U5>(Double(lhs / rhs.value_));
 }
 
+
 inline constexpr Number exp(const Number x) { return std::exp(x()); }
 inline Number floor(const Number x) { return std::floor(x()); }
 inline constexpr Number log(const Number x) { return std::log(x()); }
