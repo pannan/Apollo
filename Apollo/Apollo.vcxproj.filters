@@ -375,6 +375,9 @@
     <ClInclude Include="Environment\Atmosphere\Reference\Functions.h">
       <Filter>Environment\Atmosphere\Reference</Filter>
     </ClInclude>
+    <ClInclude Include="Math\Dimensional\test_case.h">
+      <Filter>Math\Dimensional</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -592,6 +595,9 @@
     </ClCompile>
     <ClCompile Include="Environment\Atmosphere\Reference\Functions.cpp">
       <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Dimensional\test_case.cpp">
+      <Filter>Math\Dimensional</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

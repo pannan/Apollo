@@ -230,6 +230,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Dimensional\scalar.h" />
     <ClInclude Include="Math\Dimensional\scalar_function.h" />
     <ClInclude Include="Math\Dimensional\ternary_function.h" />
+    <ClInclude Include="Math\Dimensional\test_case.h" />
     <ClInclude Include="Math\Dimensional\vector.h" />
     <ClInclude Include="Math\Matrix3x3.h" />
     <ClInclude Include="Math\Matrix4x4.h" />
@@ -310,6 +311,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="Math\Dimensional\test_case.cpp" />
     <ClCompile Include="Math\Dimensional\vector_test.cc" />
     <ClCompile Include="Math\Matrix3x3.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />

@@ -15,216 +15,217 @@ HLSLµÈ¼ÛÎÄ¼şSkyDefinitions.hlslÌá¹©Ò»ÑùµÄÀàĞÍºÍ³£Á¿£¬ÔÊĞíÒ»ÑùµÄº¯Êı±»HLSL±àÒëÆ÷±
 #include "Dimensional/ternary_function.h"
 #include "Dimensional/vector.h"
 
-//namespace Apollo
-//{
-//	namespace Atmosphere
-//	{
-//		namespace Reference
-//		{
-//			/*
-//			ÎïÀíÁ¿
-//			ÎÒÃÇµÄ´óÆøÄ£ĞÍËùĞèµÄÎïÀíÁ¿ÊÇ·øÉä¶È(radiometric)ºÍ¹â¶ÈÁ¿(photometric)¡£
-//			ÎÒÃÇ´ÓÁù¸ö»ù±¾Á¿¿ªÊ¼£º½Ç¶È(angle)£¬³¤¶È(length)£¬²¨³¤(wavelength)£¬Á¢Ìå½Ç(soild angle)£¬¹¦ÂÊ(power)ºÍ·¢¹â¹¦ÂÊ(luminous power)
-//			£¨²¨³¤Ò²ÊÇÒ»¸ö³¤¶È£¬µ«ÎÒÃÇÇø·ÖÁ½ÕßÒÔÌá¸ßÇåÎú¶È£©¡£
-//			*/
-//			typedef dimensional::Angle Aangle;
-//			typedef dimensional::Scalar<1, 0, 0, 0, 0> Length;
-//			typedef dimensional::Scalar<0, 1, 0, 0, 0> Wavelength;
-//			typedef dimensional::Scalar<0, 0, 1, 0, 0> SolidAngle;
-//			typedef dimensional::Scalar<0, 0, 0, 1, 0> Power;
-//			typedef dimensional::Scalar<0, 0, 0, 0, 1> LuminousPower;
-//
-//			/*
-//			ÓÉ´ËÎÒÃÇµÃ³ö·øÕÕ¶È(irradiance)£¬·øÉä¶È(radiance)£¬¹âÆ×·øÕÕ¶È(spectral rradiance)£¬¹âÆ×·øÉäÂÊ(spectral radiance)£¬ÁÁ¶È(luminance)µÈ£¬
-//			ÒÔ¼°´¿Êı(pure number)£¬Ãæ»ı(area)£¬Ìå»ı(volume)µÈ¡£
-//			*/
-//			typedef dimensional::Scalar<0, 0, 0, 0, 0> Number;
-//			typedef dimensional::Scalar<-1, 0, 0, 0, 0> InverseLength;
-//			typedef dimensional::Scalar<2, 0, 0, 0, 0> Area;
-//			typedef dimensional::Scalar<3, 0, 0, 0, 0> Volume;
-//			typedef dimensional::Scalar<-2, 0, 0, 1, 0> Irradiance;
-//			typedef dimensional::Scalar<-2, 0, -1, 1, 0> Radiance;
-//			typedef dimensional::Scalar<0, -1, 0, 1, 0> SpectralPower;
-//			typedef dimensional::Scalar<-2, -1, 0, 1, 0> SpectralIrradiance;
-//			typedef dimensional::Scalar<-2, -1, -1, 1, 0> SpectralRadiance;
-//			typedef dimensional::Scalar<-3, -1, -1, 1, 0> SpectralRadianceDensity;
-//			typedef dimensional::Scalar<-1, 0, 0, 0, 0> ScatteringCoefficient;
-//			typedef dimensional::Scalar<0, 0, -1, 0, 0> InverseSolidAngle;
-//			typedef dimensional::Scalar<-3, 0, 0, 0, 0> NumberDensity;
-//			typedef dimensional::Scalar<0, 0, -1, 0, 1> LuminousIntensity;
-//			typedef dimensional::Scalar<-2, 0, -1, 0, 1> Luminance;
-//			typedef dimensional::Scalar<-2, 0, 0, 0, 1> Illuminance;
-//
-//			/*
-//			ÎÒÃÇ»¹ĞèÒªÎïÀíÁ¿µÄÊ¸Á¿£¬Ö÷ÒªÊÇ¸ù¾İ²¨³¤À´±íÊ¾º¯Êı¡£
-//			ÔÚÕâÖÖÇé¿öÏÂ£¬Ê¸Á¿ÔªËØ¶ÔÓ¦ÓÚÄ³Ğ©Ô¤¶¨Òå²¨³¤µÄº¯ÊıÖµ¡£
-//			ÔÚÕâÀï£¬ÎÒÃÇÊ¹ÓÃ47¸öÔ¤¶¨Òå²¨³¤£¬¾ùÔÈ·Ö²¼ÔÚ360ºÍ830ÄÉÃ×Ö®¼ä£º
-//			*/
-//			template<int U1, int U2, int U3, int U4, int U5>
-//			using WavelengthFunction = dimensional::ScalarFunction<0, 1, 0, 0, 0, U1, U2, U3, U4, U5, 47, 360, 830>;
-//
-//			// ²¨³¤µ½ÊıÖµµÄº¯Êı¡£(Ãû×ÖÀïÃæµÄSpectrum±íÊ¾¾ÍÊÇ´Ó²¨³¤À´£¬ÏÂÃæµÄÍ¬Àí)
-//			typedef WavelengthFunction<0, 0, 0, 0, 0> DimensionlessSpectrum;
-//			// ²¨³¤µ½¹¦ÂÊµÄº¯Êı
-//			typedef WavelengthFunction<0, -1, 0, 1, 0> PowerSpectrum;
-//			// ´Ó²¨³¤µ½·øÕÕ¶ÈµÄº¯Êı
-//			typedef WavelengthFunction<-2, -1, 0, 1, 0> IrradianceSpectrum;
-//			// ²¨³¤µ½·øÉäÂÊµÄº¯Êı
-//			typedef WavelengthFunction<-2, -1, -1, 1, 0> RadianceSpectrum;
-//			// ²¨³¤µ½·øÉäÂÊÃÜ¶ÈµÄº¯Êı
-//			typedef WavelengthFunction<-3, -1, -1, 1, 0> RadianceDensitySpectrum;
-//			// ²¨³¤µ½É¢ÉäÏµÊıµÄº¯Êı
-//			typedef WavelengthFunction<-1, 0, 0, 0, 0> ScatteringSpectrum;
-//
-//			// 3DÖĞÒ»¸öµã£¨3¸ö³¤¶ÈÖµ£©
-//			typedef dimensional::Vector3<Length> Position;
-//			// 3DÖĞÒ»¸öµ¥Î»·½ÏòÏòÁ¿£¨ÎŞµ¥Î»Öµ£©
-//			typedef dimensional::Vector3<Number> Direction;
-//			// 3¸öÁÁ¶ÈÖµµÄÏòÁ¿
-//			typedef dimensional::Vector3<Luminance> Luminance3;
-//			// 3¸öÕÕ¶ÈÖµµÄÏòÁ¿
-//			typedef dimensional::Vector3<Illuminance> Illuminance3;
-//
-//			/*
-//			×îºó£¬ÎÒÃÇ»¹ĞèÒªÔÚÃ¿¸öÎÆËØÖĞ°üº¬ÎïÀíÁ¿µÄÔ¤¼ÆËãÎÆÀí£¨ÎÆÀí´óĞ¡ÔÚconstants.hÖĞ¶¨Òå£©£º
-//			*/
-//			typedef dimensional::BinaryFunction<
-//				TRANSMITTANCE_TEXTURE_WIDTH,
-//				TRANSMITTANCE_TEXTURE_HEIGHT,
-//				DimensionlessSpectrum> TransmittanceTexture;
-//
-//			template<class T>
-//			using AbstractScatteringTexture = dimensional::TernaryFunction<
-//				SCATTERING_TEXTURE_WIDTH,
-//				SCATTERING_TEXTURE_HEIGHT,
-//				SCATTERING_TEXTURE_DEPTH,
-//				T>;
-//
-//			typedef AbstractScatteringTexture<IrradianceSpectrum>
-//				ReducedScatteringTexture;
-//
-//			typedef AbstractScatteringTexture<RadianceSpectrum>
-//				ScatteringTexture;
-//
-//			typedef AbstractScatteringTexture<RadianceDensitySpectrum>
-//				ScatteringDensityTexture;
-//
-//			typedef dimensional::BinaryFunction<
-//				IRRADIANCE_TEXTURE_WIDTH,
-//				IRRADIANCE_TEXTURE_HEIGHT,
-//				IrradianceSpectrum> IrradianceTexture;
-//		}
-//
-//		/*
-//		ÎïÀíµ¥Î»
-//		È»ºóÎÒÃÇ¿ÉÒÔ¶¨Òå»ù±¾ÎïÀíÁ¿µÄµ¥Î»£º»¡¶È£¨rad£©£¬Ã×£¨m£©£¬ÄÉÃ×£¨nm£©£¬ÇòÃæ¶È£¨sr£©£¬ÍßÌØ£¨ÍßÌØ£©ºÍÁ÷Ã÷£¨lm£©£º
-//		*/
-//		constexpr dimensional::Angle rad = dimensional::rad;
-//		constexpr Length m = Length::Unit();
-//		constexpr Wavelength nm = Wavelength::Unit();
-//		constexpr SolidAngle sr = SolidAngle::Unit();
-//		constexpr Power watt = Power::Unit();
-//		constexpr LuminousPower lm = LuminousPower::Unit();
-//
-//		/*
-//		´ÓÖĞÎÒÃÇ¿ÉÒÔÍÆµ¼³öÄ³Ğ©ÅÉÉúÎïÀíÁ¿µÄµ¥Î»£¬ÒÔ¼°Ò»Ğ©ÅÉÉúµ¥Î»£¨degress deg£¬km km km£¬kilocandela kcd£©£º
-//		*/
-//		constexpr double PI_ = dimensional::PI_;
-//		constexpr dimensional::Angle pi = dimensional::pi;
-//		constexpr dimensional::Angle deg = dimensional::deg;
-//		constexpr Length km = 1000.0 * m;
-//		constexpr Area m2 = m * m;
-//		constexpr Volume m3 = m * m * m;
-//		constexpr Irradiance watt_per_square_meter = watt / m2;
-//		constexpr Radiance watt_per_square_meter_per_sr = watt / (m2 * sr);
-//		constexpr SpectralIrradiance watt_per_square_meter_per_nm = watt / (m2 * nm);
-//		constexpr SpectralRadiance watt_per_square_meter_per_sr_per_nm = watt / (m2 * sr * nm);
-//		constexpr SpectralRadianceDensity watt_per_cubic_meter_per_sr_per_nm = watt / (m3 * sr * nm);
-//		constexpr LuminousIntensity cd = lm / sr;
-//		constexpr LuminousIntensity kcd = 1000.0 * cd;
-//		constexpr Luminance cd_per_square_meter = cd / m2;
-//		constexpr Luminance kcd_per_square_meter = kcd / m2;
-//
-//		/*
-//		´óÆø²ã²ÎÊı
-//		Ê¹ÓÃÉÏÊöÀàĞÍ£¬ÎÒÃÇÏÖÔÚ¿ÉÒÔ¶¨Òå´óÆøÄ£ĞÍµÄ²ÎÊı¡£ ÎÒÃÇ´ÓÃÜ¶ÈprofilesµÄ¶¨Òå¿ªÊ¼£¬ÕâĞ©²ÎÊıÈ¡¾öÓÚ¸ß¶È£º
-//		*/
-//		//´óÆø²ãlayer¿í¶ÈÎªwidth£¬ÃÜ¶È¶¨ÒåÎªexp_term * exp(exp_scale * h) + linear_term * h + constant_term
-//		//clampµ½[0,1]£¬hÊÇº£°Î
-//		struct DensityProfileLayer
-//		{
-//			DensityProfileLayer() : DensityProfileLayer(0.0 * m, 0.0, 0.0 / m, 0.0 / m, 0.0) {}
-//			DensityProfileLayer(Length width, Number exp_term, InverseLength exp_scale, InverseLength linear_term, Number constant_term)
-//				: width(width), exp_term(exp_term), exp_scale(exp_scale),
-//				linear_term(linear_term), constant_term(constant_term) {}
-//
-//			Length width;
-//			Number exp_term;
-//			InverseLength exp_scale;
-//			InverseLength linear_term;
-//			Number constant_term;
-//		};
-//
-//		/*
-//		Ò»¸ö´óÆø²ãÃÜ¶ÈprofileÓÉ¼¸²ãÏà»¥×é³É£¨´ÓÏÂµ½ÉÏ£©
-//		×îºóÒ»²ãµÄ¿í¶È±»ºöÂÔ£¬Ëü×ÜÊÇÑÓÉêµ½¶¥²¿´óÆø²ã±ß½ç
-//		peofileÖµ´Ó0µ½1
-//		*/
-//		struct DensityProfile
-//		{
-//			DensityProfileLayer layers[2];
-//		};
-//
-//		struct AtmosphereParameters
-//		{
-//			// ´óÆø²ã¶¥²¿µÄÌ«Ñô·øÕÕ¶È
-//			IrradianceSpectrum solar_irradiance;
-//			// Ì«Ñô½Ç¶È°ë¾¶¡£Warming:ÕâÊÇ¸ö½üËÆÖµ£¬Ö»ÓĞµ±½Ç¶ÈĞ¡ÓÚ0.1»¡¶ÈÊ±ÓĞĞ§¡£
-//			Angle sun_angular_radius;
-//			// µØĞÄµ½´óÆø²ãµ×²¿±ß½çµÄ¾àÀë,ÔÚÕâÀïÊÇµØÇò°ë¾¶
-//			Length bottom_radius;
-//			// µØĞÄµ½´óÆø²ã¶¥²¿±ß½çµÄ¾àÀë
-//			Length top_radius;
-//			//¿ÕÆø·Ö×ÓµÄdensity profile
-//			//´Ó0£¨ÁãÃÜ¶È£©ºÍ1£¨×î´óÃÜ¶È£©µÄ¹ØÓÚ¸ß¶ÈµÄÎŞÁ¿¸ÙÖµº¯Êı¡£
-//			DensityProfile rayleigh_density;
-//			/*
-//			ÔÚ¿Õ×Ó·Ö×ÓÃÜ¶È×î´óµÄµØ·½µÄÉ¢ÉäÏµÊı£¨Ò»°ãÔÚ´óÆø²ãµÄµ×²¿£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
-//			ÔÚº£°ÎhµÄÉ¢ÉäÏµÊı = rayleigh_scattering * rayleigh_density
-//			*/
-//			ScatteringSpectrum rayleigh_scattering;
-//			//ÆøÈÜ½ºµÄdensity profile
-//			//´Ó0£¨ÁãÃÜ¶È£©ºÍ1£¨×î´óÃÜ¶È£©µÄ¹ØÓÚ¸ß¶ÈµÄÎŞÁ¿¸ÙÖµº¯Êı¡£
-//			DensityProfile mie_density;
-//			/*
-//			ÔÚÆøÈÜ½ºÃÜ¶È×î´óµÄµØ·½µÄÉ¢ÉäÏµÊı£¨Ò»°ãÔÚ´óÆø²ãµÄµ×²¿£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
-//			ÔÚº£°ÎhµÄÉ¢ÉäÏµÊı = mie_scattering * mie_density
-//			*/
-//			ScatteringSpectrum mie_scattering;
-//			/*
-//			ÔÚÆøÈÜ½ºÃÜ¶È×î´óµÄµØ·½µÄÏû¹âÏµÊı£¨Ò»°ãÔÚ´óÆø²ãµÄµ×²¿£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
-//			ÔÚº£°ÎhµÄÏû¹âÏµÊı = mie_extinction * mie_density
-//			*/
-//			ScatteringSpectrum mie_extinction;
-//			//¹ØÓÚÆøÈÜ½ºCornette-ShanksÏàÎ»º¯ÊıµÄ²»¶Ô³Æ²ÎÊı
-//			Number mie_phase_function_g;
-//			//¿ÕÆø·Ö×Ó£¨±ÈÈç³ôÑõ£©ÎüÊÕ¹âµÄdensity profile
-//			//´Ó0£¨ÁãÃÜ¶È£©ºÍ1£¨×î´óÃÜ¶È£©µÄ¹ØÓÚ¸ß¶ÈµÄÎŞÁ¿¸ÙÖµº¯Êı
-//			DensityProfile absorption_density;
-//			/*
-//			ÔÚ¿ÕÆø·Ö×ÓÃÜ¶È×î´óµÄµØ·½µÄÏû¹âÏµÊı£¨±ÈÈç³ôÑõ£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
-//			ÔÚº£°ÎhµÄÏû¹âÏµÊı = absorption_extinction * absorption_density
-//			*/
-//			ScatteringSpectrum absorption_extinction;
-//			/* µØ±íµÄÆ½¾ùalbedo
-//				DimensionlessSpectrum ground_albedo;
-//			/*
-//			±ØĞëÔ¤ÏÈ¼ÆËã´óÆøÉ¢ÉäµÄ×î´óÌ«ÑôÌì¶¥½ÇµÄÓàÏÒ
-//			£¨ÎªÁË»ñµÃ×î´ó¾«¶È£¬Ê¹ÓÃ×îĞ¡µÄÌ«ÑôÌì¶¥½Ç²úÉú¿ÉºöÂÔ²»¼ÆµÄÌì¹â·øÉäÖµ¡£ÀıÈç£¬¶ÔÓÚµØÇòÇé¿ö£¬102¶ÈÊÇÒ»¸ö²»´íµÄÑ¡Ôñ - ²úÉúmu_s_min = -0.2£©¡£
-//			*/
-//			Number mu_s_min;
-//		}
-//	}
-//}
+namespace Apollo
+{
+	namespace Atmosphere
+	{
+		namespace Reference
+		{
+			/*
+			ÎïÀíÁ¿
+			ÎÒÃÇµÄ´óÆøÄ£ĞÍËùĞèµÄÎïÀíÁ¿ÊÇ·øÉä¶È(radiometric)ºÍ¹â¶ÈÁ¿(photometric)¡£
+			ÎÒÃÇ´ÓÁù¸ö»ù±¾Á¿¿ªÊ¼£º½Ç¶È(angle)£¬³¤¶È(length)£¬²¨³¤(wavelength)£¬Á¢Ìå½Ç(soild angle)£¬¹¦ÂÊ(power)ºÍ·¢¹â¹¦ÂÊ(luminous power)
+			£¨²¨³¤Ò²ÊÇÒ»¸ö³¤¶È£¬µ«ÎÒÃÇÇø·ÖÁ½ÕßÒÔÌá¸ßÇåÎú¶È£©¡£
+			*/
+			typedef dimensional::Angle Angle;
+			typedef dimensional::Scalar<1, 0, 0, 0, 0> Length;
+			typedef dimensional::Scalar<0, 1, 0, 0, 0> Wavelength;
+			typedef dimensional::Scalar<0, 0, 1, 0, 0> SolidAngle;
+			typedef dimensional::Scalar<0, 0, 0, 1, 0> Power;
+			typedef dimensional::Scalar<0, 0, 0, 0, 1> LuminousPower;
+
+				/*
+				ÓÉ´ËÎÒÃÇµÃ³ö·øÕÕ¶È(irradiance)£¬·øÉä¶È(radiance)£¬¹âÆ×·øÕÕ¶È(spectral rradiance)£¬¹âÆ×·øÉäÂÊ(spectral radiance)£¬ÁÁ¶È(luminance)µÈ£¬
+				ÒÔ¼°´¿Êı(pure number)£¬Ãæ»ı(area)£¬Ìå»ı(volume)µÈ¡£
+				*/
+				typedef dimensional::Scalar<0, 0, 0, 0, 0> Number;
+				typedef dimensional::Scalar<-1, 0, 0, 0, 0> InverseLength;
+				typedef dimensional::Scalar<2, 0, 0, 0, 0> Area;
+				typedef dimensional::Scalar<3, 0, 0, 0, 0> Volume;
+				typedef dimensional::Scalar<-2, 0, 0, 1, 0> Irradiance;
+				typedef dimensional::Scalar<-2, 0, -1, 1, 0> Radiance;
+				typedef dimensional::Scalar<0, -1, 0, 1, 0> SpectralPower;
+				typedef dimensional::Scalar<-2, -1, 0, 1, 0> SpectralIrradiance;
+				typedef dimensional::Scalar<-2, -1, -1, 1, 0> SpectralRadiance;
+				typedef dimensional::Scalar<-3, -1, -1, 1, 0> SpectralRadianceDensity;
+				typedef dimensional::Scalar<-1, 0, 0, 0, 0> ScatteringCoefficient;
+				typedef dimensional::Scalar<0, 0, -1, 0, 0> InverseSolidAngle;
+				typedef dimensional::Scalar<-3, 0, 0, 0, 0> NumberDensity;
+				typedef dimensional::Scalar<0, 0, -1, 0, 1> LuminousIntensity;
+				typedef dimensional::Scalar<-2, 0, -1, 0, 1> Luminance;
+				typedef dimensional::Scalar<-2, 0, 0, 0, 1> Illuminance;
+
+				/*
+				ÎÒÃÇ»¹ĞèÒªÎïÀíÁ¿µÄÊ¸Á¿£¬Ö÷ÒªÊÇ¸ù¾İ²¨³¤À´±íÊ¾º¯Êı¡£
+				ÔÚÕâÖÖÇé¿öÏÂ£¬Ê¸Á¿ÔªËØ¶ÔÓ¦ÓÚÄ³Ğ©Ô¤¶¨Òå²¨³¤µÄº¯ÊıÖµ¡£
+				ÔÚÕâÀï£¬ÎÒÃÇÊ¹ÓÃ47¸öÔ¤¶¨Òå²¨³¤£¬¾ùÔÈ·Ö²¼ÔÚ360ºÍ830ÄÉÃ×Ö®¼ä£º
+				*/
+				template<int U1, int U2, int U3, int U4, int U5>
+				using WavelengthFunction = dimensional::ScalarFunction<0, 1, 0, 0, 0, U1, U2, U3, U4, U5, 47, 360, 830>;
+
+				// ²¨³¤µ½ÊıÖµµÄº¯Êı¡£(Ãû×ÖÀïÃæµÄSpectrum±íÊ¾¾ÍÊÇ´Ó²¨³¤À´£¬ÏÂÃæµÄÍ¬Àí)
+				typedef WavelengthFunction<0, 0, 0, 0, 0> DimensionlessSpectrum;
+				// ²¨³¤µ½¹¦ÂÊµÄº¯Êı
+				typedef WavelengthFunction<0, -1, 0, 1, 0> PowerSpectrum;
+				// ´Ó²¨³¤µ½·øÕÕ¶ÈµÄº¯Êı
+				typedef WavelengthFunction<-2, -1, 0, 1, 0> IrradianceSpectrum;
+				// ²¨³¤µ½·øÉäÂÊµÄº¯Êı
+				typedef WavelengthFunction<-2, -1, -1, 1, 0> RadianceSpectrum;
+				// ²¨³¤µ½·øÉäÂÊÃÜ¶ÈµÄº¯Êı
+				typedef WavelengthFunction<-3, -1, -1, 1, 0> RadianceDensitySpectrum;
+				// ²¨³¤µ½É¢ÉäÏµÊıµÄº¯Êı
+				typedef WavelengthFunction<-1, 0, 0, 0, 0> ScatteringSpectrum;
+
+				// 3DÖĞÒ»¸öµã£¨3¸ö³¤¶ÈÖµ£©
+				typedef dimensional::Vector3<Length> Position;
+				// 3DÖĞÒ»¸öµ¥Î»·½ÏòÏòÁ¿£¨ÎŞµ¥Î»Öµ£©
+				typedef dimensional::Vector3<Number> Direction;
+				// 3¸öÁÁ¶ÈÖµµÄÏòÁ¿
+				typedef dimensional::Vector3<Luminance> Luminance3;
+				// 3¸öÕÕ¶ÈÖµµÄÏòÁ¿
+				typedef dimensional::Vector3<Illuminance> Illuminance3;
+
+				/*
+				×îºó£¬ÎÒÃÇ»¹ĞèÒªÔÚÃ¿¸öÎÆËØÖĞ°üº¬ÎïÀíÁ¿µÄÔ¤¼ÆËãÎÆÀí£¨ÎÆÀí´óĞ¡ÔÚconstants.hÖĞ¶¨Òå£©£º
+				*/
+				typedef dimensional::BinaryFunction<
+					TRANSMITTANCE_TEXTURE_WIDTH,
+					TRANSMITTANCE_TEXTURE_HEIGHT,
+					DimensionlessSpectrum> TransmittanceTexture;
+
+				template<class T>
+				using AbstractScatteringTexture = dimensional::TernaryFunction<
+					SCATTERING_TEXTURE_WIDTH,
+					SCATTERING_TEXTURE_HEIGHT,
+					SCATTERING_TEXTURE_DEPTH,
+					T>;
+
+				typedef AbstractScatteringTexture<IrradianceSpectrum>
+					ReducedScatteringTexture;
+
+				typedef AbstractScatteringTexture<RadianceSpectrum>
+					ScatteringTexture;
+
+				typedef AbstractScatteringTexture<RadianceDensitySpectrum>
+					ScatteringDensityTexture;
+
+				typedef dimensional::BinaryFunction<
+					IRRADIANCE_TEXTURE_WIDTH,
+					IRRADIANCE_TEXTURE_HEIGHT,
+					IrradianceSpectrum> IrradianceTexture;
+			
+
+			/*
+			ÎïÀíµ¥Î»
+			È»ºóÎÒÃÇ¿ÉÒÔ¶¨Òå»ù±¾ÎïÀíÁ¿µÄµ¥Î»£º»¡¶È£¨rad£©£¬Ã×£¨m£©£¬ÄÉÃ×£¨nm£©£¬ÇòÃæ¶È£¨sr£©£¬ÍßÌØ£¨ÍßÌØ£©ºÍÁ÷Ã÷£¨lm£©£º
+			*/
+			constexpr dimensional::Angle rad = dimensional::rad;
+			constexpr Length m = Length::Unit();
+			constexpr Wavelength nm = Wavelength::Unit();
+			constexpr SolidAngle sr = SolidAngle::Unit();
+			constexpr Power watt = Power::Unit();
+			constexpr LuminousPower lm = LuminousPower::Unit();
+
+			/*
+			´ÓÖĞÎÒÃÇ¿ÉÒÔÍÆµ¼³öÄ³Ğ©ÅÉÉúÎïÀíÁ¿µÄµ¥Î»£¬ÒÔ¼°Ò»Ğ©ÅÉÉúµ¥Î»£¨degress deg£¬km km km£¬kilocandela kcd£©£º
+			*/
+			constexpr double PI = dimensional::PI;
+			constexpr dimensional::Angle pi = dimensional::pi;
+			constexpr dimensional::Angle deg = dimensional::deg;
+			constexpr Length km = 1000.0 * m;
+			constexpr Area m2 = m * m;
+			constexpr Volume m3 = m * m * m;
+			constexpr Irradiance watt_per_square_meter = watt / m2;
+			constexpr Radiance watt_per_square_meter_per_sr = watt / (m2 * sr);
+			constexpr SpectralIrradiance watt_per_square_meter_per_nm = watt / (m2 * nm);
+			constexpr SpectralRadiance watt_per_square_meter_per_sr_per_nm = watt / (m2 * sr * nm);
+			constexpr SpectralRadianceDensity watt_per_cubic_meter_per_sr_per_nm = watt / (m3 * sr * nm);
+			constexpr LuminousIntensity cd = lm / sr;
+			constexpr LuminousIntensity kcd = 1000.0 * cd;
+			constexpr Luminance cd_per_square_meter = cd / m2;
+			constexpr Luminance kcd_per_square_meter = kcd / m2;
+
+			/*
+			´óÆø²ã²ÎÊı
+			Ê¹ÓÃÉÏÊöÀàĞÍ£¬ÎÒÃÇÏÖÔÚ¿ÉÒÔ¶¨Òå´óÆøÄ£ĞÍµÄ²ÎÊı¡£ ÎÒÃÇ´ÓÃÜ¶ÈprofilesµÄ¶¨Òå¿ªÊ¼£¬ÕâĞ©²ÎÊıÈ¡¾öÓÚ¸ß¶È£º
+			*/
+			//´óÆø²ãlayer¿í¶ÈÎªwidth£¬ÃÜ¶È¶¨ÒåÎªexp_term * exp(exp_scale * h) + linear_term * h + constant_term
+			//clampµ½[0,1]£¬hÊÇº£°Î
+			struct DensityProfileLayer
+			{
+				DensityProfileLayer() : DensityProfileLayer(0.0 * m, 0.0, 0.0 / m, 0.0 / m, 0.0) {}
+				DensityProfileLayer(Length width, Number exp_term, InverseLength exp_scale, InverseLength linear_term, Number constant_term)
+					: width(width), exp_term(exp_term), exp_scale(exp_scale),
+					linear_term(linear_term), constant_term(constant_term) {}
+
+				Length width;
+				Number exp_term;
+				InverseLength exp_scale;
+				InverseLength linear_term;
+				Number constant_term;
+			};
+
+			/*
+			Ò»¸ö´óÆø²ãÃÜ¶ÈprofileÓÉ¼¸²ãÏà»¥×é³É£¨´ÓÏÂµ½ÉÏ£©
+			×îºóÒ»²ãµÄ¿í¶È±»ºöÂÔ£¬Ëü×ÜÊÇÑÓÉêµ½¶¥²¿´óÆø²ã±ß½ç
+			peofileÖµ´Ó0µ½1
+			*/
+			struct DensityProfile
+			{
+				DensityProfileLayer layers[2];
+			};
+
+			struct AtmosphereParameters
+			{
+				// ´óÆø²ã¶¥²¿µÄÌ«Ñô·øÕÕ¶È
+				IrradianceSpectrum solar_irradiance;
+				// Ì«Ñô½Ç¶È°ë¾¶¡£Warming:ÕâÊÇ¸ö½üËÆÖµ£¬Ö»ÓĞµ±½Ç¶ÈĞ¡ÓÚ0.1»¡¶ÈÊ±ÓĞĞ§¡£
+				Angle sun_angular_radius;
+				// µØĞÄµ½´óÆø²ãµ×²¿±ß½çµÄ¾àÀë,ÔÚÕâÀïÊÇµØÇò°ë¾¶
+				Length bottom_radius;
+				// µØĞÄµ½´óÆø²ã¶¥²¿±ß½çµÄ¾àÀë
+				Length top_radius;
+				//¿ÕÆø·Ö×ÓµÄdensity profile
+				//´Ó0£¨ÁãÃÜ¶È£©ºÍ1£¨×î´óÃÜ¶È£©µÄ¹ØÓÚ¸ß¶ÈµÄÎŞÁ¿¸ÙÖµº¯Êı¡£
+				DensityProfile rayleigh_density;
+				/*
+				ÔÚ¿Õ×Ó·Ö×ÓÃÜ¶È×î´óµÄµØ·½µÄÉ¢ÉäÏµÊı£¨Ò»°ãÔÚ´óÆø²ãµÄµ×²¿£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
+				ÔÚº£°ÎhµÄÉ¢ÉäÏµÊı = rayleigh_scattering * rayleigh_density
+				*/
+				ScatteringSpectrum rayleigh_scattering;
+				//ÆøÈÜ½ºµÄdensity profile
+				//´Ó0£¨ÁãÃÜ¶È£©ºÍ1£¨×î´óÃÜ¶È£©µÄ¹ØÓÚ¸ß¶ÈµÄÎŞÁ¿¸ÙÖµº¯Êı¡£
+				DensityProfile mie_density;
+				/*
+				ÔÚÆøÈÜ½ºÃÜ¶È×î´óµÄµØ·½µÄÉ¢ÉäÏµÊı£¨Ò»°ãÔÚ´óÆø²ãµÄµ×²¿£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
+				ÔÚº£°ÎhµÄÉ¢ÉäÏµÊı = mie_scattering * mie_density
+				*/
+				ScatteringSpectrum mie_scattering;
+				/*
+				ÔÚÆøÈÜ½ºÃÜ¶È×î´óµÄµØ·½µÄÏû¹âÏµÊı£¨Ò»°ãÔÚ´óÆø²ãµÄµ×²¿£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
+				ÔÚº£°ÎhµÄÏû¹âÏµÊı = mie_extinction * mie_density
+				*/
+				ScatteringSpectrum mie_extinction;
+				//¹ØÓÚÆøÈÜ½ºCornette-ShanksÏàÎ»º¯ÊıµÄ²»¶Ô³Æ²ÎÊı
+				Number mie_phase_function_g;
+				//¿ÕÆø·Ö×Ó£¨±ÈÈç³ôÑõ£©ÎüÊÕ¹âµÄdensity profile
+				//´Ó0£¨ÁãÃÜ¶È£©ºÍ1£¨×î´óÃÜ¶È£©µÄ¹ØÓÚ¸ß¶ÈµÄÎŞÁ¿¸ÙÖµº¯Êı
+				DensityProfile absorption_density;
+				/*
+				ÔÚ¿ÕÆø·Ö×ÓÃÜ¶È×î´óµÄµØ·½µÄÏû¹âÏµÊı£¨±ÈÈç³ôÑõ£©£¬ÊÇÒ»¸ö¹ØÓÚ²¨³¤µÄº¯Êı¡£
+				ÔÚº£°ÎhµÄÏû¹âÏµÊı = absorption_extinction * absorption_density
+				*/
+				ScatteringSpectrum absorption_extinction;
+				/* µØ±íµÄÆ½¾ùalbedo
+					DimensionlessSpectrum ground_albedo;
+				/*
+				±ØĞëÔ¤ÏÈ¼ÆËã´óÆøÉ¢ÉäµÄ×î´óÌ«ÑôÌì¶¥½ÇµÄÓàÏÒ
+				£¨ÎªÁË»ñµÃ×î´ó¾«¶È£¬Ê¹ÓÃ×îĞ¡µÄÌ«ÑôÌì¶¥½Ç²úÉú¿ÉºöÂÔ²»¼ÆµÄÌì¹â·øÉäÖµ¡£ÀıÈç£¬¶ÔÓÚµØÇòÇé¿ö£¬102¶ÈÊÇÒ»¸ö²»´íµÄÑ¡Ôñ - ²úÉúmu_s_min = -0.2£©¡£
+				*/
+				Number mu_s_min;
+			};
+		}
+	}
+}
 
 

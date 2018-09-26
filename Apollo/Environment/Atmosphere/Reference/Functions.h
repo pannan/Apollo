@@ -13,12 +13,12 @@ namespace Apollo
 	{
 		namespace Reference
 		{
-			/*		typedef dimensional::vec2	float2;
+					typedef dimensional::vec2	float2;
 					typedef dimensional::vec3	float3;
-					typedef dimensional::vec4	float4;*/
+					typedef dimensional::vec4	float4;
 
 			//Õ∏…‰¬ 
-			//Length DistanceToTopAtmosphereBoundary(const AtmosphereParameters& atmosphere, Length r, Number mu);
+			Length DistanceToTopAtmosphereBoundary(const AtmosphereParameters& atmosphere, Length r, Number mu);
 		}
 	}
 }
