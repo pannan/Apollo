@@ -55,7 +55,9 @@ inline float3 UVToCameraRay2(float2 uv)
 	return ray;
 }
 
-VS_OUTPUT VSMAIN(in VS_INPUT input)
+#define IN(x) in x
+
+VS_OUTPUT VSMAIN(IN(VS_INPUT input))
 {
 	VS_OUTPUT output;
 

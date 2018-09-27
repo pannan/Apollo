@@ -601,6 +601,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Environment\Atmosphere\Functions.hlsl" />
+    <None Include="Environment\Atmosphere\Functions.hlsl">
+      <Filter>Environment\Atmosphere</Filter>
+    </None>
   </ItemGroup>
 </Project>
