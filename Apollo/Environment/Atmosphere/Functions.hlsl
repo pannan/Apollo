@@ -105,7 +105,7 @@ d = sqrt( Rb*Rb + r*r * (mu*mu - 1)) - r*mu
 bool RayIntersectsGround(_IN(AtmosphereParameters) atmopshere, Length r, Number mu)
 {
 	//只有当mu <0才可能和地面相交
-	return mu < 0.0 && atmopshere.bottom_radius * atmopshere.bottom_radius + r*r * (mu*mu - 1.0) >= 0.0;
+	return mu < 0.0 && r*r * (mu*mu - 1.0) + atmopshere.bottom_radius * atmopshere.bottom_radius >= 0.0 * m2;
 }
 
 
@@ -137,7 +137,7 @@ Length ComputeOpticalLengthToTopAtmosphereBoundary(_IN(AtmosphereParameters) atm
 	//积分步长，每个积分间隔的长度
 	Length dx = DistanceToTopAtmosphereBoundary(atmosphere, r, mu) / Number(SAMPLE_COUNT);
 	//积分循环
-	Length result = 0.0;
+	Length result = 0.0 * m;
 	for (int i = 0; i <= SAMPLE_COUNT; ++i)
 	{
 		Length d_i = dx * i;
@@ -323,7 +323,7 @@ void GetRMuFromTransmittanceTextureUv(_IN(AtmosphereParameters) atmosphere, _IN(
 	Length d_max = H + K;
 	Length d = x_mu * (d_max - d_min) + d_min;
 	//从上面知道，d_min是mu = 1时出现，当d == 0时，mu = 1
-	mu = d == 0.0 ? Number(1.0) : (H * H - K * K - d * d) / (2.0 * r * d);
+	mu = d == 0.0 * m ? Number(1.0) : (H * H - K * K - d * d) / (2.0 * r * d);
 	mu = ClampCosine(mu);
 }
 
@@ -678,7 +678,7 @@ void GetRMuMuSNuFromScatteringTextureUvwz(_IN(AtmosphereParameters) atmosphere, 
 		Length d_min = r - atmosphere.bottom_radius;
 		Length d_max = K;
 		Length d = d_min + (d_max - d_min) * GetUnitRangeFromTextureCoord(1.0 - 2.0 * uvwz.z, SCATTERING_TEXTURE_MU_SIZE / 2);
-		mu = d == 0.0 ? Number(-1.0) : ClampCosine(-(K * K + d * d) / (2.0 * r * d));
+		mu = d == 0.0*m ? Number(-1.0) : ClampCosine(-(K * K + d * d) / (2.0 * r * d));
 		ray_r_mu_intersects_ground = true;
 	}
 	else
@@ -688,7 +688,7 @@ void GetRMuMuSNuFromScatteringTextureUvwz(_IN(AtmosphereParameters) atmosphere, 
 		Length d_max = K + H;
 		Length d = d_min + (d_max - d_min) * GetUnitRangeFromTextureCoord(
 			2.0 * uvwz.z - 1.0, SCATTERING_TEXTURE_MU_SIZE / 2);
-		mu = d == 0.0 ? Number(1.0) : ClampCosine((H * H - K * K - d * d) / (2.0 * r * d));
+		mu = d == 0.0*m ? Number(1.0) : ClampCosine((H * H - K * K - d * d) / (2.0 * r * d));
 		ray_r_mu_intersects_ground = false;
 	}
 
@@ -698,7 +698,7 @@ void GetRMuMuSNuFromScatteringTextureUvwz(_IN(AtmosphereParameters) atmosphere, 
 	Number A = -2.0 * atmosphere.mu_s_min * atmosphere.bottom_radius / (d_max_s - d_min_s);
 	Number a = (A - x_mu_s * A) / (1.0 + x_mu_s * A);
 	Length d = d_min_s + min(a, A) * (d_max_s - d_min_s);
-	mu_s = d == 0.0 ? Number(1.0) : ClampCosine((H * H - d * d) / (2.0 * atmosphere.bottom_radius * d));
+	mu_s = d == 0.0*m ? Number(1.0) : ClampCosine((H * H - d * d) / (2.0 * atmosphere.bottom_radius * d));
 
 	nu = ClampCosine(uvwz.x * 2.0 - 1.0);
 }

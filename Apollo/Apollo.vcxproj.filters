@@ -590,14 +590,14 @@
     <ClCompile Include="Sample\SkySample.cpp">
       <Filter>Sample</Filter>
     </ClCompile>
-    <ClCompile Include="Math\Dimensional\vector_test.cc">
-      <Filter>Math\Dimensional</Filter>
-    </ClCompile>
     <ClCompile Include="Environment\Atmosphere\Reference\Functions.cpp">
       <Filter>Environment\Atmosphere\Reference</Filter>
     </ClCompile>
     <ClCompile Include="Math\Dimensional\test_case.cpp">
       <Filter>Math\Dimensional</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment\Atmosphere\Reference\Functions_test.cpp">
+      <Filter>Environment\Atmosphere\Reference</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

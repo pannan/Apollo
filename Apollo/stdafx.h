@@ -174,4 +174,9 @@ enum class RenderPipelineType : uint8_t
 	RenderPipelineCount
 };
 
+#define NAME_SPACE_BEGIN_APOLLO namespace Apollo {
+#define NAME_SPACE_BEGIN_ATMOSPHERE namespace Atmosphere {
+#define NAME_SPACE_BEGIN_REFERENCE namespace Reference {
+#define NAME_SPACE_END }
+
 // TODO:  在此处引用程序需要的其他头文件

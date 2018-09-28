@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "VertexStruct.h"
 #include "DirectXMath.h"
+#include "Dimensional/test_case.h"
 using namespace Apollo;
 using namespace DirectX;
 
@@ -63,6 +64,8 @@ void SkySample::init()
 	m_atmosphereParameters.top_radius = 6420.0f;
 	m_atmosphereParametersBuffer->set(&m_atmosphereParameters, sizeof(AtmosphereParameters));
 	m_psShader->setConstantBuffer("AtmosphereParameters", m_atmosphereParametersBuffer);
+
+	dimensional::TestCase::RunAllTests();
 }
 
 /*

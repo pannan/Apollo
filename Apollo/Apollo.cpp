@@ -234,7 +234,6 @@ int main(int, char**)
 
 	FileSystemWatcher fsw;
 	bool r = fsw.Run(sDir, true, dwNotifyFilter, &MyDeal, 0);
-
 	
 	LogUI logUI;
 

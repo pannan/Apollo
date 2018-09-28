@@ -297,6 +297,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureCubeMapDX11.cpp" />
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Environment\Atmosphere\Reference\Functions.cpp" />
+    <ClCompile Include="Environment\Atmosphere\Reference\Functions_test.cpp" />
     <ClCompile Include="Graphics\AABB.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\ClearRenderTargetPass.cpp" />
@@ -312,7 +313,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="ImGui\imgui_demo.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="Math\Dimensional\test_case.cpp" />
-    <ClCompile Include="Math\Dimensional\vector_test.cc" />
     <ClCompile Include="Math\Matrix3x3.cpp" />
     <ClCompile Include="Math\Matrix4x4.cpp" />
     <ClCompile Include="Math\Plane.cpp" />

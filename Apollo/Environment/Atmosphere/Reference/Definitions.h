@@ -216,8 +216,8 @@ namespace Apollo
 				在海拔h的消光系数 = absorption_extinction * absorption_density
 				*/
 				ScatteringSpectrum absorption_extinction;
-				/* 地表的平均albedo
-					DimensionlessSpectrum ground_albedo;
+				//地表的平均albedo
+				DimensionlessSpectrum ground_albedo;
 				/*
 				必须预先计算大气散射的最大太阳天顶角的余弦
 				（为了获得最大精度，使用最小的太阳天顶角产生可忽略不计的天光辐射值。例如，对于地球情况，102度是一个不错的选择 - 产生mu_s_min = -0.2）。
