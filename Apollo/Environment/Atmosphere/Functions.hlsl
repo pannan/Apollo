@@ -75,6 +75,8 @@ pow(d + r*mu,2) = R*R + r*r*mu*mu - r*r
 d + r*mu = sqrt(R*R + r*r*mu*mu - r*r)
 d = sqrt(R*R + r*r*mu*mu - r*r) - r*mu
 d = sqrt(R*R + r*r * (mu*mu - 1)) - r*mu
+注意上面的sqrt(R*R + r*r * (mu*mu - 1))可能为正为负
+当和地面相交时为负
 */
 Length DistanceToTopAtmosphereBoundary(_IN(AtmosphereParameters) atmopshere, Length r, Number mu)
 {
@@ -90,7 +92,8 @@ Length DistanceToBottomAtmosphereBoundary(_IN(AtmosphereParameters) atmopshere, 
 {
 	//R*R + r*r * (mu*mu - 1)
 	Area discriminant = r * r * (mu * mu - 1.0) + atmopshere.bottom_radius * atmopshere.bottom_radius;
-	return ClampDistance(SafeSqrt(discriminant) - r * mu);
+	//注意这里的SafeSqrt(discriminant)为负
+	return ClampDistance(-r * mu - SafeSqrt(discriminant));
 }
 
 /*
@@ -305,7 +308,7 @@ float2 GetTransmittanceTextureUvFromRMu(_IN(AtmosphereParameters) atmosphere, Le
 	Number x_r = K / H;
 
 	Number u = GetTextureCoordFromUnitRange(x_mu, TRANSMITTANCE_TEXTURE_WIDTH);
-	Number v = GetTextureCoordFromUnitRange(x_r, TRANSMITTANCE_TEXTURE_WIDTH);
+	Number v = GetTextureCoordFromUnitRange(x_r, TRANSMITTANCE_TEXTURE_HEIGHT);
 	return float2(u, v);
 }
 
@@ -313,7 +316,7 @@ float2 GetTransmittanceTextureUvFromRMu(_IN(AtmosphereParameters) atmosphere, Le
 void GetRMuFromTransmittanceTextureUv(_IN(AtmosphereParameters) atmosphere, _IN(float2) uv, _OUT(Length) r, _OUT(Number) mu)
 {
 	Number x_mu = GetUnitRangeFromTextureCoord(uv.x, TRANSMITTANCE_TEXTURE_WIDTH);
-	Number x_r = GetUnitRangeFromTextureCoord(uv.y, TRANSMITTANCE_TEXTURE_WIDTH);
+	Number x_r = GetUnitRangeFromTextureCoord(uv.y, TRANSMITTANCE_TEXTURE_HEIGHT);
 
 	Length H = sqrt(atmosphere.top_radius * atmosphere.top_radius - atmosphere.bottom_radius * atmosphere.bottom_radius);
 	Length K = H * x_r;
@@ -390,8 +393,15 @@ DimensionlessSpectrum GetTransmittance(_IN(AtmosphereParameters) atmosphere, _IN
 
 	if (ray_r_mu_intersects_ground)
 	{
-		DimensionlessSpectrum Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, -mu);
-		DimensionlessSpectrum Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, -mu_d);
+		//DimensionlessSpectrum Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, -mu);
+		//DimensionlessSpectrum Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, -mu_d);
+		//DimensionlessSpectrum Tqp = Tqi / Tpi;
+		//注意，这里因为对mu,mu_d取反了，为什么取反？因为这里假设不和地面相交
+		//这里我的理解是这时r_d变成了r:r_d->r
+		//r变成了r_d:r->r_d
+		//也就是射线是从r_d发出的，所以Tpi和Tqi对换了,所以重写为
+		DimensionlessSpectrum Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, -mu);
+		DimensionlessSpectrum Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, -mu_d);
 		DimensionlessSpectrum Tpq = Tpi / Tqi;
 		return min(Tpq, DimensionlessSpectrum(1.0));
 	}
@@ -671,7 +681,7 @@ void GetRMuMuSNuFromScatteringTextureUvwz(_IN(AtmosphereParameters) atmosphere, 
 {
 	Length H = sqrt(atmosphere.top_radius * atmosphere.top_radius - atmosphere.bottom_radius * atmosphere.bottom_radius);
 	Length K = H * GetUnitRangeFromTextureCoord(uvwz.w,SCATTERING_TEXTURE_R_SIZE);
-
+	r = sqrt(K*K + atmosphere.bottom_radius * atmosphere.bottom_radius);
 	if (uvwz.z < 0.5)
 	{
 		//ray(r,mu)到地面的距离，对所有mu的最小和最大值，通过ray(r,-1)和ray(r,m_horizon)获得
@@ -762,7 +772,38 @@ AbstractSpectrum GetScattering(_IN(AtmosphereParameters) atmosphere,
 	_IN(AbstractScatteringTexture TEMPLATE_ARGUMENT(AbstractSpectrum))scattering_texture,
 	Length r, Number mu, Number mu_s, Number nu, bool ray_r_mu_intersects_ground)
 {
-	float4 uvwz GetScatteringTextureUvwzFromRMuMuSNu(atmosphere, r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+	float4 uvwz = GetScatteringTextureUvwzFromRMuMuSNu(atmosphere, r, mu, mu_s, nu, ray_r_mu_intersects_ground);
 
-	Number text
+	Number tex_coord_x = uvwz.x * Number(SCATTERING_TEXTURE_NU_SIZE - 1);
+	Number tex_x = floor(tex_coord_x);
+	Number lerp = tex_coord_x - tex_x;
+	float3 uvw0 = float3((tex_x + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
+	float3 uvw1 = float3((tex_x + 1.0 + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
+	return AbstractSpectrum(texture(scattering_texture, uvw0) * (1.0 - lerp) + texture(scattering_texture, uvw1) * lerp);
+}
+
+/*
+最后，我们在这里提供了一个方便查找功能，这将在下一节中有用。 
+此函数返回包含相位函数的单个散射，或者第n order散射(n>1)。 
+假设，如果scat_order严格大于1，则multiple_scattering_texture对应于此散射order，包括Rayleigh和Mie，以及所有相位函数项。
+*/
+RadianceSpectrum GetScattering(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(ReducedScatteringTexture) single_rayleigh_scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	_IN(ScatteringTexture) multiple_scattering_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground,
+	int scattering_order) 
+{
+	if (scattering_order == 1)
+	{
+		IrradianceSpectrum rayleigh = GetScattering(atmosphere, single_rayleigh_scattering_texture, r, mu, mu_s, nu,ray_r_mu_intersects_ground);
+		IrradianceSpectrum mie = GetScattering(atmosphere, single_mie_scattering_texture, r, mu, mu_s, nu,ray_r_mu_intersects_ground);
+		return rayleigh * RayleighPhaseFunction(nu) + mie * MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
+	}
+	else 
+	{
+		return GetScattering(atmosphere, multiple_scattering_texture, r, mu, mu_s, nu,ray_r_mu_intersects_ground);
+	}
 }

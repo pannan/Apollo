@@ -447,6 +447,506 @@ public:
 		ExpectNear(0.5 / TRANSMITTANCE_TEXTURE_HEIGHT, uv.y(), kEpsilon);
 	}
 
+	/*
+	从透射率纹理坐标的映射：检查透射率纹理的边界纹素的中心是否映射到r（r_bottom和r_top）和mu（mu_horiz和1）的边界值。 
+	最后，检查映射函数及其逆实际上是否相反（即它们的乘应该给出Identity函数）。
+	*/
+	void TestGetRMuFromTransmittanceTextureUv() 
+	{
+		Length r;
+		Number mu;
+		GetRMuFromTransmittanceTextureUv(
+			atmosphere_parameters_,
+			float2(0.5 / TRANSMITTANCE_TEXTURE_WIDTH,1.0 - 0.5 / TRANSMITTANCE_TEXTURE_HEIGHT),
+			r, mu);
+		ExpectNear(kTopRadius, r, 1.0 * m);
+		ExpectNear(1.0, mu(), kEpsilon);
+
+		GetRMuFromTransmittanceTextureUv(
+			atmosphere_parameters_,
+			float2(1.0 - 0.5 / TRANSMITTANCE_TEXTURE_WIDTH,1.0 - 0.5 / TRANSMITTANCE_TEXTURE_HEIGHT),
+			r, mu);
+		ExpectNear(kTopRadius, r, 1.0 * m);
+		ExpectNear(CosineOfHorizonZenithAngle(kTopRadius)(),mu(),kEpsilon);
+
+		GetRMuFromTransmittanceTextureUv(
+			atmosphere_parameters_,
+			float2(0.5 / TRANSMITTANCE_TEXTURE_WIDTH,0.5 / TRANSMITTANCE_TEXTURE_HEIGHT),
+			r, mu);
+		ExpectNear(kBottomRadius, r, 1.0 * m);
+		ExpectNear(1.0, mu(), kEpsilon);
+
+		GetRMuFromTransmittanceTextureUv(
+			atmosphere_parameters_,
+			float2(1.0 - 0.5 / TRANSMITTANCE_TEXTURE_WIDTH,0.5 / TRANSMITTANCE_TEXTURE_HEIGHT),
+			r, mu);
+		ExpectNear(kBottomRadius, r, 1.0 * m);
+		ExpectNear(0.0, mu(), kEpsilon);
+
+		GetRMuFromTransmittanceTextureUv(
+			atmosphere_parameters_,
+			GetTransmittanceTextureUvFromRMu(atmosphere_parameters_,kBottomRadius * 0.2 + kTopRadius * 0.8, 0.25),
+			r, mu);
+		ExpectNear(kBottomRadius * 0.2 + kTopRadius * 0.8, r, 1.0 * m);
+		ExpectNear(0.25, mu(), kEpsilon);
+	}
+
+	/*
+	透射率纹理：检查我们是否获得与顶部大气边界相同的透射率（或多或少于e）
+	无论我们是使用ComputeTransmittanceToTopAtmosphereBoundary直接计算，还是通过预先计算的透射率纹理中的双线性插值查找。
+	*/
+	void TestGetTransmittanceToTopAtmosphereBoundary() 
+	{
+		LazyTransmittanceTexture transmittance_texture(atmosphere_parameters_);
+
+		const Length r = kBottomRadius * 0.2 + kTopRadius * 0.8;
+		const Number mu = 0.4;
+		ExpectNear(
+			ComputeTransmittanceToTopAtmosphereBoundary(
+				atmosphere_parameters_, r, mu)[0],
+			GetTransmittanceToTopAtmosphereBoundary(
+				atmosphere_parameters_, transmittance_texture, r, mu)[0],
+			Number(kEpsilon));
+	}
+
+	/*
+	透射率纹理：检查GetTransmittance（它在预先计算的透射率纹理中组合了两个双线性插值查找）给出的预期结果
+	在某些情况下，可以解析计算结果（当没有气溶胶且空气分子密度均匀时， 光学深度就是Rayleigh散射系数乘以大气中传播的距离。
+	*/
+	void TestComputeAndGetTransmittance() 
+	{
+		SetUniformAtmosphere();
+		RemoveAerosols();
+		LazyTransmittanceTexture transmittance_texture(atmosphere_parameters_);
+
+		const Length r = kBottomRadius * 0.2 + kTopRadius * 0.8;
+		const Length d = (kTopRadius - kBottomRadius) * 0.1;
+
+		//水平射线，从底部大气层边界
+		ExpectNear(
+			exp(-kRayleighScattering * d),
+			GetTransmittance(atmosphere_parameters_, transmittance_texture,kBottomRadius, 0.0, d, false /* ray_intersects_ground */)[0],
+			Number(kEpsilon));
+	
+		//向上的，几乎垂直的射线
+		ExpectNear(
+			exp(-kRayleighScattering * d),
+			GetTransmittance(atmosphere_parameters_, transmittance_texture, r, 0.7, d,false /* ray_intersects_ground */)[0],
+			Number(kEpsilon));
+
+		//向下的，几乎垂直的射线
+		ExpectNear(
+			exp(-kRayleighScattering * d),
+			GetTransmittance(atmosphere_parameters_, transmittance_texture, r, -0.7, d,RayIntersectsGround(atmosphere_parameters_, r, -0.7))[0],
+			Number(kEpsilon));
+	}
+
+	/*
+	单次散射积分：检查ComputeSingleScatteringIntegrand中的计算（使用预先计算的透射率纹理）给出预期结果，在3种情况下，可以解析计算此结果：
+
+	1)
+	垂直射线，从地面向上看，太阳在天顶，散射在r。被积函数这样计算：
+		从大气底部到顶部的透射率。
+		这涉及从大气的底部到顶部的Rayleigh和Mie光学深度，其具有形式:
+		Kext*∫[r_top,r_bottom]exp(-(x-r_bottom)/K)dx = Kext*K [1-exp(-(r_top-r_bottom)/K)]
+		在r处的数值密度:exp(-(r-r_bottom)/K)
+
+	2）
+	垂直射线，从顶部大气层边界俯视，太阳位于天顶，散射在r。被积函数这样计算：
+		从大气顶部到r的透射率，并且返回。
+		这涉及从大气顶部到r（乘2）的Rayleigh和Mie光学深度，其形式为：
+		Kext*K*[exp(-(r-r_bottom)/K)-exp(-(r_top-r_bottom)/K)]
+		在r的数值密度:exp(-(r-r_bottom)/K)
+
+	3)
+	从地面的水平射线，太阳在地平线，散射距离观察者的距离d,没有气溶胶和均匀密度的空气分子。
+	然后，被积函数只是从地面到顶部大气边界的水平射线的透射率（已经在TestComputeTransmittanceToTopAtmosphereBoundary中计算）。
+	*/
+	void TestComputeSingleScatteringIntegrand()
+	{
+		LazyTransmittanceTexture transmittance_texture(atmosphere_parameters_);
+
+		// Vertical ray, from bottom to top atmosphere boundary, scattering at
+		// middle of ray, scattering angle equal to 0.
+		//从底部到顶部大气层边界的垂直射线，在射线中点散射，nu角度为0
+		const Length h_top = kTopRadius - kBottomRadius;
+		const Length h = h_top / 2.0;
+		DimensionlessSpectrum rayleigh;
+		DimensionlessSpectrum mie;
+		ComputeSingleScatteringIntegrand(atmosphere_parameters_, transmittance_texture,kBottomRadius, 1.0, 1.0, 1.0, h, false, rayleigh, mie);
+
+		Number rayleigh_optical_depth = kRayleighScattering * kRayleighScaleHeight * (1.0 - exp(-h_top / kRayleighScaleHeight));
+		Number mie_optical_depth = kMieExtinction * kMieScaleHeight * (1.0 - exp(-h_top / kMieScaleHeight));
+		ExpectNear(
+			exp(-rayleigh_optical_depth - mie_optical_depth) * exp(-h / kRayleighScaleHeight),
+			rayleigh[0],
+			Number(kEpsilon));
+
+		ExpectNear(exp(-rayleigh_optical_depth - mie_optical_depth) * exp(-h / kMieScaleHeight),
+			mie[0],
+			Number(kEpsilon));
+
+		// Vertical ray, top to middle of atmosphere, scattering angle 180 degrees.
+		//大气层顶部到中间的垂直射线，nu为180，-1
+		ComputeSingleScatteringIntegrand(atmosphere_parameters_, transmittance_texture,kTopRadius, -1.0, 1.0, -1.0, h, true, rayleigh, mie);
+
+		rayleigh_optical_depth = 2.0 * kRayleighScattering * kRayleighScaleHeight *
+			(exp(-h / kRayleighScaleHeight) - exp(-h_top / kRayleighScaleHeight));
+
+		mie_optical_depth = 2.0 * kMieExtinction * kMieScaleHeight *
+			(exp(-h / kMieScaleHeight) - exp(-h_top / kMieScaleHeight));
+
+		ExpectNear(exp(-rayleigh_optical_depth - mie_optical_depth) * exp(-h / kRayleighScaleHeight),
+			rayleigh[0],
+			Number(kEpsilon));
+		ExpectNear(exp(-rayleigh_optical_depth - mie_optical_depth) * exp(-h / kMieScaleHeight),
+			mie[0],
+			Number(kEpsilon));
+
+		// Horizontal ray, from bottom to top atmosphere boundary, scattering at
+		// 50km, scattering angle equal to 0, uniform atmosphere, no aerosols.
+		//从底部到大气层顶部的水平射线,在50km处散射，nu为0，大气均匀，无气溶胶
+		transmittance_texture.Clear();
+		SetUniformAtmosphere();
+		RemoveAerosols();
+		ComputeSingleScatteringIntegrand(atmosphere_parameters_, transmittance_texture,kBottomRadius, 0.0, 0.0, 1.0, 50.0 * km, false, rayleigh, mie);
+		rayleigh_optical_depth = kRayleighScattering * sqrt(kTopRadius * kTopRadius - kBottomRadius * kBottomRadius);
+		ExpectNear(
+			exp(-rayleigh_optical_depth),
+			rayleigh[0],
+			Number(kEpsilon));
+	}
+
+	/*
+	到最近的大气边界的距离：
+	对应垂直向上看(mu = 1)的射线检测值为r_op - r
+	水平射线(mu = 0)为sqrt(r_top*r_top - r*r)
+	垂直向下看的射线(mu=-1) r-r_bottom
+	*/
+	void TestDistanceToNearestAtmosphereBoundary()
+	{
+		constexpr Length r = kBottomRadius * 0.2 + kTopRadius * 0.8;
+		// 垂直向上射线
+		ExpectNear(
+			kTopRadius - r,
+			DistanceToNearestAtmosphereBoundary(atmosphere_parameters_, r, 1.0,RayIntersectsGround(atmosphere_parameters_, r, 1.0)),
+			1.0 * m);
+		// 水平射线
+		ExpectNear(
+			sqrt(kTopRadius * kTopRadius - r * r),
+			DistanceToNearestAtmosphereBoundary(atmosphere_parameters_, r, 0.0,RayIntersectsGround(atmosphere_parameters_, r, 0.0)),
+			1.0 * m);
+		// 垂直向下射线
+		ExpectNear(
+			r - kBottomRadius,
+			DistanceToNearestAtmosphereBoundary(atmosphere_parameters_, r, -1.0,RayIntersectsGround(atmosphere_parameters_, r, -1.0)),
+			1.0 * m);
+	}
+
+	/*
+	单次散射：检查ComputeSingleScattering中的数值积分是否给出预期结果，在2种情况下，可以解析计算积分：
+	1)
+	垂直射线，从地面向上看，太阳在天顶。
+	单个散射积分具有形式（我们省略了太阳辐照度和Mie术语以简化表达式;另请参见TestComputeSingleScatteringIntegrand）：
+	Ksca*∫[r_top,r_bottom] exp(-Kext*K [1 - exp(-(r_top-r_bottom)/K)]) * exp(-(r-r_bottom)/K)dr
+	等于
+	Ksca * exp(-Kext*K [1 - exp(-(r_top-r_bottom)/K)]) * K [1-exp(-(r_top-r_bottom)K)]
+
+	2)
+	垂直射线，从顶部大气边界俯视，太阳在天顶，没有气溶胶。
+	单个散射积分具有形式（我们省略了太阳辐照度;另请参见TestComputeSingleScatteringIntegrand）：
+	Ksca*∫[r_top,r_bottom] exp(-2*Ksca*K [exp(-(r-r_bottom)/K) - exp(-(r_top-r_bottom)/K)]) * exp(-(r-r_bottom)/K)dr
+	其中，令变量u = exp(-(r - r_bottom) / K),给出
+	0.5*(1 - exp(-2*Ksca*K(1 - exp(-(r_top-r_bottom) / K))))
+	*/
+	void TestComputeSingleScattering() 
+	{
+		LazyTransmittanceTexture transmittance_texture(atmosphere_parameters_);
+
+		// Vertical ray, from bottom atmosphere boundary, scattering angle 0.
+		//从下垂直向上到大气层边界，nu = 0
+		const Length h_top = kTopRadius - kBottomRadius;
+		IrradianceSpectrum rayleigh;
+		IrradianceSpectrum mie;
+		ComputeSingleScattering(atmosphere_parameters_, transmittance_texture,kBottomRadius, 1.0, 1.0, 1.0, false, rayleigh, mie);
+		Number rayleigh_optical_depth = kRayleighScattering * kRayleighScaleHeight * (1.0 - exp(-h_top / kRayleighScaleHeight));
+		Number mie_optical_depth = kMieExtinction * kMieScaleHeight * (1.0 - exp(-h_top / kMieScaleHeight));
+		// The relative error is about 1% here.
+		ExpectNear(
+			Number(1.0),
+			rayleigh[0] / (kSolarIrradiance * rayleigh_optical_depth * exp(-rayleigh_optical_depth - mie_optical_depth)),
+			Number(10.0 * kEpsilon));
+		ExpectNear(
+			Number(1.0),
+			mie[0] / (kSolarIrradiance * mie_optical_depth * kMieScattering / kMieExtinction * exp(-rayleigh_optical_depth - mie_optical_depth)),
+			Number(10.0 * kEpsilon));
+
+		// Vertical ray, from top atmosphere boundary, scattering angle 180 degrees,
+		// no aerosols.
+		transmittance_texture.Clear();
+		RemoveAerosols();
+		ComputeSingleScattering(atmosphere_parameters_, transmittance_texture,kTopRadius, -1.0, 1.0, -1.0, true, rayleigh, mie);
+		ExpectNear(
+			Number(1.0),
+			rayleigh[0] / (kSolarIrradiance * 0.5 * (1.0 - exp(-2.0 * kRayleighScaleHeight * kRayleighScattering * (1.0 - exp(-h_top / kRayleighScaleHeight))))),
+			Number(2.0 * kEpsilon));
+		ExpectNear(0.0, mie[0].to(watt_per_square_meter_per_nm), kEpsilon);
+	}
+
+	/*
+	Rayleigh和Mie相位函数：检查这些相位函数在所有立体角上的积分是否为1。
+	*/
+	void TestPhaseFunctions() 
+	{
+		Number rayleigh_integral = 0.0;
+		Number mie_integral = 0.0;
+		const unsigned int N = 100;
+		for (unsigned int i = 0; i < N; ++i) 
+		{
+			Angle theta = (i + 0.5) * pi / N;
+			SolidAngle domega = sin(theta) * (PI / N) * (2.0 * PI) * sr;
+			rayleigh_integral = rayleigh_integral + RayleighPhaseFunction(cos(theta)) * domega;
+			mie_integral = mie_integral + MiePhaseFunction(0.8, cos(theta)) * domega;
+		}
+		ExpectNear(1.0, rayleigh_integral(), 2.0 * kEpsilon);
+		ExpectNear(1.0, mie_integral(), 2.0 * kEpsilon);
+	}
+
+	/*
+	映射到散射纹理坐标：
+	检查r(r_top,r_bottom),mu(-1,mu_horiz,1),mu_s(-1,1)和nu(-1,1)的边界值是否映射到中心 散射纹理的边界纹素。
+	*/
+	void TestGetScatteringTextureUvwzFromRMuMuSNu() 
+	{
+		ExpectNear(
+			0.5 / SCATTERING_TEXTURE_R_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kBottomRadius, 0.0, 0.0, 0.0, false).w(),
+			kEpsilon);
+
+		ExpectNear(
+			1.0 - 0.5 / SCATTERING_TEXTURE_R_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kTopRadius, 0.0, 0.0, 0.0, false).w(),
+			kEpsilon);
+
+		const Length r = (kTopRadius + kBottomRadius) / 2.0;
+		const Number mu = CosineOfHorizonZenithAngle(r);
+		ExpectNear(
+			0.5 / SCATTERING_TEXTURE_MU_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, r, mu, 0.0, 0.0, true).z(),
+			kEpsilon);
+		ExpectNear(
+			1.0 - 0.5 / SCATTERING_TEXTURE_MU_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, r, mu, 0.0, 0.0, false).z(),
+			kEpsilon);
+		ExpectTrue(GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, r, -1.0, 0.0, 0.0, true).z() < 0.5);
+		ExpectTrue(GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, r, 1.0, 0.0, 0.0, false).z() > 0.5);
+
+		ExpectNear(
+			0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kBottomRadius, 0.0, -1.0, 0.0, false).y(),
+			kEpsilon);
+		ExpectNear(
+			1.0 - 0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kBottomRadius, 0.0, 1.0, 0.0, false).y(),
+			kEpsilon);
+
+		ExpectNear(
+			0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kTopRadius, 0.0, -1.0, 0.0, false).y(),
+			kEpsilon);
+		ExpectNear(
+			1.0 - 0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kTopRadius, 0.0, 1.0, 0.0, false).y(),
+			kEpsilon);
+
+		ExpectNear(
+			0.0,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kBottomRadius, 0.0, 0.0, -1.0, false).x(),
+			kEpsilon);
+		ExpectNear(
+			1.0,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_, kBottomRadius, 0.0, 0.0, 1.0, false).x(),
+			kEpsilon);
+	}
+
+	/*
+	从散射纹理坐标映射：
+	检查散射纹理的边界纹素的中心是否映射到r(r_top,t_bottom),mu(-1,mu_horiz,1),mu_s(-1,1),nu(-1,1)
+	最后，检查映射函数及其逆实际上是否相反（即它们的组成应该给出标识函数）。
+	*/
+	void TestGetRMuMuSNuFromScatteringTextureUvwz() 
+	{
+		Length r;
+		Number mu;
+		Number mu_s;
+		Number nu;
+		bool ray_r_mu_intersects_ground;
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(0.0,
+				0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				0.5 / SCATTERING_TEXTURE_MU_SIZE,
+				0.5 / SCATTERING_TEXTURE_R_SIZE),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(kBottomRadius, r, 1.0 * m);
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(0.0,
+				0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				0.5 / SCATTERING_TEXTURE_MU_SIZE,
+				1.0 - 0.5 / SCATTERING_TEXTURE_R_SIZE),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(kTopRadius, r, 1.0 * m);
+
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(0.0,
+				0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				0.5 / SCATTERING_TEXTURE_MU_SIZE + kEpsilon,
+				0.5),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		const Number mu_horizon = CosineOfHorizonZenithAngle(r);
+		ExpectNear(mu_horizon, mu, Number(kEpsilon));
+		ExpectTrue(mu <= mu_horizon);
+		ExpectTrue(ray_r_mu_intersects_ground);
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(0.0,
+				0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				1.0 - 0.5 / SCATTERING_TEXTURE_MU_SIZE - kEpsilon,
+				0.5),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(mu_horizon, mu, Number(5.0 * kEpsilon));
+		ExpectTrue(mu >= mu_horizon);
+		ExpectFalse(ray_r_mu_intersects_ground);
+
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(0.0,
+				0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				0.5 / SCATTERING_TEXTURE_MU_SIZE,
+				0.5 / SCATTERING_TEXTURE_R_SIZE),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(-1.0, mu_s(), kEpsilon);
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(0.0,
+				1.0 - 0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				0.5 / SCATTERING_TEXTURE_MU_SIZE,
+				0.5 / SCATTERING_TEXTURE_R_SIZE),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(1.0, mu_s(), kEpsilon);
+
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(0.0,
+				0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				0.5 / SCATTERING_TEXTURE_MU_SIZE,
+				0.5 / SCATTERING_TEXTURE_R_SIZE),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(-1.0, nu(), kEpsilon);
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			float4(1.0,
+				0.5 / SCATTERING_TEXTURE_MU_S_SIZE,
+				0.5 / SCATTERING_TEXTURE_MU_SIZE,
+				0.5 / SCATTERING_TEXTURE_R_SIZE),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(1.0, nu(), kEpsilon);
+
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_,
+				kBottomRadius, -1.0, 1.0, -1.0, true),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(kBottomRadius, r, 1.0 * m);
+		ExpectNear(-1.0, mu(), kEpsilon);
+		ExpectNear(1.0, mu_s(), kEpsilon);
+		ExpectNear(-1.0, nu(), kEpsilon);
+		ExpectTrue(ray_r_mu_intersects_ground);
+
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_,
+				kTopRadius, -1.0, 1.0, -1.0, true),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear(kTopRadius, r, 1.0 * m);
+		ExpectNear(-1.0, mu(), kEpsilon);
+		ExpectNear(1.0, mu_s(), kEpsilon);
+		ExpectNear(-1.0, nu(), kEpsilon);
+		ExpectTrue(ray_r_mu_intersects_ground);
+
+		GetRMuMuSNuFromScatteringTextureUvwz(atmosphere_parameters_,
+			GetScatteringTextureUvwzFromRMuMuSNu(atmosphere_parameters_,
+			(kBottomRadius + kTopRadius) / 2.0, 0.2, 0.3, 0.4, false),
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+		ExpectNear((kBottomRadius + kTopRadius) / 2.0, r, 1.0 * m);
+		ExpectNear(0.2, mu(), kEpsilon);
+		ExpectNear(0.3, mu_s(), kEpsilon);
+		ExpectNear(0.4, nu(), kEpsilon);
+		ExpectFalse(ray_r_mu_intersects_ground);
+	}
+
+	/*
+	单个散射纹理：
+	检查我们是否获得相同的单个散射值（或多或少于e）
+	无论我们是使用ComputeSingleScattering直接计算它，还是通过预先计算的单个散射纹理中的quadrilinearly插值查找。
+	*/
+	void TestComputeAndGetSingleScattering() 
+	{
+		LazyTransmittanceTexture transmittance_texture(atmosphere_parameters_);
+		LazySingleScatteringTexture single_rayleigh_scattering_texture(
+			atmosphere_parameters_, transmittance_texture, true);
+		LazySingleScatteringTexture single_mie_scattering_texture(
+			atmosphere_parameters_, transmittance_texture, false);
+
+		//Vertical ray, from bottom atmosphere boundary, scattering angle 0.
+			IrradianceSpectrum rayleigh = GetScattering(
+				atmosphere_parameters_, single_rayleigh_scattering_texture,
+				kBottomRadius, 1.0, 1.0, 1.0, false);
+		IrradianceSpectrum mie = GetScattering(
+			atmosphere_parameters_, single_mie_scattering_texture,
+			kBottomRadius, 1.0, 1.0, 1.0, false);
+		IrradianceSpectrum expected_rayleigh;
+		IrradianceSpectrum expected_mie;
+		ComputeSingleScattering(
+			atmosphere_parameters_, transmittance_texture,
+			kBottomRadius, 1.0, 1.0, 1.0, false, expected_rayleigh, expected_mie);
+		ExpectNear(1.0, (rayleigh / expected_rayleigh)[0](), kEpsilon);
+		ExpectNear(1.0, (mie / expected_mie)[0](), kEpsilon);
+
+		// Vertical ray, from top atmosphere boundary, scattering angle 180 degrees.
+		rayleigh = GetScattering(
+			atmosphere_parameters_, single_rayleigh_scattering_texture,
+			kTopRadius, -1.0, 1.0, -1.0, true);
+		mie = GetScattering(
+			atmosphere_parameters_, single_mie_scattering_texture,
+			kTopRadius, -1.0, 1.0, -1.0, true);
+		ComputeSingleScattering(
+			atmosphere_parameters_, transmittance_texture,
+			kTopRadius, -1.0, 1.0, -1.0, true, expected_rayleigh, expected_mie);
+		ExpectNear(1.0, (rayleigh / expected_rayleigh)[0](), kEpsilon);
+		ExpectNear(1.0, (mie / expected_mie)[0](), kEpsilon);
+
+		// Horizontal ray, from bottom of atmosphere, scattering angle 90 degrees.
+		rayleigh = GetScattering(
+			atmosphere_parameters_, single_rayleigh_scattering_texture,
+			kBottomRadius, 0.0, 0.0, 0.0, false);
+		mie = GetScattering(
+			atmosphere_parameters_, single_mie_scattering_texture,
+			kBottomRadius, 0.0, 0.0, 0.0, false);
+		ComputeSingleScattering(
+			atmosphere_parameters_, transmittance_texture,
+			kBottomRadius, 0.0, 0.0, 0.0, false, expected_rayleigh, expected_mie);
+		// The relative error is quite large in this case, i.e. between 6 to 8%.
+		ExpectNear(1.0, (rayleigh / expected_rayleigh)[0](), 1e-1);
+		ExpectNear(1.0, (mie / expected_mie)[0](), 1e-1);
+
+		// Ray just above the horizon, sun at the zenith.
+		Number mu = CosineOfHorizonZenithAngle(kTopRadius);
+		rayleigh = GetScattering(
+			atmosphere_parameters_, single_rayleigh_scattering_texture,
+			kTopRadius, mu, 1.0, mu, false);
+		mie = GetScattering(
+			atmosphere_parameters_, single_mie_scattering_texture,
+			kTopRadius, mu, 1.0, mu, false);
+		ComputeSingleScattering(
+			atmosphere_parameters_, transmittance_texture,
+			kTopRadius, mu, 1.0, mu, false, expected_rayleigh, expected_mie);
+		ExpectNear(1.0, (rayleigh / expected_rayleigh)[0](), kEpsilon);
+		ExpectNear(1.0, (mie / expected_mie)[0](), kEpsilon);
+	}
+
 private:
 
 	/*
@@ -489,9 +989,50 @@ private:
 //	"GetTextureCoordFromUnitRange",
 //	&FunctionsTest::TestGetTextureCoordFromUnitRange);
 
-FunctionsTest get_transmittance_texture_uv_from_rmu(
-	"GetTransmittanceTextureUvFromRMu",
-	&FunctionsTest::TestGetTransmittanceTextureUvFromRMu);
+//FunctionsTest get_transmittance_texture_uv_from_rmu(
+//	"GetTransmittanceTextureUvFromRMu",
+//	&FunctionsTest::TestGetTransmittanceTextureUvFromRMu);
+
+//FunctionsTest get_rmu_from_transmittance_texture_uv(
+//	"GetRMuFromTransmittanceTextureUv",
+//	&FunctionsTest::TestGetRMuFromTransmittanceTextureUv);
+
+//FunctionsTest get_transmittance_to_top_atmosphere_boundary(
+//	"GetTransmittanceToTopAtmosphereBoundary",
+//	&FunctionsTest::TestGetTransmittanceToTopAtmosphereBoundary);
+
+//FunctionsTest compute_and_get_transmittance(
+//	"ComputeAndGetTransmittance",
+//	&FunctionsTest::TestComputeAndGetTransmittance);
+
+//FunctionsTest compute_single_scattering_integrand(
+//	"ComputeSingleScatteringIntegrand",
+//	&FunctionsTest::TestComputeSingleScatteringIntegrand);
+
+//FunctionsTest distance_to_nearest_atmosphere_boundary(
+//	"DistanceToNearestAtmosphereBoundary",
+//	&FunctionsTest::TestDistanceToNearestAtmosphereBoundary);
+
+//FunctionsTest compute_single_scattering(
+//	"ComputeSingleScattering",
+//	&FunctionsTest::TestComputeSingleScattering);
+
+//FunctionsTest phase_functions(
+//	"PhaseFunctions",
+//	&FunctionsTest::TestPhaseFunctions);
+
+//FunctionsTest get_scattering_texture_uvwz_from_rmumusnu(
+//	"GetScatteringTextureUvwzFromRMuMuSNu",
+//	&FunctionsTest::TestGetScatteringTextureUvwzFromRMuMuSNu);
+
+//FunctionsTest get_rmumusnu_from_scattering_texture_uvwz(
+//	"GetRMuMuSNuFromScatteringTextureUvwz",
+//	&FunctionsTest::TestGetRMuMuSNuFromScatteringTextureUvwz);
+
+FunctionsTest compute_and_get_scattering(
+	"ComputeAndGetSingleScattering",
+	&FunctionsTest::TestComputeAndGetSingleScattering);
+
 
 NAME_SPACE_END
 NAME_SPACE_END
