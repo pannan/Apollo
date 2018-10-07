@@ -947,6 +947,85 @@ public:
 		ExpectNear(1.0, (mie / expected_mie)[0](), kEpsilon);
 	}
 
+	/*
+	多次散射，步骤1：
+	检查ComputeScatteringDensity中的数值积分是否在两种情况下给出预期结果，其中可以解析计算的积分：
+	1）
+	如果来自(n - 1)阶的入射辐射(radiance)在所有方向上是相同的，并且如果地面反照率是0。
+	在这种情况下散射辐射在所有方向上是相同的，并且等于散射系数乘以入射辐射亮度(radiance)
+	（相位函数的影响抵消了，因为我们在所有方向上积分，并且相位函数在所有方向上的积分为1）。
+	2）
+	如果来自(n - 1)阶的入射辐射(radiance)为零，则地面辐照度(irradiance)在任何地方都是相同的，并且透射率为1。
+	然后，在地平面上，在水平方向上散射的辐射(radiance)是散射系数乘以地面辐照度(irradiance)，乘以地面反照率，除以π（LambertianBRDF），
+	除以2（因为入射辐射(radiance)仅覆盖底部半球，并且由于相位函数的相关性和观察条件 - 尤其是散射辐射(radiance)的水平方向的选择。
+	*/
+	void TestComputeScatteringDensity() 
+	{
+		RadianceSpectrum kRadiance(13.0 * watt_per_square_meter_per_sr_per_nm);
+		TransmittanceTexture full_transmittance(DimensionlessSpectrum(1.0));
+		ReducedScatteringTexture no_single_scattering(
+			IrradianceSpectrum(0.0 * watt_per_square_meter_per_nm));
+		ScatteringTexture uniform_multiple_scattering(kRadiance);
+		IrradianceTexture no_irradiance(
+			IrradianceSpectrum(0.0 * watt_per_square_meter_per_nm));
+
+		RadianceDensitySpectrum scattering_density = ComputeScatteringDensity(
+			atmosphere_parameters_, full_transmittance, no_single_scattering,
+			no_single_scattering, uniform_multiple_scattering, no_irradiance,
+			kBottomRadius, 0.0, 0.0, 1.0, 3);
+
+		SpectralRadianceDensity kExpectedScatteringDensity =
+			(kRayleighScattering + kMieScattering) * kRadiance[0];
+
+		ExpectNear(1.0,(scattering_density[0] / kExpectedScatteringDensity)(),2.0 * kEpsilon);
+
+		IrradianceSpectrum kIrradiance(13.0 * watt_per_square_meter_per_nm);
+		IrradianceTexture uniform_irradiance(kIrradiance);
+
+		ScatteringTexture no_multiple_scattering(
+			RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm));
+
+		scattering_density = ComputeScatteringDensity(
+			atmosphere_parameters_, full_transmittance, no_single_scattering,
+			no_single_scattering, no_multiple_scattering, uniform_irradiance,
+			kBottomRadius, 0.0, 0.0, 1.0, 3);
+		kExpectedScatteringDensity = (kRayleighScattering + kMieScattering) *
+			kGroundAlbedo / (2.0 * PI * sr) * kIrradiance[0];
+
+		ExpectNear(1.0,(scattering_density[0] / kExpectedScatteringDensity)(),2.0 * kEpsilon);
+	}
+
+	/*
+	多次散射，步骤2：
+	检查ComputeMultipleScattering中的数值积分是否可以在某些情况下给出预期结果，其中可以解析计算积分的情况。 
+	如果从步骤1计算的辐射度(radiance)在所有方向上都是相同的，并且如果透射率是1，
+	那么ComputeMultipleScattering中的数值积分应该简单地等于辐射率乘以距离最近大气边界的距离。 
+	我们在下面查看下方的垂直光线，以及观察地平线的光线。
+	*/
+	void TestComputeMultipleScattering()
+	{
+		RadianceDensitySpectrum kRadianceDensity(
+			0.17 * watt_per_cubic_meter_per_sr_per_nm);
+		TransmittanceTexture full_transmittance(DimensionlessSpectrum(1.0));
+		ScatteringDensityTexture uniform_scattering_density(kRadianceDensity);
+
+		// Vertical ray, looking bottom.
+		Length r = kBottomRadius * 0.2 + kTopRadius * 0.8;
+		Length distance_to_ground = r - kBottomRadius;
+		ExpectNear(
+			kRadianceDensity[0] * distance_to_ground,
+			ComputeMultipleScattering(atmosphere_parameters_, full_transmittance,
+				uniform_scattering_density, r, -1.0, 1.0, -1.0, true)[0],
+			kRadianceDensity[0] * distance_to_ground * kEpsilon);
+
+		// Ray just below the horizon.
+		Number mu = CosineOfHorizonZenithAngle(kTopRadius);
+		Length distance_to_horizon = sqrt(kTopRadius * kTopRadius - kBottomRadius * kBottomRadius);
+		ExpectNear(
+			kRadianceDensity[0] * distance_to_horizon,
+			ComputeMultipleScattering(atmosphere_parameters_, full_transmittance,uniform_scattering_density, kTopRadius, mu, 1.0, mu, true)[0],
+			kRadianceDensity[0] * distance_to_horizon * kEpsilon);
+	}
 private:
 
 	/*
@@ -1029,9 +1108,14 @@ private:
 //	"GetRMuMuSNuFromScatteringTextureUvwz",
 //	&FunctionsTest::TestGetRMuMuSNuFromScatteringTextureUvwz);
 
-FunctionsTest compute_and_get_scattering(
-	"ComputeAndGetSingleScattering",
-	&FunctionsTest::TestComputeAndGetSingleScattering);
+//FunctionsTest compute_and_get_scattering(
+//	"ComputeAndGetSingleScattering",
+//	&FunctionsTest::TestComputeAndGetSingleScattering);
+
+//多次散射
+FunctionsTest compute_scattering_density(
+	"ComputeScatteringDensity",
+	&FunctionsTest::TestComputeScatteringDensity);
 
 
 NAME_SPACE_END

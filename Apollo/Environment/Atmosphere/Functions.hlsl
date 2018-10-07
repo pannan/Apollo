@@ -807,3 +807,217 @@ RadianceSpectrum GetScattering(
 		return GetScattering(atmosphere, multiple_scattering_texture, r, mu, mu_s, nu,ray_r_mu_intersects_ground);
 	}
 }
+
+//多次散射
+/*
+多次散射辐射度(radiance)是指在大气层中从太阳经过两次或多次反射后到达某点的太阳光（其中反弹是散射事件或来自地面的反射）。 
+以下部分描述了我们如何计算它，如何将它存储在预先计算的纹理中，以及我们如何读取它。
+
+请注意，对于单次散射，我们在此处排除了最后一次反弹是地面反射的光路。 
+这些路径的贡献在渲染时单独计算，以便考虑实际的地面反照率（对于地面上的中间反射，这是预先计算的，我们使用平均的均匀反射率）。
+*/
+
+//计算
+/*
+多次散射可以分解为两次散射，三次散射等的总和，其中每个项对应于在正好2,3次等反弹之后在大气中的某个点来自太阳的光。 
+而且，每个项可以在前一个项的基础上计算。 
+实际上，在n次反弹之后从方向ω到达某点p的光是在上一次反弹的所有可能点q上的积分，其涉及在n-1反弹之后从任何方向到达q的光。
+
+该描述表明，每个散射orfer需要从前一个计算三重积分（在从ω方向上的p到最近大气边界线段上的所有点q上的一个积分，以及在q点上每个方向上的所有方向上的嵌套双积分）。 
+因此，如果我们想要“从头开始”计算每个order，我们对两次散射需要三重积分，三次散射需要六重积分等。
+由于所有冗余计算（对n order的计算基本就是重复所有之前order的计算，导致对order数量的二次复杂度(O(n*n))），这显然是低效的。 
+相反，下面的计算要有效很多:
+1) 
+预处理单次散射并储存在一个纹理里
+2) 
+对n>=2
+	预计算纹理中的第n个散射，其被积函数的三重积分由在第（n-1）个散射纹理中查找得到
+
+该策略避免了许多冗余计算，但并未消除所有这些计算。 
+考虑例如下图中的点p和p'，以及计算在n次反弹之后从方向ω到达这两个点所需的光所需的计算。 
+这些计算尤其涉及辐射(radiance)L的评估，该辐射L来自n-1反弹之后的所有方向，在q点被散射到方向-ω：	
+
+p -------p'---------q---->ω
+
+因此，如果我们用如上所述的三重积分计算第n个散射，我们将冗余地计算L（事实上，对所有在p和q之间的点和在-ω方向上大气层边界最近点）。 
+为了避免这种情况，从而提高多次散射计算的效率，我们将上述算法细化如下：
+1)
+预处理单次散射并储存在一个纹理里
+2)
+对n>=2
+	对于每个点q和方向ω，预先计算在q处朝向-ω方向散射的光，这些光来自n-1反弹之后的任何方向（这仅涉及双积分，其被积函数使用（n-1）次散射纹理来查找）
+	对于每个点p和方向ω，预先计算n次反弹后来自方向ω的光（这只涉及单个积分，其被积函数使用前一行计算的纹理中的查找）
+
+为了获得完整的算法，我们现在必须指定如何在上面的循环中实现这两个步骤。 这就是我们在本节其余部分所做的工作。
+
+第一步
+
+第一步计算在大气中某个点q处向某个方向-ω散射的辐射(radiance)。 此外，我们假设此散射事件是第n次反弹。
+该辐射是所有可能的入射方向ω_i的积分
+	入射辐射度(radiance)L_i在第（n - 1）次反射后从方向ω_i到达q的和是:
+		(n - 1) order的预计算散射纹理给出一个项
+		如果射线ray(q,ω_i)和地面相交于r，则来自n - 1次反弹光路的贡献，其最后的一次反弹位于r，即在地面上
+		(根据定义，在我们的逾计算纹理里，这些路径被排除在外，但是在这里我们必须考虑它们，因为地面的反弹之后是q处的反弹。)
+		反过来，这些贡献由以下产生:
+			q和r之间的透射率
+			(平均)地面反射率
+			Lambertian BRDF 1/PI
+			在n - 2次反弹后的地面辐射(irradiance)接受。我们在下一段解释我们怎么样预计算到纹理。
+			现在，我们假设我们能用下面的函数从预计算纹理接受辐射(irradiance)：
+*/
+IrradianceSpectrum GetIrradiance(_IN(AtmosphereParameters) atmosphere,_IN(IrradianceTexture) irradiance_texture,Length r, Number mu_s);
+
+/*
+	在q点的散射系数
+	ω和ω_i方向的散射相位函数
+
+这导致了以下实现（其中multiple_scattering_texture应该包含散射的第（n-1）阶
+如果n> 2，则illuminiance_texture是在n-2之后在地面上接收的辐照度 ，scattering_order等于n）：
+*/
+RadianceDensitySpectrum ComputeScatteringDensity(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(ReducedScatteringTexture) single_rayleigh_scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	_IN(ScatteringTexture) multiple_scattering_texture,
+	_IN(IrradianceTexture) irradiance_texture,
+	Length r, Number mu, Number mu_s, Number nu, int scattering_order) 
+{
+	assert(r >= atmosphere.bottom_radius && r <= atmosphere.top_radius);
+	assert(mu >= -1.0 && mu <= 1.0);
+	assert(mu_s >= -1.0 && mu_s <= 1.0);
+	assert(nu >= -1.0 && nu <= 1.0);
+	assert(scattering_order >= 2);
+
+	// Compute unit direction vectors for the zenith, the view direction omega and
+	// and the sun direction omega_s, such that the cosine of the view-zenith
+	// angle is mu, the cosine of the sun-zenith angle is mu_s, and the cosine of
+	// the view-sun angle is nu. The goal is to simplify computations below.
+	float3 zenith_direction = float3(0.0, 0.0, 1.0);
+	float3 omega = float3(sqrt(1.0 - mu * mu), 0.0, mu);
+	Number sun_dir_x = omega.x == 0.0 ? 0.0 : (nu - mu * mu_s) / omega.x;
+	Number sun_dir_y = sqrt(max(1.0 - sun_dir_x * sun_dir_x - mu_s * mu_s, 0.0));
+	float3 omega_s = float3(sun_dir_x, sun_dir_y, mu_s);
+
+	const int SAMPLE_COUNT = 16;
+	const Angle dphi = pi / Number(SAMPLE_COUNT);
+	const Angle dtheta = pi / Number(SAMPLE_COUNT);
+	RadianceDensitySpectrum rayleigh_mie = RadianceDensitySpectrum(0.0 * watt_per_cubic_meter_per_sr_per_nm);
+
+	// Nested loops for the integral over all the incident directions omega_i.
+	for (int l = 0; l < SAMPLE_COUNT; ++l) 
+	{
+		Angle theta = (Number(l) + 0.5) * dtheta;
+		Number cos_theta = cos(theta);
+		Number sin_theta = sin(theta);
+		bool ray_r_theta_intersects_ground = RayIntersectsGround(atmosphere, r, cos_theta);
+
+		// The distance and transmittance to the ground only depend on theta, so we
+		// can compute them in the outer loop for efficiency.
+		Length distance_to_ground = 0.0 * m;
+		DimensionlessSpectrum transmittance_to_ground = DimensionlessSpectrum(0.0);
+		DimensionlessSpectrum ground_albedo = DimensionlessSpectrum(0.0);
+		if (ray_r_theta_intersects_ground) 
+		{
+			distance_to_ground = DistanceToBottomAtmosphereBoundary(atmosphere, r, cos_theta);
+			transmittance_to_ground = GetTransmittance(atmosphere, transmittance_texture, r, cos_theta,distance_to_ground, true /* ray_intersects_ground */);
+			ground_albedo = atmosphere.ground_albedo;
+		}
+
+		for (int m = 0; m < 2 * SAMPLE_COUNT; ++m) 
+		{
+			Angle phi = (Number(m) + 0.5) * dphi;
+			float3 omega_i = float3(cos(phi) * sin_theta, sin(phi) * sin_theta, cos_theta);
+			SolidAngle domega_i = (dtheta / rad) * (dphi / rad) * sin(theta) * sr;
+
+			// The radiance L_i arriving from direction omega_i after n-1 bounces is
+			// the sum of a term given by the precomputed scattering texture for the
+			// (n-1)-th order:
+			Number nu1 = dot(omega_s, omega_i);
+			RadianceSpectrum incident_radiance = GetScattering(atmosphere,
+				single_rayleigh_scattering_texture, single_mie_scattering_texture,
+				multiple_scattering_texture, r, omega_i.z, mu_s, nu1,
+				ray_r_theta_intersects_ground, scattering_order - 1);
+
+			// and of the contribution from the light paths with n-1 bounces and whose
+			// last bounce is on the ground. This contribution is the product of the
+			// transmittance to the ground, the ground albedo, the ground BRDF, and
+			// the irradiance received on the ground after n-2 bounces.
+			float3 ground_normal = normalize(zenith_direction * r + omega_i * distance_to_ground);
+			IrradianceSpectrum ground_irradiance = GetIrradiance(atmosphere, irradiance_texture, atmosphere.bottom_radius,dot(ground_normal, omega_s));
+			incident_radiance += transmittance_to_ground * ground_albedo * (1.0 / (PI * sr)) * ground_irradiance;
+
+			// The radiance finally scattered from direction omega_i towards direction
+			// -omega is the product of the incident radiance, the scattering
+			// coefficient, and the phase function for directions omega and omega_i
+			// (all this summed over all particle types, i.e. Rayleigh and Mie).
+			Number nu2 = dot(omega, omega_i);
+			Number rayleigh_density = GetProfileDensity(atmosphere.rayleigh_density, r - atmosphere.bottom_radius);
+			Number mie_density = GetProfileDensity(atmosphere.mie_density, r - atmosphere.bottom_radius);
+			rayleigh_mie += incident_radiance * (atmosphere.rayleigh_scattering * rayleigh_density * RayleighPhaseFunction(nu2) + 
+				atmosphere.mie_scattering * mie_density *
+				MiePhaseFunction(atmosphere.mie_phase_function_g, nu2)) *
+				domega_i;
+		}
+	}
+	return rayleigh_mie;
+}
+
+/*
+第二步
+
+计算第n个散射order的第二步是利用前面函数预计算的纹理，计算每个点p和方向ω的radiance
+其radiance来自n次反弹后的方向ω
+
+这个radiance是q和p点间所有点和在ω方向上和大气层最近交点的积分:
+	1）之前函数预计算的纹理给出一个项，来自n - 1次反弹后的任何方向，在q点被散射到p
+	2）p和q直接的透射率
+
+注意这里排除了上一次反弹在地面上的第n次反弹（也就是n-1次的反弹后击中地面，造成第n次反弹）
+确实，我们选择在我们的预计算纹理排除这些路径，这样那我们可以在渲染时计算它们，使用实际的地面反射率。
+
+第二部的执行很简单：
+*/
+RadianceSpectrum ComputeMultipleScattering(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(ScatteringDensityTexture) scattering_density_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground) 
+{
+	assert(r >= atmosphere.bottom_radius && r <= atmosphere.top_radius);
+	assert(mu >= -1.0 && mu <= 1.0);
+	assert(mu_s >= -1.0 && mu_s <= 1.0);
+	assert(nu >= -1.0 && nu <= 1.0);
+
+	// Number of intervals for the numerical integration.
+	const int SAMPLE_COUNT = 50;
+	// The integration step, i.e. the length of each integration interval.
+	Length dx = DistanceToNearestAtmosphereBoundary(atmosphere, r, mu, ray_r_mu_intersects_ground) / Number(SAMPLE_COUNT);
+	// Integration loop.
+	RadianceSpectrum rayleigh_mie_sum = RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
+	for (int i = 0; i <= SAMPLE_COUNT; ++i) 
+	{
+		Length d_i = Number(i) * dx;
+
+		// The r, mu and mu_s parameters at the current integration point (see the
+		// single scattering section for a detailed explanation).
+		Length r_i = ClampRadius(atmosphere, sqrt(d_i * d_i + 2.0 * r * mu * d_i + r * r));
+		Number mu_i = ClampCosine((r * mu + d_i) / r_i);
+		Number mu_s_i = ClampCosine((r * mu_s + d_i * nu) / r_i);
+
+		// The Rayleigh and Mie multiple scattering at the current sample point.
+		RadianceSpectrum rayleigh_mie_i =
+			GetScattering(
+				atmosphere, scattering_density_texture, r_i, mu_i, mu_s_i, nu,
+				ray_r_mu_intersects_ground) *
+			GetTransmittance(
+				atmosphere, transmittance_texture, r, mu, d_i,
+				ray_r_mu_intersects_ground) *
+			dx;
+		// Sample weight (from the trapezoidal rule).
+		Number weight_i = (i == 0 || i == SAMPLE_COUNT) ? 0.5 : 1.0;
+		rayleigh_mie_sum += rayleigh_mie_i * weight_i;
+	}
+	return rayleigh_mie_sum;
+}
