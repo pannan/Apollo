@@ -1113,9 +1113,9 @@ private:
 //	&FunctionsTest::TestComputeAndGetSingleScattering);
 
 //∂‡¥Œ…¢…‰
-FunctionsTest compute_scattering_density(
-	"ComputeScatteringDensity",
-	&FunctionsTest::TestComputeScatteringDensity);
+//FunctionsTest compute_scattering_density(
+//	"ComputeScatteringDensity",
+//	&FunctionsTest::TestComputeScatteringDensity);
 
 
 NAME_SPACE_END

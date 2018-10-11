@@ -18,6 +18,58 @@ SkySample::~SkySample()
 	SAFE_DELETE(m_camera);
 }
 
+void SkySample::initTestTerrain()
+{
+	const float terriainSize = 100000;
+	const float halfTerrainSize = terriainSize * 0.5f;
+	Vertex_Pos data[4];
+
+	//现在中心是在0,0
+	data[0].pos = Vector3(-halfTerrainSize, 0, halfTerrainSize);
+	data[1].pos = Vector3(halfTerrainSize, 0, halfTerrainSize);
+	data[2].pos = Vector3(halfTerrainSize, 0, -halfTerrainSize);
+	data[3].pos = Vector3(-halfTerrainSize, 0, -halfTerrainSize);
+
+	//中心变换到camera位置	
+	const Vector3& camPos = m_camera->getPosition();
+	Vector3 offset(camPos.m_x, 0.0, camPos.m_z);
+	data[0].pos += offset;
+	data[1].pos += offset;
+	data[2].pos += offset;
+	data[3].pos += offset;
+
+
+	//m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0),4);
+
+	uint16_t index[6] = { 0,1,2,2,3,0 };
+	m_testTerrainModel.createFromMemory(data, sizeof(Vertex_Pos), 4, index, 6);
+
+	//create shader and material
+	ShaderDX11Ptr terrainVS = ShaderDX11Ptr(new ShaderDX11());
+	terrainVS->loadShaderFromFile(ShaderType::VertexShader,
+		"../bin/Assets/Shader/MeshOnlyPos.hlsl",
+		ShaderMacros(),
+		"VSMAIN",
+		"vs_5_0");
+
+	ShaderDX11Ptr terrainPS = ShaderDX11Ptr(new ShaderDX11());
+	terrainPS->loadShaderFromFile(ShaderType::PixelShader,
+		"../bin/Assets/Shader/MeshOnlyPos.hlsl",
+		ShaderMacros(),
+		"PSMAIN",
+		"ps_5_0");
+
+	MaterialDX11* material = new MaterialDX11;
+	material->m_vs = terrainVS;
+	material->m_ps[(uint8_t)RenderPipelineType::ForwardRender] = terrainPS;
+	m_testTerrainModel.addMaterial(MaterialPtr(material));
+
+	m_mvpMatrixBufferPtr = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(Matrix4x4), true, true, nullptr));
+	terrainVS->setConstantBuffer("PerObject", m_mvpMatrixBufferPtr);
+
+	m_testTerrainRenderState.createState();
+}
+
 void SkySample::initQuadMesh()
 {
 	m_quadModelPtr = ModelDX11Ptr(ModelDX11::createFullScreenQuadModel());
@@ -47,9 +99,11 @@ void SkySample::init()
 {
 	initQuadMesh();
 
+	m_renderState.setCullingMode(D3D11_CULL_NONE);
+	m_renderState.setDepthWriteMask(D3D11_DEPTH_WRITE_MASK_ZERO);
 	m_renderState.createState();
 
-	m_camera = new Camera(Vector3(4000, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
+	m_camera = new Camera(Vector3(4000, 10, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
 
@@ -65,6 +119,7 @@ void SkySample::init()
 	m_atmosphereParametersBuffer->set(&m_atmosphereParameters, sizeof(AtmosphereParameters));
 	m_psShader->setConstantBuffer("AtmosphereParameters", m_atmosphereParametersBuffer);
 
+	initTestTerrain();
 	dimensional::TestCase::RunAllTests();
 }
 
@@ -239,12 +294,22 @@ void test2()
 	int ii = 0;
 }
 
+void SkySample::drawTestTerrain()
+{	
+	Matrix4x4 mvpMat = m_camera->getViewProjMat();
+	m_mvpMatrixBufferPtr->set(&mvpMat, sizeof(Matrix4x4));
+
+	m_testTerrainRenderState.bind();
+
+	m_testTerrainModel.draw();
+}
+
 void SkySample::render()
 {
 	m_camera->updateViewProjMatrix();
-	test();
+	//test();
 
-	test2();
+	//test2();
 	m_renderState.bind();
 
 	ZeroMemory(&m_globalParameters, sizeof(GlobalParameters));
@@ -267,4 +332,7 @@ void SkySample::render()
 	m_globalParametersBuffer->set(&m_globalParameters, sizeof(GlobalParameters));
 
 	m_quadModelPtr->draw();
+
+	
+	drawTestTerrain();
 }

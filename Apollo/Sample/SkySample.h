@@ -44,6 +44,10 @@ namespace Apollo
 
 		void		initQuadMesh();
 
+		void		initTestTerrain();
+
+		void		drawTestTerrain();
+
 		void		test();
 
 	private:
@@ -55,10 +59,16 @@ namespace Apollo
 
 		ModelDX11Ptr				m_quadModelPtr;
 
+		ModelDX11					m_testTerrainModel;
+
+		ConstantBufferDX11Ptr	m_mvpMatrixBufferPtr;
+
 		ShaderDX11Ptr			m_vsShader;
 		ShaderDX11Ptr			m_psShader;
 
 		RenderStateDX11		m_renderState;
+
+		RenderStateDX11		m_testTerrainRenderState;
 
 		AtmosphereParameters	m_atmosphereParameters;
 

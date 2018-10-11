@@ -13,7 +13,7 @@ SampleManager::SampleManager()
 {
 	m_gpuFrameTimes = 0.0f;
 	m_query = new QueryDX11(Query::QueryType::Timer, 2);
-	m_cameraAltitude = 0.0f;
+	m_cameraAltitude = 10.0f;
 }
 
 SampleManager::~SampleManager()
@@ -83,7 +83,7 @@ void SampleManager::debugOverlay()
 	ImGui::Text("Camera RightDir: (%.1f,%.1f,%.1f)", rightDir.m_x, rightDir.m_y, rightDir.m_z);
 	ImGui::Text("GPU Times: (%.1f)", m_gpuFrameTimes);
 
-	ImGui::SliderFloat("Camera Altitude", &m_cameraAltitude, 0.0, 1000000.0f);
+	ImGui::SliderFloat("Camera Altitude", &m_cameraAltitude, 10.0, 10000.0f);
 	camPos.m_y = m_cameraAltitude;
 	cam->setposition(camPos);
 	ImGui::End();

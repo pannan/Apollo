@@ -35,6 +35,12 @@ namespace Apollo
 
 		void		setRenderPipelineType(RenderPipelineType type) { m_renderPipelineType = type; }
 
+		void		setCullingMode(D3D11_CULL_MODE cullMode) { m_rasterizerDesc.CullMode = cullMode; }
+
+		void		setDepthEnable(bool enable) { m_depthStencilDesc.DepthEnable = enable; }
+		void		setDepthWriteMask(D3D11_DEPTH_WRITE_MASK mask) { m_depthStencilDesc.DepthWriteMask = mask; }
+
+
 //	private:
 
 		D3D11_RECT						m_scissorRects;
