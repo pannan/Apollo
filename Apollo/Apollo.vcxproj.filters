@@ -58,6 +58,9 @@
     <Filter Include="Environment\Atmosphere\Reference">
       <UniqueIdentifier>{2c2fbbf7-30bd-4c62-b1aa-c8051e73f0ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{f30f4ccd-5348-4eb5-928f-56e4d446dab3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -603,6 +606,57 @@
   <ItemGroup>
     <None Include="Environment\Atmosphere\Functions.hlsl">
       <Filter>Environment\Atmosphere</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\Deferred.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\DeferredLighting.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\DepthOnly.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\HeightMapNormalCS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\HeightTerrain.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\InvertColorCS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\Mesh.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\MeshOnlyPos.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\ParticleSystemInsertCS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\ParticleSystemRender.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\ParticleSystemUpdateCS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\Sky.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\SkyDefinitions.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\SkyFuntion.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\Test_CS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\TexturePS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\TextureVS.hlsl">
+      <Filter>Shader</Filter>
     </None>
   </ItemGroup>
 </Project>

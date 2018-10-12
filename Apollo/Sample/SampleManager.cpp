@@ -83,7 +83,8 @@ void SampleManager::debugOverlay()
 	ImGui::Text("Camera RightDir: (%.1f,%.1f,%.1f)", rightDir.m_x, rightDir.m_y, rightDir.m_z);
 	ImGui::Text("GPU Times: (%.1f)", m_gpuFrameTimes);
 
-	ImGui::SliderFloat("Camera Altitude", &m_cameraAltitude, 10.0, 10000.0f);
+	float camMaxHeight = (6420 - 6360) * 1000 + 20000;
+	ImGui::SliderFloat("Camera Altitude", &m_cameraAltitude, 10.0, camMaxHeight);
 	camPos.m_y = m_cameraAltitude;
 	cam->setposition(camPos);
 	ImGui::End();

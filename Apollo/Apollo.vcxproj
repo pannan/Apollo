@@ -348,6 +348,59 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\Assets\Shader\Deferred.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\DeferredLighting.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\DepthOnly.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\HeightMapNormalCS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\HeightTerrain.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\InvertColorCS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\Mesh.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\MeshOnlyPos.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\ParticleSystemInsertCS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\ParticleSystemRender.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\ParticleSystemUpdateCS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\Sky.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\SkyDefinitions.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\SkyFuntion.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\Test_CS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\TexturePS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\bin\Assets\Shader\TextureVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

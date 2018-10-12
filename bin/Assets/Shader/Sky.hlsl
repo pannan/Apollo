@@ -100,8 +100,15 @@ float4 PSMAIN( in VS_OUTPUT input ) : SV_Target
 	d = sqrt(R*R + r*r*(mu*mu - 1)) - r*mu
 	这样，如果ray(r,mu)和地面相交，R = bottom_radius,并且R*R + r*r*(mu*mu - 1) >= 0
 	*/
-	if (mu < 0 && bottom_radius*bottom_radius + r*r*(mu*mu - 1) > 0)
+	if (mu < 0 && bottom_radius*bottom_radius + r*r*(mu*mu - 1) >= 0)
 		return float4(1, 0, 0, 1);
+
+	//如果相机在大气层外并且不和大气层相交
+	//首先如果相机在大气层里，ray肯定和大气层相交，所以相机高度必须超过大气层
+	//如果mu是向上的，必定不和大气层相交
+	//如果向下，判断R*R + r*r*(mu*mu - 1)是否有解
+	if ((r >= top_radius && mu < 0 && top_radius*top_radius + r * r*(mu*mu - 1) < 0) || (r >= top_radius && mu >= 0))
+		return float4(0, 0, 0, 1);
 
 	return float4(0, 0, 1, 1);
 }

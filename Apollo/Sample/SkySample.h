@@ -28,6 +28,16 @@ namespace Apollo
 		Vector2	expand;
 	};
 
+	class RenderSkyOnCPU
+	{
+	public:
+
+		void		renderSingleScatting();
+
+		int		m_windowWidth;
+		int		m_windowHeight;
+	};
+
 	class SkySample : public SampleBase
 	{
 	public:

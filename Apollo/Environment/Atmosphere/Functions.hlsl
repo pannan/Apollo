@@ -865,7 +865,12 @@ p -------p'---------q---->ω
 			在n - 2次反弹后的地面辐射(irradiance)接受。我们在下一段解释我们怎么样预计算到纹理。
 			现在，我们假设我们能用下面的函数从预计算纹理接受辐射(irradiance)：
 */
-IrradianceSpectrum GetIrradiance(_IN(AtmosphereParameters) atmosphere,_IN(IrradianceTexture) irradiance_texture,Length r, Number mu_s);
+IrradianceSpectrum GetIrradiance(_IN(AtmosphereParameters) atmosphere, _IN(IrradianceTexture) irradiance_texture, Length r, Number mu_s)
+{
+	//实现在后面，但是现在编译不过，先加点临时代码
+	IrradianceSpectrum ttt;
+	return ttt;
+}
 
 /*
 	在q点的散射系数
