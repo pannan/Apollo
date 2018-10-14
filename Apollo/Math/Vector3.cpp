@@ -18,6 +18,13 @@ namespace Apollo
 		return Vector3(dot(v0),dot(v1),dot(v2));
 	}
 
+	float Vector3::length()
+	{
+		float t = m_x * m_x + m_y * m_y + m_z * m_z;
+		t = sqrtf(t);
+		return t;
+	}
+
 	Vector3&	Vector3::normalize()
 	{
 		float t = m_x * m_x + m_y * m_y + m_z * m_z;

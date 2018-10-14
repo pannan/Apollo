@@ -8,6 +8,62 @@
 using namespace Apollo;
 using namespace DirectX;
 
+RenderSkyOnCPU::RenderSkyOnCPU(Camera* camera,int w,int h)
+{
+	m_windowWidth = w;
+	m_windowHeight = h;
+	m_camera = camera;
+}
+
+Vector3 RenderSkyOnCPU::uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat,const Matrix4x4& inverseViewMat)
+{
+	Vector2 uv = inUV;
+	uv.m_y = 1.0f - uv.m_y;
+	uv = uv * 2.0f - Vector2(1.0,1.0);
+	Vector4 clipPos = Vector4(uv.m_x,uv.m_y, 0.5, 1.0);
+
+	Vector3 ray;
+	ray.m_z = (clipPos.m_z - projMat.m_matrix[3][2]) / projMat.m_matrix[2][2];
+	ray.m_x = clipPos.m_x * ray.m_z * projMat.m_matrix[2][3];
+	ray.m_y = clipPos.m_y * ray.m_z * projMat.m_matrix[2][3] / projMat.m_matrix[1][1];
+	ray.normalize();
+
+	Vector4 temp(ray.m_x, ray.m_y, ray.m_z, 0.0f);
+	temp = temp * inverseViewMat;
+	return Vector3(temp.m_x,temp.m_y,temp.m_z);
+}
+
+void RenderSkyOnCPU::renderSingleScatting()
+{
+	Matrix4x4 projMat = m_camera->getProjMat();
+	Matrix4x4 inverseViewMat = m_camera->getViewMat().inverse();
+
+	float bottom_radius = 6360.0f;
+	float top_radius = 6420.0f;
+	Vector3 worldPosVec3 = m_camera->getPosition();
+	Vector3 earthSpacePosVec3 = (m_camera->getPosition() * 0.001f + Vector3(0.0, bottom_radius, 0.0f));
+	
+	AtmosphereParameters atmosphereParameters;
+
+	for (int y = 0; y < m_windowHeight; ++y)
+	{
+		for (int x = 0; x < m_windowWidth; ++x)
+		{
+			float u = (float)x / m_windowWidth;
+			float v = (float)y / m_windowHeight;
+
+			Vector3 ray = uvToCameraRay(Vector2(u,v), projMat, inverseViewMat);
+			ray.normalize();
+			float r = earthSpacePosVec3.length();
+			Vector3 eartjCenterToEyeDirection = earthSpacePosVec3 / r;
+			float mu = ray.dot(eartjCenterToEyeDirection);
+
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 SkySample::SkySample()
 {
 	m_camera = nullptr;
@@ -16,6 +72,7 @@ SkySample::SkySample()
 SkySample::~SkySample()
 {
 	SAFE_DELETE(m_camera);
+	SAFE_DELETE(m_renderSkyOnCPU);
 }
 
 void SkySample::initTestTerrain()
@@ -121,6 +178,8 @@ void SkySample::init()
 
 	initTestTerrain();
 	dimensional::TestCase::RunAllTests();
+
+	m_renderSkyOnCPU = new RenderSkyOnCPU(m_camera, 800, 600);
 }
 
 /*
@@ -308,7 +367,7 @@ void SkySample::render()
 {
 	m_camera->updateViewProjMatrix();
 	//test();
-
+	m_renderSkyOnCPU->renderSingleScatting();
 	//test2();
 	m_renderState.bind();
 

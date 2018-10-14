@@ -83,6 +83,8 @@ namespace Apollo
 
 		Vector3& normalize();
 
+		float			length();
+
 		Vector3 corss(const Vector3& vec);
 
 		Vector3 operator * (const Matrix3x3& mat3x3);

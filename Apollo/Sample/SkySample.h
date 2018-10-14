@@ -32,10 +32,20 @@ namespace Apollo
 	{
 	public:
 
+		RenderSkyOnCPU(Camera* camera,int w,int h);
+
 		void		renderSingleScatting();
+
+	protected:
+
+		Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat);
+
+	protected:
 
 		int		m_windowWidth;
 		int		m_windowHeight;
+
+		Camera*	m_camera;
 	};
 
 	class SkySample : public SampleBase
@@ -83,5 +93,7 @@ namespace Apollo
 		AtmosphereParameters	m_atmosphereParameters;
 
 		GlobalParameters			m_globalParameters;
+
+		RenderSkyOnCPU*			m_renderSkyOnCPU;
 	};
 }
