@@ -205,6 +205,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Environment\Atmosphere\Definitions.h" />
     <ClInclude Include="Environment\Atmosphere\Reference\Definitions.h" />
     <ClInclude Include="Environment\Atmosphere\Reference\Functions.h" />
+    <ClInclude Include="Environment\Atmosphere\Reference\SkyRenderCPUTest.h" />
     <ClInclude Include="Graphics\AABB.h" />
     <ClInclude Include="Graphics\Camera.h" />
     <ClInclude Include="Graphics\ClearRenderTargetPass.h" />
@@ -298,6 +299,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Environment\Atmosphere\Reference\Functions.cpp" />
     <ClCompile Include="Environment\Atmosphere\Reference\Functions_test.cpp" />
+    <ClCompile Include="Environment\Atmosphere\Reference\SkyRenderCPUTest.cpp" />
     <ClCompile Include="Graphics\AABB.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
     <ClCompile Include="Graphics\ClearRenderTargetPass.cpp" />

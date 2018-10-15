@@ -21,6 +21,130 @@ namespace Apollo
 			using std::max;
 			using std::min;
 #include "Environment/Atmosphere/Functions.hlsl"
+
+			//我自己的test函数
+			DimensionlessSpectrum getTransmittance(const AtmosphereParameters& atmosphere,Length r, Number mu, Length d, bool ray_r_mu_intersects_ground)
+			{
+				Length r_d = ClampRadius(atmosphere, sqrt(d*d + 2 * r*mu*d + r * r));
+				Number mu_d = ClampCosine((r * mu + d) / r_d);
+
+				if (ray_r_mu_intersects_ground)
+				{
+					//DimensionlessSpectrum Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, -mu);
+					//DimensionlessSpectrum Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, -mu_d);
+					//DimensionlessSpectrum Tqp = Tqi / Tpi;
+					//注意，这里因为对mu,mu_d取反了，为什么取反？因为这里假设不和地面相交
+					//这里我的理解是这时r_d变成了r:r_d->r
+					//r变成了r_d:r->r_d
+					//也就是射线是从r_d发出的，所以Tpi和Tqi对换了,所以重写为
+					DimensionlessSpectrum Tqi = ComputeTransmittanceToTopAtmosphereBoundary(atmosphere, r, -mu);
+					DimensionlessSpectrum Tpi = ComputeTransmittanceToTopAtmosphereBoundary(atmosphere, r_d, -mu_d);
+					DimensionlessSpectrum Tpq = Tpi / Tqi;
+					return min(Tpq, DimensionlessSpectrum(1.0));
+				}
+				else
+				{
+					DimensionlessSpectrum Tpi = ComputeTransmittanceToTopAtmosphereBoundary(atmosphere, r, mu);
+					DimensionlessSpectrum Tqi = ComputeTransmittanceToTopAtmosphereBoundary(atmosphere, r_d, mu_d);
+					DimensionlessSpectrum Tpq = Tpi / Tqi;
+					return min(Tpq, DimensionlessSpectrum(1.0));
+				}
+			}
+
+			DimensionlessSpectrum getTransmittanceToSun(const AtmosphereParameters& atmosphere,Length r, Number mu_s)
+			{
+				//sin_theta_h = sin(Rh)
+				//在地面上有一点p，有||op|| = r,
+				//从P点向地面做切线，切点为e,||oe|| = rbottom = 地球半径
+				//oep组成直角三角形，直角为oep,斜边为[o,p]
+				//Rh为[pe]和[p,o的夹角]
+				// sin(Rh) = ||oe|| / ||po|| = rbottom / r	
+				Number sin_theta_h = atmosphere.bottom_radius / r;
+				Number cos_theta_h = -sqrt(max(1.0 - sin_theta_h * sin_theta_h, 0.0));
+
+
+				/*
+				Rs:太阳天顶角
+				Rh:地平线天顶角
+				As:太阳的角度半径，就也是太阳半径对应的角度
+				由前面知：
+				当太阳完全在地平线之下时，有
+				Rs > Rh + As  ->
+				cos(Rs) < cos(Rh +Ａs)　＝～cos(Rh) - As*sin(Rh) ->
+				cos(Rs) < cos(Rh) - As*sin(Rh) ->
+				cos(Rs) - cos(Rh) < -As*sin(Rh)
+				也就是当cos(Rs) - cos(Rh) 小于 -As*sin(Rh)时，太阳完全在地平线之下（Fraction = 0）
+				同理：
+				当太阳完全在地平线之上时：
+				Rs < Rh - As ->
+				cos(Rs) > cos(Rh - As) ->
+				cos(Rs) > cos(Rh) + As*sin(Rh) ->
+				cos(Rs) - cos(Rh) > As*sin(Rh)
+				也就是当cos(Rs) - cos(Rh) 大于 As*sin(Rh)时，太阳完全在地平线之上（Fraction = 1）
+				Fraction = 0 :cos(Rs) - cos(Rh) < -As*sin(Rh)
+				Fraction = 1: cos(Rs) - cos(Rh) > As*sin(Rh)
+				上面是Fraction在<0 和 >1的范围，
+				Fraction在[0,1]时，符号取反,得：
+				-As*sin(Rh) <= cos(Rs) - cos(Rh) <= As*sin(Rh)
+				smoothstep(-As*sin(Rh),As*sin(Rh),cos(Rs) - cos(Rh))
+				*/
+				Number sin_theat_h_sun_angular = sin_theta_h * atmosphere.sun_angular_radius / rad;
+				Number Fraction = smoothstep(-sin_theat_h_sun_angular, sin_theat_h_sun_angular, mu_s - cos_theta_h);
+				DimensionlessSpectrum TransmittanceToSun = ComputeTransmittanceToTopAtmosphereBoundary(atmosphere, r, mu_s);
+
+				return TransmittanceToSun * Fraction;
+			}
+
+			void computeSingleScattingIntegrand(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, Number nu, 
+				Length d, bool ray_r_mu_intersects_ground,
+				DimensionlessSpectrum& outRayleigh, DimensionlessSpectrum& outMie)
+			{
+				Length r_d = ClampRadius(atmosphere, sqrt(d*d + 2 * d*r*mu + r * r));
+				Number mu_s_d = ClampCosine((r*mu_s + nu * d) / r_d);
+
+				//q到p的透射率
+				DimensionlessSpectrum T_q_p = getTransmittance(atmosphere,r, mu, d, ray_r_mu_intersects_ground);
+				//q和太阳之间的透射率
+				DimensionlessSpectrum T_sun_q = getTransmittanceToSun(atmosphere,r_d, mu_s_d);
+
+				//太阳到q,然后q到p的透射率
+				DimensionlessSpectrum T_sun_q_p = T_sun_q * T_q_p;
+
+				outRayleigh = T_sun_q_p * GetProfileDensity(atmosphere.rayleigh_density, r_d - atmosphere.bottom_radius);
+				outMie = T_sun_q_p * GetProfileDensity(atmosphere.mie_density, r_d - atmosphere.bottom_radius);
+			}
+
+			void computeSingleScatting(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, 
+				Number nu, bool ray_r_mu_intersects_ground,
+				IrradianceSpectrum& outRayleigh, IrradianceSpectrum& outMie)
+			{
+				//数值积分的间隔数（采样数）
+				const int SAMPLE_COUNT = 50;
+				//采样点的间隔长度
+				Length dx = DistanceToNearestAtmosphereBoundary(atmosphere, r, mu, ray_r_mu_intersects_ground) / Number(SAMPLE_COUNT);
+
+				DimensionlessSpectrum rayleigh_sum = DimensionlessSpectrum(0.0);
+				DimensionlessSpectrum mie_sum = DimensionlessSpectrum(0.0);
+
+				for (int i = 0; i <= SAMPLE_COUNT; ++i)
+				{
+					Length d_i = Number(i) * dx;
+
+					DimensionlessSpectrum rayleigh_i;
+					DimensionlessSpectrum mie_i;
+
+					computeSingleScattingIntegrand(atmosphere, r, mu, mu_s, nu, d_i, ray_r_mu_intersects_ground, rayleigh_i, mie_i);
+
+					//采样权重(trapezoidla rule)
+					Number weight_i = (i == 0) || (i == SAMPLE_COUNT) ? 0.5 : 1.0;
+					rayleigh_sum += rayleigh_i * weight_i;
+					mie_sum += mie_i * weight_i;
+				}
+
+				outRayleigh = rayleigh_sum * dx * atmosphere.solar_irradiance * atmosphere.rayleigh_scattering;
+				outMie = mie_sum * dx * atmosphere.solar_irradiance * atmosphere.mie_scattering;
+			}
+
 		}
 	}
 }

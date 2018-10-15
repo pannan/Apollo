@@ -7,208 +7,229 @@ function.ccÖÐÌá¹©ÁËC ++¡°ÊµÏÖ¡±£¨¸ÃÎÄ¼þÔÚ¶¨ÒåÁËËüËùÒÀÀµµÄºêÖ®ºóÖ»°üº¬ÁËGLSLÎÄ¼þ£
 
 #include "Environment/Atmosphere/Reference/Definitions.h"
 
-namespace Apollo
-{
-	namespace Atmosphere
-	{
-		namespace Reference
-		{
-					typedef dimensional::vec2	float2;
-					typedef dimensional::vec3	float3;
-					typedef dimensional::vec4	float4;
+//namespace Apollo
+//{
+//	namespace Atmosphere
+//	{
+//		namespace Reference
+//		{
+NAME_SPACE_BEGIN_APOLLO
+NAME_SPACE_BEGIN_ATMOSPHERE
+NAME_SPACE_BEGIN_REFERENCE
 
-					Length DistanceToTopAtmosphereBoundary(
-						const AtmosphereParameters& atmosphere, Length r, Number mu);
+typedef dimensional::vec2	float2;
+typedef dimensional::vec3	float3;
+typedef dimensional::vec4	float4;
 
-					Length DistanceToBottomAtmosphereBoundary(
-						const AtmosphereParameters& atmosphere, Length r, Number mu);
+Length DistanceToTopAtmosphereBoundary(
+	const AtmosphereParameters& atmosphere, Length r, Number mu);
 
-					bool RayIntersectsGround(
-						const AtmosphereParameters& atmosphere, Length r, Number mu);
+Length DistanceToBottomAtmosphereBoundary(
+	const AtmosphereParameters& atmosphere, Length r, Number mu);
 
-					Number GetLayerDensity(const DensityProfileLayer& layer, Length altitude);
+bool RayIntersectsGround(
+	const AtmosphereParameters& atmosphere, Length r, Number mu);
 
-					Number GetProfileDensity(const DensityProfile& profile, Length altitude);
+Number GetLayerDensity(const DensityProfileLayer& layer, Length altitude);
 
-					Length ComputeOpticalLengthToTopAtmosphereBoundary(
-						const AtmosphereParameters& atmosphere, const DensityProfile& profile,
-						Length r, Number mu);
+Number GetProfileDensity(const DensityProfile& profile, Length altitude);
 
-					DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundary(
-						const AtmosphereParameters& atmosphere, Length r, Number mu);
+Length ComputeOpticalLengthToTopAtmosphereBoundary(
+	const AtmosphereParameters& atmosphere, const DensityProfile& profile,
+	Length r, Number mu);
 
-					Number GetTextureCoordFromUnitRange(Number x, int texture_size);
+DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundary(
+	const AtmosphereParameters& atmosphere, Length r, Number mu);
 
-					Number GetUnitRangeFromTextureCoord(Number u, int texture_size);
+Number GetTextureCoordFromUnitRange(Number x, int texture_size);
 
-					float2 GetTransmittanceTextureUvFromRMu(const AtmosphereParameters& atmosphere,
-						Length r, Number mu);
+Number GetUnitRangeFromTextureCoord(Number u, int texture_size);
 
-					void GetRMuFromTransmittanceTextureUv(const AtmosphereParameters& atmosphere,
-						const float2& uv, Length& r, Number& mu);
+float2 GetTransmittanceTextureUvFromRMu(const AtmosphereParameters& atmosphere,
+	Length r, Number mu);
 
-					DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundaryTexture(
-						const AtmosphereParameters& atmosphere, const float2& gl_frag_coord);
+void GetRMuFromTransmittanceTextureUv(const AtmosphereParameters& atmosphere,
+	const float2& uv, Length& r, Number& mu);
 
-					DimensionlessSpectrum GetTransmittanceToTopAtmosphereBoundary(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						Length r, Number mu);
+DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundaryTexture(
+	const AtmosphereParameters& atmosphere, const float2& gl_frag_coord);
 
-					DimensionlessSpectrum GetTransmittance(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						Length r, Number mu, Length d, bool ray_r_mu_intersects_ground);
+DimensionlessSpectrum GetTransmittanceToTopAtmosphereBoundary(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	Length r, Number mu);
 
-					// Single scattering.
+DimensionlessSpectrum GetTransmittance(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	Length r, Number mu, Length d, bool ray_r_mu_intersects_ground);
 
-					void ComputeSingleScatteringIntegrand(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						Length r, Number mu, Number mu_s, Number nu, Length d,
-						bool ray_r_mu_intersects_ground,
-						DimensionlessSpectrum& rayleigh, DimensionlessSpectrum& mie);
+// Single scattering.
 
-					Length DistanceToNearestAtmosphereBoundary(
-						const AtmosphereParameters& atmosphere, Length r, Number mu,
-						bool ray_r_mu_intersects_ground);
+void ComputeSingleScatteringIntegrand(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	Length r, Number mu, Number mu_s, Number nu, Length d,
+	bool ray_r_mu_intersects_ground,
+	DimensionlessSpectrum& rayleigh, DimensionlessSpectrum& mie);
 
-					void ComputeSingleScattering(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						Length r, Number mu, Number mu_s, Number nu,
-						bool ray_r_mu_intersects_ground,
-						IrradianceSpectrum& rayleigh, IrradianceSpectrum& mie);
+Length DistanceToNearestAtmosphereBoundary(
+	const AtmosphereParameters& atmosphere, Length r, Number mu,
+	bool ray_r_mu_intersects_ground);
 
-					InverseSolidAngle RayleighPhaseFunction(Number nu);
-					InverseSolidAngle MiePhaseFunction(Number g, Number nu);
+void ComputeSingleScattering(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground,
+	IrradianceSpectrum& rayleigh, IrradianceSpectrum& mie);
 
-					float4 GetScatteringTextureUvwzFromRMuMuSNu(
-						const AtmosphereParameters& atmosphere,
-						Length r, Number mu, Number mu_s, Number nu,
-						bool ray_r_mu_intersects_ground);
+InverseSolidAngle RayleighPhaseFunction(Number nu);
+InverseSolidAngle MiePhaseFunction(Number g, Number nu);
 
-					void GetRMuMuSNuFromScatteringTextureUvwz(
-						const AtmosphereParameters& atmosphere, const float4& uvwz,
-						Length& r, Number& mu, Number& mu_s, Number& nu,
-						bool& ray_r_mu_intersects_ground);
+float4 GetScatteringTextureUvwzFromRMuMuSNu(
+	const AtmosphereParameters& atmosphere,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground);
 
-					void ComputeSingleScatteringTexture(const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const float3& gl_frag_coord, IrradianceSpectrum& rayleigh,
-						IrradianceSpectrum& mie);
+void GetRMuMuSNuFromScatteringTextureUvwz(
+	const AtmosphereParameters& atmosphere, const float4& uvwz,
+	Length& r, Number& mu, Number& mu_s, Number& nu,
+	bool& ray_r_mu_intersects_ground);
 
-					template<class T>
-					T GetScattering(
-						const AtmosphereParameters& atmosphere,
-						const AbstractScatteringTexture<T>& scattering_texture,
-						Length r, Number mu, Number mu_s, Number nu,
-						bool ray_r_mu_intersects_ground);
+void ComputeSingleScatteringTexture(const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const float3& gl_frag_coord, IrradianceSpectrum& rayleigh,
+	IrradianceSpectrum& mie);
 
-					RadianceSpectrum GetScattering(
-						const AtmosphereParameters& atmosphere,
-						const ReducedScatteringTexture& single_rayleigh_scattering_texture,
-						const ReducedScatteringTexture& single_mie_scattering_texture,
-						const ScatteringTexture& multiple_scattering_texture,
-						Length r, Number mu, Number mu_s, Number nu,
-						bool ray_r_mu_intersects_ground,
-						int scattering_order);
+template<class T>
+T GetScattering(
+	const AtmosphereParameters& atmosphere,
+	const AbstractScatteringTexture<T>& scattering_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground);
 
-					// Multiple scattering.
+RadianceSpectrum GetScattering(
+	const AtmosphereParameters& atmosphere,
+	const ReducedScatteringTexture& single_rayleigh_scattering_texture,
+	const ReducedScatteringTexture& single_mie_scattering_texture,
+	const ScatteringTexture& multiple_scattering_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground,
+	int scattering_order);
 
-					RadianceDensitySpectrum ComputeScatteringDensity(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const ReducedScatteringTexture& single_rayleigh_scattering_texture,
-						const ReducedScatteringTexture& single_mie_scattering_texture,
-						const ScatteringTexture& multiple_scattering_texture,
-						const IrradianceTexture& irradiance_texture,
-						Length r, Number mu, Number mu_s, Number nu,
-						int scattering_order);
+// Multiple scattering.
 
-					RadianceSpectrum ComputeMultipleScattering(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const ScatteringDensityTexture& scattering_density_texture,
-						Length r, Number mu, Number mu_s, Number nu,
-						bool ray_r_mu_intersects_ground);
+RadianceDensitySpectrum ComputeScatteringDensity(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const ReducedScatteringTexture& single_rayleigh_scattering_texture,
+	const ReducedScatteringTexture& single_mie_scattering_texture,
+	const ScatteringTexture& multiple_scattering_texture,
+	const IrradianceTexture& irradiance_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	int scattering_order);
 
-					RadianceDensitySpectrum ComputeScatteringDensityTexture(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const ReducedScatteringTexture& single_rayleigh_scattering_texture,
-						const ReducedScatteringTexture& single_mie_scattering_texture,
-						const ScatteringTexture& multiple_scattering_texture,
-						const IrradianceTexture& irradiance_texture,
-						const float3& gl_frag_coord, int scattering_order);
+RadianceSpectrum ComputeMultipleScattering(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const ScatteringDensityTexture& scattering_density_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground);
 
-					RadianceSpectrum ComputeMultipleScatteringTexture(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const ScatteringDensityTexture& scattering_density_texture,
-						const float3& gl_frag_coord, Number& nu);
+RadianceDensitySpectrum ComputeScatteringDensityTexture(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const ReducedScatteringTexture& single_rayleigh_scattering_texture,
+	const ReducedScatteringTexture& single_mie_scattering_texture,
+	const ScatteringTexture& multiple_scattering_texture,
+	const IrradianceTexture& irradiance_texture,
+	const float3& gl_frag_coord, int scattering_order);
 
-					// Ground irradiance.
+RadianceSpectrum ComputeMultipleScatteringTexture(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const ScatteringDensityTexture& scattering_density_texture,
+	const float3& gl_frag_coord, Number& nu);
 
-					IrradianceSpectrum ComputeDirectIrradiance(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						Length r, Number mu_s);
+// Ground irradiance.
 
-					IrradianceSpectrum ComputeIndirectIrradiance(
-						const AtmosphereParameters& atmosphere,
-						const ReducedScatteringTexture& single_rayleigh_scattering_texture,
-						const ReducedScatteringTexture& single_mie_scattering_texture,
-						const ScatteringTexture& multiple_scattering_texture,
-						Length r, Number mu_s, int scattering_order);
+IrradianceSpectrum ComputeDirectIrradiance(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	Length r, Number mu_s);
 
-					float2 GetIrradianceTextureUvFromRMuS(const AtmosphereParameters& atmosphere,
-						Length r, Number mu_s);
+IrradianceSpectrum ComputeIndirectIrradiance(
+	const AtmosphereParameters& atmosphere,
+	const ReducedScatteringTexture& single_rayleigh_scattering_texture,
+	const ReducedScatteringTexture& single_mie_scattering_texture,
+	const ScatteringTexture& multiple_scattering_texture,
+	Length r, Number mu_s, int scattering_order);
 
-					void GetRMuSFromIrradianceTextureUv(const AtmosphereParameters& atmosphere,
-						const float2& uv, Length& r, Number& mu_s);
+float2 GetIrradianceTextureUvFromRMuS(const AtmosphereParameters& atmosphere,
+	Length r, Number mu_s);
 
-					IrradianceSpectrum ComputeDirectIrradianceTexture(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const float2& gl_frag_coord);
+void GetRMuSFromIrradianceTextureUv(const AtmosphereParameters& atmosphere,
+	const float2& uv, Length& r, Number& mu_s);
 
-					IrradianceSpectrum ComputeIndirectIrradianceTexture(
-						const AtmosphereParameters& atmosphere,
-						const ReducedScatteringTexture& single_rayleigh_scattering_texture,
-						const ReducedScatteringTexture& single_mie_scattering_texture,
-						const ScatteringTexture& multiple_scattering_texture,
-						const float2& gl_frag_coord, int scattering_order);
+IrradianceSpectrum ComputeDirectIrradianceTexture(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const float2& gl_frag_coord);
 
-					IrradianceSpectrum GetIrradiance(
-						const AtmosphereParameters& atmosphere,
-						const IrradianceTexture& irradiance_texture,
-						Length r, Number mu_s);
+IrradianceSpectrum ComputeIndirectIrradianceTexture(
+	const AtmosphereParameters& atmosphere,
+	const ReducedScatteringTexture& single_rayleigh_scattering_texture,
+	const ReducedScatteringTexture& single_mie_scattering_texture,
+	const ScatteringTexture& multiple_scattering_texture,
+	const float2& gl_frag_coord, int scattering_order);
 
-					// Rendering.
+IrradianceSpectrum GetIrradiance(
+	const AtmosphereParameters& atmosphere,
+	const IrradianceTexture& irradiance_texture,
+	Length r, Number mu_s);
 
-					RadianceSpectrum GetSkyRadiance(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const ReducedScatteringTexture& scattering_texture,
-						const ReducedScatteringTexture& single_mie_scattering_texture,
-						Position camera, const Direction& view_ray, Length shadow_length,
-						const Direction& sun_direction, DimensionlessSpectrum& transmittance);
+// Rendering.
 
-					RadianceSpectrum GetSkyRadianceToPoint(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const ReducedScatteringTexture& scattering_texture,
-						const ReducedScatteringTexture& single_mie_scattering_texture,
-						Position camera, const Position& point, Length shadow_length,
-						const Direction& sun_direction, DimensionlessSpectrum& transmittance);
+RadianceSpectrum GetSkyRadiance(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const ReducedScatteringTexture& scattering_texture,
+	const ReducedScatteringTexture& single_mie_scattering_texture,
+	Position camera, const Direction& view_ray, Length shadow_length,
+	const Direction& sun_direction, DimensionlessSpectrum& transmittance);
 
-					IrradianceSpectrum GetSunAndSkyIrradiance(
-						const AtmosphereParameters& atmosphere,
-						const TransmittanceTexture& transmittance_texture,
-						const IrradianceTexture& irradiance_texture,
-						const Position& point, const Direction& normal,
-						const Direction& sun_direction, IrradianceSpectrum& sky_irradiance);
-		}
-	}
-}
+RadianceSpectrum GetSkyRadianceToPoint(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const ReducedScatteringTexture& scattering_texture,
+	const ReducedScatteringTexture& single_mie_scattering_texture,
+	Position camera, const Position& point, Length shadow_length,
+	const Direction& sun_direction, DimensionlessSpectrum& transmittance);
+
+IrradianceSpectrum GetSunAndSkyIrradiance(
+	const AtmosphereParameters& atmosphere,
+	const TransmittanceTexture& transmittance_texture,
+	const IrradianceTexture& irradiance_texture,
+	const Position& point, const Direction& normal,
+	const Direction& sun_direction, IrradianceSpectrum& sky_irradiance);
+
+
+//ÎÒ×Ô¼ºµÄtest º¯Êý
+void		computeSingleScatting(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, 
+						Number nu, bool ray_r_mu_intersects_ground,
+						IrradianceSpectrum& outRayleigh, IrradianceSpectrum& outMie);
+
+void		computeSingleScattingIntegrand(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, Number nu, 
+	Length d, bool ray_r_mu_intersects_ground,DimensionlessSpectrum& outRayleigh, DimensionlessSpectrum& outMie);
+
+DimensionlessSpectrum		getTransmittance(const AtmosphereParameters& atmosphere,Length r, Number mu, Length d, bool ray_r_mu_intersects_ground);
+
+DimensionlessSpectrum		getTransmittanceToSun(const AtmosphereParameters& atmosphere,Length r, Number mu_s);
+
+//		}
+//	}
+//}
+NAME_SPACE_END
+NAME_SPACE_END
+NAME_SPACE_END

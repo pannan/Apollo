@@ -6,6 +6,16 @@
 #include "ShaderDX11.h"
 #include "RenderStateDX11.h"
 
+NAME_SPACE_BEGIN_APOLLO
+NAME_SPACE_BEGIN_ATMOSPHERE
+NAME_SPACE_BEGIN_REFERENCE
+
+class SkyRenderCPUTest;
+
+NAME_SPACE_END
+NAME_SPACE_END
+NAME_SPACE_END
+
 namespace Apollo
 {
 	class Camera;
@@ -21,32 +31,13 @@ namespace Apollo
 		Vector4	projMat[4];
 	};
 
-	struct AtmosphereParameters
+	struct AtmosphereParameters_Simple
 	{
 		float  top_radius;
 		float  bottom_radius;
 		Vector2	expand;
 	};
 
-	class RenderSkyOnCPU
-	{
-	public:
-
-		RenderSkyOnCPU(Camera* camera,int w,int h);
-
-		void		renderSingleScatting();
-
-	protected:
-
-		Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat);
-
-	protected:
-
-		int		m_windowWidth;
-		int		m_windowHeight;
-
-		Camera*	m_camera;
-	};
 
 	class SkySample : public SampleBase
 	{
@@ -90,10 +81,10 @@ namespace Apollo
 
 		RenderStateDX11		m_testTerrainRenderState;
 
-		AtmosphereParameters	m_atmosphereParameters;
+		AtmosphereParameters_Simple	m_atmosphereParameters;
 
 		GlobalParameters			m_globalParameters;
 
-		RenderSkyOnCPU*			m_renderSkyOnCPU;
+		Apollo::Atmosphere::Reference::SkyRenderCPUTest*		m_skyRenderCPUTest;
 	};
 }

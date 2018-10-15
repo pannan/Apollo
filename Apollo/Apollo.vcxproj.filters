@@ -381,6 +381,9 @@
     <ClInclude Include="Math\Dimensional\test_case.h">
       <Filter>Math\Dimensional</Filter>
     </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Reference\SkyRenderCPUTest.h">
+      <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -600,6 +603,9 @@
       <Filter>Math\Dimensional</Filter>
     </ClCompile>
     <ClCompile Include="Environment\Atmosphere\Reference\Functions_test.cpp">
+      <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment\Atmosphere\Reference\SkyRenderCPUTest.cpp">
       <Filter>Environment\Atmosphere\Reference</Filter>
     </ClCompile>
   </ItemGroup>
