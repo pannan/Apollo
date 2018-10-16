@@ -4,7 +4,10 @@
 #include "Environment/Atmosphere/Reference/Functions.h"
 //#include "Environment/Atmosphere/Reference/Definitions.h"
 #include "Environment/Atmosphere/Constants.h"
-
+#include "Texture2dConfigDX11.h"
+#include "TextureDX11ResourceFactory.h"
+#include "RendererDX11.h"
+#include "Texture2dDX11.h"
 
 #define _IN(x) const x&
 #define _OUT(x) x&
@@ -24,7 +27,9 @@ typedef dimensional::vec4	float4;
 using std::max;
 using std::min;
 
-
+constexpr Wavelength kLambdaR = 680.0 * nm;
+constexpr Wavelength kLambdaG = 550.0 * nm;
+constexpr Wavelength kLambdaB = 440.0 * nm;
 
 SkyRenderCPUTest::SkyRenderCPUTest(int w, int h, Camera* camera)
 {
@@ -158,6 +163,9 @@ void SkyRenderCPUTest::renderSingleScatting()
 	Vector3 worldPosVec3 = m_camera->getPosition();
 	Vector3 earthSpacePosVec3 = (m_camera->getPosition() + Vector3(0.0, bottom_radius, 0.0f));
 
+	if (m_radianceRGBBuffer.size() != m_windowHeight * m_windowHeight)
+		m_radianceRGBBuffer.resize(m_windowHeight * m_windowHeight);
+
 	for (int y = 0; y < m_windowHeight; ++y)
 	{
 		for (int x = 0; x < m_windowWidth; ++x)
@@ -174,12 +182,44 @@ void SkyRenderCPUTest::renderSingleScatting()
 			double nu = ray.dot(sunDirection);
 			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m,mu);
 
-			IrradianceSpectrum rayleigh;
-			IrradianceSpectrum mie;
-			computeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround, rayleigh, mie);
+			RadianceSpectrum rgbSpectrum = computeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround);
+			
+			double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
+			double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);
+			double color_b = rgbSpectrum(kLambdaB).to(watt_per_square_meter_per_sr_per_nm);
 
+			Vector3 color(color_r, color_g, color_b);
+
+			m_radianceRGBBuffer[y * m_windowWidth + x] = color;
 		}
 	}
+
+	
+	saveRadianceRGBBufferToFile();
+}
+
+void SkyRenderCPUTest::saveRadianceRGBBufferToFile()
+{
+	//´´½¨ÎÆÀí
+	Texture2dConfigDX11 tex2dConfig;
+	tex2dConfig.SetWidth(m_windowWidth);
+	tex2dConfig.SetHeight(m_windowHeight);
+	tex2dConfig.SetBindFlags(D3D11_BIND_SHADER_RESOURCE);
+	tex2dConfig.SetFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
+	tex2dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
+	uint32_t handle = TextureDX11ResourceFactory::getInstance().createTexture2D("RadianceRGBTexture", tex2dConfig);
+
+	Texture2dDX11* rgbTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(handle);
+
+	D3D11_MAPPED_SUBRESOURCE mapSubResource;
+	mapSubResource.pData = &m_radianceRGBBuffer[0];
+	mapSubResource.RowPitch = m_windowWidth * 4;
+	mapSubResource.DepthPitch = 0;
+	HRESULT hr = RendererDX11::getInstance().getDeviceContex()->Map(rgbTex->getTexture2D(), 0, D3D11_MAP_WRITE, 0, &mapSubResource);
+
+	RendererDX11::getInstance().getDeviceContex()->Unmap(rgbTex->getTexture2D(), 0);
+
+	D3DX11SaveTextureToFile()
 }
 
 NAME_SPACE_END

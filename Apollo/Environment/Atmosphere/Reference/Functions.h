@@ -216,9 +216,8 @@ IrradianceSpectrum GetSunAndSkyIrradiance(
 
 
 //我自己的test 函数
-void		computeSingleScatting(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, 
-						Number nu, bool ray_r_mu_intersects_ground,
-						IrradianceSpectrum& outRayleigh, IrradianceSpectrum& outMie);
+RadianceSpectrum		computeSingleScatting(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s,
+						Number nu, bool ray_r_mu_intersects_ground);
 
 void		computeSingleScattingIntegrand(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, Number nu, 
 	Length d, bool ray_r_mu_intersects_ground,DimensionlessSpectrum& outRayleigh, DimensionlessSpectrum& outMie);

@@ -27,6 +27,8 @@ protected:
 
 	Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat);
 
+	void		saveRadianceRGBBufferToFile();
+
 private:
 
 	int		m_windowWidth;
@@ -34,7 +36,9 @@ private:
 
 	Camera*	m_camera;
 
-AtmosphereParameters m_atmosphereParameters;
+	std::vector<Vector3>		m_radianceRGBBuffer;
+
+	AtmosphereParameters m_atmosphereParameters;
 };
 
 NAME_SPACE_END

@@ -114,9 +114,8 @@ namespace Apollo
 				outMie = T_sun_q_p * GetProfileDensity(atmosphere.mie_density, r_d - atmosphere.bottom_radius);
 			}
 
-			void computeSingleScatting(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, 
-				Number nu, bool ray_r_mu_intersects_ground,
-				IrradianceSpectrum& outRayleigh, IrradianceSpectrum& outMie)
+			RadianceSpectrum computeSingleScatting(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s,
+				Number nu, bool ray_r_mu_intersects_ground)
 			{
 				//数值积分的间隔数（采样数）
 				const int SAMPLE_COUNT = 50;
@@ -141,8 +140,14 @@ namespace Apollo
 					mie_sum += mie_i * weight_i;
 				}
 
-				outRayleigh = rayleigh_sum * dx * atmosphere.solar_irradiance * atmosphere.rayleigh_scattering;
-				outMie = mie_sum * dx * atmosphere.solar_irradiance * atmosphere.mie_scattering;
+				IrradianceSpectrum rayleighIrradiance = rayleigh_sum * dx * atmosphere.solar_irradiance * atmosphere.rayleigh_scattering;
+				IrradianceSpectrum mieIrradiance = mie_sum * dx * atmosphere.solar_irradiance * atmosphere.mie_scattering;
+
+				//乘相位函数
+				RadianceSpectrum rayleigh = rayleighIrradiance * RayleighPhaseFunction(nu);
+				RadianceSpectrum mie = mieIrradiance * MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
+
+				return rayleigh + mie;
 			}
 
 		}

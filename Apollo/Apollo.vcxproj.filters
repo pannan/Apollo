@@ -61,6 +61,9 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{f30f4ccd-5348-4eb5-928f-56e4d446dab3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SDK">
+      <UniqueIdentifier>{f854e34c-eb32-400f-9592-0a793d1d48d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -383,6 +386,9 @@
     </ClInclude>
     <ClInclude Include="Environment\Atmosphere\Reference\SkyRenderCPUTest.h">
       <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\minpng.h">
+      <Filter>SDK</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
