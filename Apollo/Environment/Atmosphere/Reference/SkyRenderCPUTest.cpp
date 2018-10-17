@@ -8,6 +8,7 @@
 #include "TextureDX11ResourceFactory.h"
 #include "RendererDX11.h"
 #include "Texture2dDX11.h"
+#include "SDK/minpng.h"
 
 #define _IN(x) const x&
 #define _OUT(x) x&
@@ -31,11 +32,15 @@ constexpr Wavelength kLambdaR = 680.0 * nm;
 constexpr Wavelength kLambdaG = 550.0 * nm;
 constexpr Wavelength kLambdaB = 440.0 * nm;
 
-SkyRenderCPUTest::SkyRenderCPUTest(int w, int h, Camera* camera)
+SkyRenderCPUTest::SkyRenderCPUTest(int w, int h)
 {
-	m_camera = camera;
 	m_windowWidth = w;
 	m_windowHeight = h;
+
+	m_camera = new Camera(Vector3(4000, 10, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
+	m_camera->setViewportWidth(w);
+	m_camera->setViewportHeight(h);
+	m_camera->updateViewProjMatrix();
 }
 
 void SkyRenderCPUTest::init()
@@ -163,8 +168,8 @@ void SkyRenderCPUTest::renderSingleScatting()
 	Vector3 worldPosVec3 = m_camera->getPosition();
 	Vector3 earthSpacePosVec3 = (m_camera->getPosition() + Vector3(0.0, bottom_radius, 0.0f));
 
-	if (m_radianceRGBBuffer.size() != m_windowHeight * m_windowHeight)
-		m_radianceRGBBuffer.resize(m_windowHeight * m_windowHeight);
+	if (m_radianceRGBBuffer.size() != m_windowWidth * m_windowHeight)
+		m_radianceRGBBuffer.resize(m_windowWidth * m_windowHeight);
 
 	for (int y = 0; y < m_windowHeight; ++y)
 	{
@@ -181,45 +186,67 @@ void SkyRenderCPUTest::renderSingleScatting()
 			double mu_s = sunDirection.dot(earthCenterToEyeDirection);
 			double nu = ray.dot(sunDirection);
 			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m,mu);
-
+			if (rayIsIntersectsGround)
+				int ii = 0;
 			RadianceSpectrum rgbSpectrum = computeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround);
 			
 			double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
 			double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);
 			double color_b = rgbSpectrum(kLambdaB).to(watt_per_square_meter_per_sr_per_nm);
 
+			Number exposure_ = 10;
+			double testg = 1.0 - std::exp(-color_g * exposure_());
+			color_r = std::pow(1.0 - std::exp(-color_r * exposure_()), 1.0 / 2.2);
+			color_g = std::pow(1.0 - std::exp(-color_g * exposure_()), 1.0 / 2.2);
+			color_b = std::pow(1.0 - std::exp(-color_b * exposure_()), 1.0 / 2.2);
+
 			Vector3 color(color_r, color_g, color_b);
 
 			m_radianceRGBBuffer[y * m_windowWidth + x] = color;
 		}
 	}
-
-	
-	saveRadianceRGBBufferToFile();
 }
 
 void SkyRenderCPUTest::saveRadianceRGBBufferToFile()
 {
-	//´´½¨ÎÆÀí
-	Texture2dConfigDX11 tex2dConfig;
-	tex2dConfig.SetWidth(m_windowWidth);
-	tex2dConfig.SetHeight(m_windowHeight);
-	tex2dConfig.SetBindFlags(D3D11_BIND_SHADER_RESOURCE);
-	tex2dConfig.SetFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
-	tex2dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
-	uint32_t handle = TextureDX11ResourceFactory::getInstance().createTexture2D("RadianceRGBTexture", tex2dConfig);
+	//////////////////////////////make test data////////////////////////////////////////////
+	/*if (m_radianceRGBBuffer.size() != m_windowWidth * m_windowHeight)
+		m_radianceRGBBuffer.resize(m_windowWidth * m_windowHeight);
 
-	Texture2dDX11* rgbTex = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(handle);
+	for (int y = 0; y < m_windowHeight; ++y)
+	{
+		for (int x = 0; x < m_windowWidth; ++x)
+		{
+			size_t index = y * m_windowWidth + x;
+			m_radianceRGBBuffer[index].m_x = (float)x / m_windowWidth;
+			m_radianceRGBBuffer[index].m_y = (float)y / m_windowHeight;
+			m_radianceRGBBuffer[index].m_z = 0.0f;
+		}
+	}*/
 
-	D3D11_MAPPED_SUBRESOURCE mapSubResource;
-	mapSubResource.pData = &m_radianceRGBBuffer[0];
-	mapSubResource.RowPitch = m_windowWidth * 4;
-	mapSubResource.DepthPitch = 0;
-	HRESULT hr = RendererDX11::getInstance().getDeviceContex()->Map(rgbTex->getTexture2D(), 0, D3D11_MAP_WRITE, 0, &mapSubResource);
+	//////////////////////////////////////////////////////////////////////////
 
-	RendererDX11::getInstance().getDeviceContex()->Unmap(rgbTex->getTexture2D(), 0);
 
-	D3DX11SaveTextureToFile()
+	uint32_t* iRGBBuffer = new uint32_t[m_radianceRGBBuffer.size()];
+
+	for (size_t i = 0; i < m_radianceRGBBuffer.size(); ++i)
+	{
+		uint32_t r = m_radianceRGBBuffer[i].m_x * 255;
+		uint32_t g = m_radianceRGBBuffer[i].m_y * 255;
+		uint32_t b = m_radianceRGBBuffer[i].m_z * 255;
+		uint32_t a = 255;
+
+		uint32_t irgb = a << 24;
+		irgb += r << 16;
+		irgb += g << 8;
+		irgb += b;
+
+		iRGBBuffer[i] = irgb;
+	}
+
+	write_png("c:\\out.png", iRGBBuffer, m_windowWidth, m_windowHeight);
+
+	SAFE_DELETE_ARRAY(iRGBBuffer);
 }
 
 NAME_SPACE_END

@@ -390,6 +390,9 @@
     <ClInclude Include="SDK\minpng.h">
       <Filter>SDK</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\coroutine.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

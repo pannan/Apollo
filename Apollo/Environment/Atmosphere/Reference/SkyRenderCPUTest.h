@@ -16,18 +16,20 @@ class SkyRenderCPUTest
 {
 public:
 
-	SkyRenderCPUTest(int w, int h, Camera* camera);
+	SkyRenderCPUTest(int w, int h);
 
 	void		renderSingleScatting();
 
 	void		init();
+
+	void		saveRadianceRGBBufferToFile();
 
 protected:
 
 
 	Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat);
 
-	void		saveRadianceRGBBufferToFile();
+	
 
 private:
 

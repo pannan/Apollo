@@ -126,9 +126,10 @@ void SkySample::init()
 	initTestTerrain();
 	dimensional::TestCase::RunAllTests();
 
-	m_skyRenderCPUTest = new Apollo::Atmosphere::Reference::SkyRenderCPUTest(800, 600, m_camera);
+	m_skyRenderCPUTest = new Apollo::Atmosphere::Reference::SkyRenderCPUTest(80, 60);
 	m_skyRenderCPUTest->init();
 	m_skyRenderCPUTest->renderSingleScatting();
+	m_skyRenderCPUTest->saveRadianceRGBBufferToFile();
 }
 
 /*

@@ -1,3 +1,4 @@
+#define OpticalLengthSampleCount 50//500
 
 Number ClampCosine(Number mu)
 {
@@ -136,7 +137,7 @@ Number GetProfileDensity(_IN(DensityProfile) profile, Length altitude)
 Length ComputeOpticalLengthToTopAtmosphereBoundary(_IN(AtmosphereParameters) atmosphere, _IN(DensityProfile) profile, Length r, Number mu)
 {
 	//数值积分的间隔数量
-	const int SAMPLE_COUNT = 500;
+	const int SAMPLE_COUNT = OpticalLengthSampleCount;
 	//积分步长，每个积分间隔的长度
 	Length dx = DistanceToTopAtmosphereBoundary(atmosphere, r, mu) / Number(SAMPLE_COUNT);
 	//积分循环
