@@ -64,6 +64,9 @@
     <Filter Include="SDK">
       <UniqueIdentifier>{f854e34c-eb32-400f-9592-0a793d1d48d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thread">
+      <UniqueIdentifier>{b01e7052-6de4-41bf-aec8-dd19fe56d5e3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -616,6 +619,9 @@
     </ClCompile>
     <ClCompile Include="Environment\Atmosphere\Reference\SkyRenderCPUTest.cpp">
       <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread\Thread_CaseTest.cpp">
+      <Filter>Thread</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

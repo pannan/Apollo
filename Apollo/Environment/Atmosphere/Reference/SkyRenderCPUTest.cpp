@@ -158,7 +158,12 @@ Vector3 SkyRenderCPUTest::uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, 
 
 void SkyRenderCPUTest::renderSingleScatting()
 {
+	float sunTheta_radian = 90.0f * PI / 180.0f;
+	float sunphi = 0;
 	Vector3	sunDirection(1, 1, 1);
+	sunDirection.m_y = cos(sunTheta_radian);
+	sunDirection.m_x = sin(sunTheta_radian) * cos(sunphi);
+	sunDirection.m_z = sin(sunTheta_radian) * sin(sunphi);
 	sunDirection.normalize();
 	Matrix4x4 projMat = m_camera->getProjMat();
 	Matrix4x4 inverseViewMat = m_camera->getViewMat().inverse();
