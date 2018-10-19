@@ -22,7 +22,13 @@ namespace Apollo
 
 	protected:
 
+#ifdef DEBUG
 		typedef std::hash_map<std::string, ISelectPropertyUI*>		PropertyUIMap;
+#else
+		typedef std::unordered_map<std::string, ISelectPropertyUI*>		PropertyUIMap;
+#endif // DEBUG
+
+		
 		PropertyUIMap		m_perportyMap;
 
 	private:

@@ -60,6 +60,8 @@ void SampleManager::postRender()
 
 void SampleManager::debugOverlay()
 { 
+
+	m_currentSample->onGUI();
 	
 	int frameRate = Timer::getInstance().framerate();
 

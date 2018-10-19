@@ -49,6 +49,8 @@ namespace Apollo
 
 		virtual void	render();
 
+		virtual void onGUI();
+
 		virtual Camera* getCamera() { return m_camera; }
 
 	protected:

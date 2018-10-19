@@ -9,6 +9,9 @@
 #include "RendererDX11.h"
 #include "Texture2dDX11.h"
 #include "SDK/minpng.h"
+#include <thread>
+#include "imgui.h"
+#include<atomic>  
 
 #define _IN(x) const x&
 #define _OUT(x) x&
@@ -34,10 +37,18 @@ constexpr Wavelength kLambdaB = 440.0 * nm;
 
 SkyRenderCPUTest::SkyRenderCPUTest(int w, int h)
 {
+	m_isProcessing = false;
 	m_windowWidth = w;
 	m_windowHeight = h;
 
-	m_camera = new Camera(Vector3(4000, 10, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
+	m_sunTheta = 85.0f;
+	m_sunPhi = 0.0f;
+
+	m_cpuSkyTextureHandle = 0;
+
+	Vector3 camPos(0, 1000, 0);
+	Vector3 lookAt = camPos + Vector3(1, 1, 1) * 10;
+	m_camera = new Camera(camPos, lookAt, Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
 	m_camera->setViewportWidth(w);
 	m_camera->setViewportHeight(h);
 	m_camera->updateViewProjMatrix();
@@ -137,7 +148,7 @@ void SkyRenderCPUTest::init()
 	m_atmosphereParameters.mu_s_min = cos(102.0 * deg);
 }
 
-Vector3 SkyRenderCPUTest::uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat)
+Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat)
 {
 	Vector2 uv = inUV;
 	uv.m_y = 1.0f - uv.m_y;
@@ -155,41 +166,206 @@ Vector3 SkyRenderCPUTest::uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, 
 	return Vector3(temp.m_x, temp.m_y, temp.m_z);
 }
 
+struct RayRadianceThreadChunk 
+{
+	Vector3 earthSpacePosVec3;
+	Vector3 sunDirection;
+	AtmosphereParameters atmosphereParameters;
+	Matrix4x4 projMat;
+	Matrix4x4 inverseViewMat;
+};
+
+//outRadiance不能为Vector3&这样的引用 ，不然不发传递值，要为指针
+void computeRayRadianceThread(const Vector2& uv, RayRadianceThreadChunk& threadChunk,Vector3* outRadiance)
+{
+	Vector3 ray = uvToCameraRay(uv, threadChunk.projMat, threadChunk.inverseViewMat);
+	ray.normalize();
+	double r = threadChunk.earthSpacePosVec3.length();
+	Vector3 earthCenterToEyeDirection = threadChunk.earthSpacePosVec3 / r;
+	double mu = ray.dot(earthCenterToEyeDirection);
+	double mu_s = threadChunk.sunDirection.dot(earthCenterToEyeDirection);
+	double nu = ray.dot(threadChunk.sunDirection);
+	bool rayIsIntersectsGround = RayIntersectsGround(threadChunk.atmosphereParameters, r * m, mu);
+	if (rayIsIntersectsGround)
+		int ii = 0;
+	RadianceSpectrum rgbSpectrum = computeSingleScatting(threadChunk.atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
+
+	double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
+	double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);
+	double color_b = rgbSpectrum(kLambdaB).to(watt_per_square_meter_per_sr_per_nm);
+
+	Number exposure_ = 10;
+	double testg = 1.0 - std::exp(-color_g * exposure_());
+	color_r = std::pow(1.0 - std::exp(-color_r * exposure_()), 1.0 / 2.2);
+	color_g = std::pow(1.0 - std::exp(-color_g * exposure_()), 1.0 / 2.2);
+	color_b = std::pow(1.0 - std::exp(-color_b * exposure_()), 1.0 / 2.2);
+
+	*outRadiance = Vector3(color_r, color_g, color_b);
+}
+
+Vector2	normalizeUV(float x, float y,int w,int h)
+{
+	float u = (float)x / w;
+	float v = (float)y / h;
+	return Vector2(u, v);
+}
+
+float g_progress = 0.0f;
+std::atomic_int g_atomicProgress = 0;
+
+void computeSkyRadianceThread(int w,int h, RayRadianceThreadChunk& threadChunk, Vector3* outRadiance)
+{
+	
+
+	for (int y = 0; y < h; ++y)
+	{
+		for (int x = 0; x < w;)
+		{
+			int pixelXIndex[4];
+			Vector2 uv[4];
+
+			pixelXIndex[0] = x;
+			uv[0] = normalizeUV(x, y,w,h);
+
+			++x;
+			pixelXIndex[1] = x % w;
+			uv[1] = normalizeUV(pixelXIndex[1], y,w,h);
+
+			++x;
+			pixelXIndex[2] = x % w;
+			uv[2] = normalizeUV(pixelXIndex[2], y, w, h);
+
+			++x;
+			pixelXIndex[3] = x % w;
+			uv[3] = normalizeUV(pixelXIndex[3], y, w, h);
+
+			++x;
+
+			g_atomicProgress += 4;
+
+			Vector3 tempRadiance[4];
+
+			std::thread t0(computeRayRadianceThread, uv[0], threadChunk, &tempRadiance[0]);
+			std::thread t1(computeRayRadianceThread, uv[1], threadChunk, &tempRadiance[1]);
+			std::thread t2(computeRayRadianceThread, uv[2], threadChunk, &tempRadiance[2]);
+			std::thread t3(computeRayRadianceThread, uv[3], threadChunk, &tempRadiance[3]);
+
+			t0.join();
+			t1.join();
+			t2.join();
+			t3.join();
+
+			outRadiance[y * w + pixelXIndex[0]] = tempRadiance[0];
+			outRadiance[y * w + pixelXIndex[1]] = tempRadiance[1];
+			outRadiance[y * w + pixelXIndex[2]] = tempRadiance[2];
+			outRadiance[y * w + pixelXIndex[3]] = tempRadiance[3];
+		}
+	}
+
+	int ii = 0;
+}
+
+void SkyRenderCPUTest::updateSunDirection()
+{
+	//度到弧度
+	float sunTheta_radian = m_sunTheta * PI / 180.0f;
+	float sunphi = m_sunPhi * PI / 180.0f;;
+
+	m_sunDirection.m_y = cos(sunTheta_radian);
+	m_sunDirection.m_x = sin(sunTheta_radian) * cos(sunphi);
+	m_sunDirection.m_z = sin(sunTheta_radian) * sin(sunphi);
+	m_sunDirection.normalize();
+}
+
+#define  ENABLE_THREAD
 
 void SkyRenderCPUTest::renderSingleScatting()
 {
-	float sunTheta_radian = 90.0f * PI / 180.0f;
-	float sunphi = 0;
-	Vector3	sunDirection(1, 1, 1);
-	sunDirection.m_y = cos(sunTheta_radian);
-	sunDirection.m_x = sin(sunTheta_radian) * cos(sunphi);
-	sunDirection.m_z = sin(sunTheta_radian) * sin(sunphi);
-	sunDirection.normalize();
+	g_atomicProgress = 0;
+
+	updateSunDirection();
+
 	Matrix4x4 projMat = m_camera->getProjMat();
 	Matrix4x4 inverseViewMat = m_camera->getViewMat().inverse();
 
 	double bottom_radius = m_atmosphereParameters.bottom_radius.to(m);
 	float top_radius = m_atmosphereParameters.top_radius.to(m);
 	Vector3 worldPosVec3 = m_camera->getPosition();
-	Vector3 earthSpacePosVec3 = (m_camera->getPosition() + Vector3(0.0, bottom_radius, 0.0f));
+	m_earthSpacePosVec3 = (m_camera->getPosition() + Vector3(0.0, bottom_radius, 0.0f));
 
 	if (m_radianceRGBBuffer.size() != m_windowWidth * m_windowHeight)
 		m_radianceRGBBuffer.resize(m_windowWidth * m_windowHeight);
+
+	RayRadianceThreadChunk threadChunk;
+	threadChunk.atmosphereParameters = m_atmosphereParameters;
+	threadChunk.earthSpacePosVec3 = m_earthSpacePosVec3;
+	threadChunk.inverseViewMat = inverseViewMat;
+	threadChunk.projMat = projMat;
+	threadChunk.sunDirection = m_sunDirection;
+
+#ifdef ENABLE_THREAD
+
+	std::thread t(computeSkyRadianceThread,m_windowWidth,m_windowHeight,threadChunk, &m_radianceRGBBuffer[0]);
+	t.detach();
+	/*for (int y = 0; y < m_windowHeight; ++y)
+	{
+		for (int x = 0; x < m_windowWidth;)
+		{
+			int pixelXIndex[4];
+			Vector2 uv[4];
+
+			pixelXIndex[0] = x;
+			uv[0] = normalizeUV(x, y);
+
+			++x;
+			pixelXIndex[1] = x % m_windowWidth;
+			uv[1] = normalizeUV(pixelXIndex[1], y);
+
+			++x;
+			pixelXIndex[2] = x % m_windowWidth;
+			uv[2] = normalizeUV(pixelXIndex[2], y);
+
+			++x;
+			pixelXIndex[3] = x % m_windowWidth;
+			uv[3] = normalizeUV(pixelXIndex[3], y);
+
+			++x;
+
+			Vector3 outRadiance[4];
+
+			std::thread t0(computeRayRadianceThread, uv[0], threadChunk, &outRadiance[0]);
+			std::thread t1(computeRayRadianceThread, uv[1], threadChunk, &outRadiance[1]);
+			std::thread t2(computeRayRadianceThread, uv[2], threadChunk, &outRadiance[2]);
+			std::thread t3(computeRayRadianceThread, uv[3], threadChunk, &outRadiance[3]);
+
+			t0.join();
+			t1.join();
+			t2.join();
+			t3.join();
+
+			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[0]] = outRadiance[0];
+			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[1]] = outRadiance[1];
+			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[2]] = outRadiance[2];
+			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[3]] = outRadiance[3];
+		}
+	}	*/
+
+#else
 
 	for (int y = 0; y < m_windowHeight; ++y)
 	{
 		for (int x = 0; x < m_windowWidth; ++x)
 		{
 			float u = (float)x / m_windowWidth;
-			float v = (float)y / m_windowHeight;
+			float v = (float)y / m_windowHeight;			
 
 			Vector3 ray = uvToCameraRay(Vector2(u, v), projMat, inverseViewMat);
 			ray.normalize();
-			double r = earthSpacePosVec3.length();
-			Vector3 earthCenterToEyeDirection = earthSpacePosVec3 / r;
+			double r = m_earthSpacePosVec3.length();
+			Vector3 earthCenterToEyeDirection = m_earthSpacePosVec3 / r;
 			double mu = ray.dot(earthCenterToEyeDirection);
-			double mu_s = sunDirection.dot(earthCenterToEyeDirection);
-			double nu = ray.dot(sunDirection);
+			double mu_s = m_sunDirection.dot(earthCenterToEyeDirection);
+			double nu = ray.dot(m_sunDirection);
 			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m,mu);
 			if (rayIsIntersectsGround)
 				int ii = 0;
@@ -210,29 +386,75 @@ void SkyRenderCPUTest::renderSingleScatting()
 			m_radianceRGBBuffer[y * m_windowWidth + x] = color;
 		}
 	}
+
+#endif
+}
+
+void SkyRenderCPUTest::updateCpuSkyTexture()
+{
+	rgbaFloatBufferToRgba32Buffer();
+
+	
+	if (m_cpuSkyTextureHandle == 0)
+	{
+		Texture2dConfigDX11 tex2dConfig;
+		tex2dConfig.SetWidth(m_windowWidth);
+		tex2dConfig.SetHeight(m_windowHeight);
+		tex2dConfig.SetFormat(DXGI_FORMAT_R8G8B8A8_UNORM);
+		tex2dConfig.SetMipLevels(1);
+		tex2dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
+		tex2dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
+		D3D11_SUBRESOURCE_DATA subResource;
+		subResource.pSysMem = &m_rgba32Buffer[0];
+		subResource.SysMemPitch = m_windowWidth * 4;
+		subResource.SysMemSlicePitch = 0;
+		m_cpuSkyTextureHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("CpuSkyTexture", tex2dConfig, &subResource);
+		return;
+	}
+
+	Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_cpuSkyTextureHandle);
+
+	D3D11_MAPPED_SUBRESOURCE mappedSubResource;
+	//mappedSubResource.pData = &m_rgba32Buffer[0];
+	//mappedSubResource.RowPitch = m_windowWidth * 4;
+	//mappedSubResource.DepthPitch = 0;
+	HRESULT hr = RendererDX11::getInstance().getDeviceContex()->Map(srcTex2d->getTexture2D(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
+
+	memcpy(mappedSubResource.pData, &m_rgba32Buffer[0], m_rgba32Buffer.size() * 4);
+
+	RendererDX11::getInstance().getDeviceContex()->Unmap(srcTex2d->getTexture2D(), 0); 
+}
+
+void SkyRenderCPUTest::rgbaFloatBufferToRgba32Buffer()
+{
+	if (m_rgba32Buffer.size() != m_windowWidth * m_windowHeight)
+		m_rgba32Buffer.resize(m_windowHeight * m_windowWidth);
+
+	for (size_t i = 0; i < m_radianceRGBBuffer.size(); ++i)
+	{
+		uint32_t r = m_radianceRGBBuffer[i].m_x * 255;
+		uint32_t g = m_radianceRGBBuffer[i].m_y * 255;
+		uint32_t b = m_radianceRGBBuffer[i].m_z * 255;
+		uint32_t a = 255;
+
+		//下面这个是png的顺序
+		//uint32_t irgb = a << 24;
+		//irgb += r << 16;
+		//irgb += g << 8;
+		//irgb += b;
+		//这个是dx rgba的顺序
+		uint32_t irgb = a << 24;
+		irgb += b << 16;
+		irgb += g << 8;
+		irgb += r;
+
+		m_rgba32Buffer[i] = irgb;
+	}
 }
 
 void SkyRenderCPUTest::saveRadianceRGBBufferToFile()
 {
-	//////////////////////////////make test data////////////////////////////////////////////
-	/*if (m_radianceRGBBuffer.size() != m_windowWidth * m_windowHeight)
-		m_radianceRGBBuffer.resize(m_windowWidth * m_windowHeight);
-
-	for (int y = 0; y < m_windowHeight; ++y)
-	{
-		for (int x = 0; x < m_windowWidth; ++x)
-		{
-			size_t index = y * m_windowWidth + x;
-			m_radianceRGBBuffer[index].m_x = (float)x / m_windowWidth;
-			m_radianceRGBBuffer[index].m_y = (float)y / m_windowHeight;
-			m_radianceRGBBuffer[index].m_z = 0.0f;
-		}
-	}*/
-
-	//////////////////////////////////////////////////////////////////////////
-
-
-	uint32_t* iRGBBuffer = new uint32_t[m_radianceRGBBuffer.size()];
+	/*uint32_t* iRGBBuffer = new uint32_t[m_radianceRGBBuffer.size()];
 
 	for (size_t i = 0; i < m_radianceRGBBuffer.size(); ++i)
 	{
@@ -247,11 +469,56 @@ void SkyRenderCPUTest::saveRadianceRGBBufferToFile()
 		irgb += b;
 
 		iRGBBuffer[i] = irgb;
+	}*/
+
+	rgbaFloatBufferToRgba32Buffer();
+
+	write_png("c:\\out.png", &m_rgba32Buffer[0], m_windowWidth, m_windowHeight);
+
+	//SAFE_DELETE_ARRAY(iRGBBuffer);
+}
+
+void SkyRenderCPUTest::onGUI()
+{
+	static bool g_overLayShow = true;
+	ImGui::SetNextWindowPos(ImVec2(100, 300));
+	if (!ImGui::Begin("SkyRender", &g_overLayShow, ImVec2(500, 800), 0.7f, ImGuiWindowFlags_NoTitleBar))
+	{
+		ImGui::End();
+		return;
 	}
 
-	write_png("c:\\out.png", iRGBBuffer, m_windowWidth, m_windowHeight);
+	if(ImGui::Button("CPU Render", ImVec2(200, 50)))
+	{
+		m_isProcessing = true;
+		renderSingleScatting();		
+	}
 
-	SAFE_DELETE_ARRAY(iRGBBuffer);
+	ImGui::SliderFloat("sun theta", &m_sunTheta, 0.0f, 90.f);
+
+	ImGui::SliderFloat("sun phi", &m_sunPhi, 0.0f, 360.0f);
+
+	if (m_isProcessing)
+	{
+		float fProgress = (float)g_atomicProgress / (m_windowHeight * m_windowWidth);
+		ImGui::ProgressBar(fProgress, ImVec2(150, 20));
+		if (fProgress >= 1.0f)
+		{
+			m_isProcessing = false;
+
+			updateCpuSkyTexture();
+		}			
+	}
+	
+	if (m_cpuSkyTextureHandle != 0)
+	{
+		Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_cpuSkyTextureHandle);
+
+		ImGui::Image(srcTex2d->getShaderResourceView(), ImVec2(200, 200));
+	}
+
+	
+	ImGui::End();
 }
 
 NAME_SPACE_END

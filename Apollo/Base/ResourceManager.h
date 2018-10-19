@@ -35,10 +35,19 @@ namespace Apollo
 
 	protected:
 
+#ifdef DEBUG
 		typedef stdext::hash_map<std::string, IResourceFactory*>	FactorySuffixHashMap;
 		typedef stdext::hash_map<int, IResourceFactory*>				FactoryTypeHashMap;
 		typedef stdext::hash_map<std::string, uint32_t>					ResourceHandleHashMap;
 		typedef stdext::hash_map<std::string, ResourceChunk>		ResourceChunkMap;
+#else
+		typedef std::unordered_map<std::string, IResourceFactory*>	FactorySuffixHashMap;
+		typedef std::unordered_map<int, IResourceFactory*>				FactoryTypeHashMap;
+		typedef std::unordered_map<std::string, uint32_t>					ResourceHandleHashMap;
+		typedef std::unordered_map<std::string, ResourceChunk>		ResourceChunkMap;
+#endif // DEBUG
+
+		
 
 		FactorySuffixHashMap				m_factorySuffixHashMap;
 		FactoryTypeHashMap					m_factoryTypeHashMap;

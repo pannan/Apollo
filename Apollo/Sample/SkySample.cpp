@@ -126,10 +126,10 @@ void SkySample::init()
 	initTestTerrain();
 	dimensional::TestCase::RunAllTests();
 
-	m_skyRenderCPUTest = new Apollo::Atmosphere::Reference::SkyRenderCPUTest(80, 60);
+	m_skyRenderCPUTest = new Apollo::Atmosphere::Reference::SkyRenderCPUTest(40, 30);
 	m_skyRenderCPUTest->init();
-	m_skyRenderCPUTest->renderSingleScatting();
-	m_skyRenderCPUTest->saveRadianceRGBBufferToFile();
+	//m_skyRenderCPUTest->renderSingleScatting();
+	//m_skyRenderCPUTest->saveRadianceRGBBufferToFile();
 }
 
 /*
@@ -313,11 +313,15 @@ void SkySample::drawTestTerrain()
 	m_testTerrainModel.draw();
 }
 
+void SkySample::onGUI()
+{
+	m_skyRenderCPUTest->onGUI();
+}
+
 void SkySample::render()
 {
 	m_camera->updateViewProjMatrix();
 	//test();
-
 	//test2();
 	m_renderState.bind();
 

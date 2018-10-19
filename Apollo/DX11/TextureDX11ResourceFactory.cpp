@@ -98,14 +98,15 @@ TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, ui
 	return nullptr;
 }
 
-uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Texture2dConfigDX11& config)
+uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Texture2dConfigDX11& config, 
+	D3D11_SUBRESOURCE_DATA* subResource)
 {
 	uint32_t index = m_textureResourceList.size();
 	uint32_t handle = RT_TEXTURE;
 	handle |= (index << 8);
 
 	ID3D11Texture2D * tex2d = nullptr;
-	HRESULT hr = RendererDX11::getInstance().getDevice()->CreateTexture2D(&config.GetTextureDesc(), nullptr, &tex2d);
+	HRESULT hr = RendererDX11::getInstance().getDevice()->CreateTexture2D(&config.GetTextureDesc(), subResource, &tex2d);
 	if (hr != S_OK)
 	{
 		LogManager::getInstance().log(name + " create failed!");

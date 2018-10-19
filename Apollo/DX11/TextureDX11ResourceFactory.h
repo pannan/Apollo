@@ -25,7 +25,8 @@ namespace Apollo
 		virtual	Resource*	getResource(uint32_t handle);
 
 		//创建一个空的纹理，没有初始化类容
-		uint32_t				createTexture2D(const std::string& name, Texture2dConfigDX11& config);
+		uint32_t				createTexture2D(const std::string& name, Texture2dConfigDX11& config, 
+			D3D11_SUBRESOURCE_DATA* subResource = nullptr);
 
 	protected:
 

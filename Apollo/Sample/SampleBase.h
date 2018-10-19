@@ -16,6 +16,8 @@ namespace Apollo
 
 		virtual void render() = 0;
 
+		virtual void onGUI() {};
+
 		virtual Camera* getCamera() = 0;
 
 	protected:

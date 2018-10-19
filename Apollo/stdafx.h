@@ -20,8 +20,8 @@
 #include <assert.h>
 #include <memory>
 #include <limits>
-//#include <unordered_map>
-#include <hash_map>
+#include <unordered_map>
+//#include <hash_map>
 #include <iostream>
 #include <strstream>
 #include <sstream>
@@ -148,8 +148,15 @@ enum class ShaderParameterType
 	AppendBuffer,//append struct buffer
 };
 
+//#ifdef DEBUG
 const float MAX_FLOAT = std::numeric_limits<float>::max();
 const float MIN_FLOAT = std::numeric_limits<float>::min();
+//#else
+//const float MAX_FLOAT = 10000000000;// std::numeric_limits<float>::max();
+//const float MIN_FLOAT = -10000000000;// std::numeric_limits<float>::min();
+//#endif // DEBUG
+
+
 
 enum PlaneAABBIntersectType
 {
