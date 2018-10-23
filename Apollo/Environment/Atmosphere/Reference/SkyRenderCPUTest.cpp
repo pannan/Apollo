@@ -47,7 +47,7 @@ SkyRenderCPUTest::SkyRenderCPUTest(int w, int h)
 	m_cpuSkyTextureHandle = 0;
 
 	Vector3 camPos(0, 1000, 0);
-	Vector3 lookAt = camPos + Vector3(1, 1, 1) * 10;
+	Vector3 lookAt = camPos + Vector3(3, 8, 1) * 10;
 	m_camera = new Camera(camPos, lookAt, Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
 	m_camera->setViewportWidth(w);
 	m_camera->setViewportHeight(h);
@@ -203,7 +203,7 @@ void computeRayRadianceThread(const Vector2& uv, RayRadianceThreadChunk& threadC
 	*outRadiance = Vector3(color_r, color_g, color_b);
 }
 
-Vector2	normalizeUV(float x, float y,int w,int h)
+Vector2	normalizeUV(float x, float y, int w, int h)
 {
 	float u = (float)x / w;
 	float v = (float)y / h;
@@ -212,11 +212,11 @@ Vector2	normalizeUV(float x, float y,int w,int h)
 
 float g_progress = 0.0f;
 std::atomic_int g_atomicProgress = 0;
+std::atomic_int g_freeThread = 0;
+
 
 void computeSkyRadianceThread(int w,int h, RayRadianceThreadChunk& threadChunk, Vector3* outRadiance)
 {
-	
-
 	for (int y = 0; y < h; ++y)
 	{
 		for (int x = 0; x < w;)
@@ -241,8 +241,6 @@ void computeSkyRadianceThread(int w,int h, RayRadianceThreadChunk& threadChunk, 
 
 			++x;
 
-			g_atomicProgress += 4;
-
 			Vector3 tempRadiance[4];
 
 			std::thread t0(computeRayRadianceThread, uv[0], threadChunk, &tempRadiance[0]);
@@ -259,10 +257,66 @@ void computeSkyRadianceThread(int w,int h, RayRadianceThreadChunk& threadChunk, 
 			outRadiance[y * w + pixelXIndex[1]] = tempRadiance[1];
 			outRadiance[y * w + pixelXIndex[2]] = tempRadiance[2];
 			outRadiance[y * w + pixelXIndex[3]] = tempRadiance[3];
+
+			g_atomicProgress += 4;
 		}
 	}
 
 	int ii = 0;
+}
+
+//这里的outRadiance是个数组
+void computeRayRadianceThread2(int x, int y, int w, int h, RayRadianceThreadChunk& threadChunk, Vector3* outRadiance)
+{
+	Vector2 uv = normalizeUV(x, y, w, h);
+	Vector3 ray = uvToCameraRay(uv, threadChunk.projMat, threadChunk.inverseViewMat);
+	ray.normalize();
+	double r = threadChunk.earthSpacePosVec3.length();
+	Vector3 earthCenterToEyeDirection = threadChunk.earthSpacePosVec3 / r;
+	double mu = ray.dot(earthCenterToEyeDirection);
+	double mu_s = threadChunk.sunDirection.dot(earthCenterToEyeDirection);
+	double nu = ray.dot(threadChunk.sunDirection);
+	bool rayIsIntersectsGround = RayIntersectsGround(threadChunk.atmosphereParameters, r * m, mu);
+	if (rayIsIntersectsGround)
+		int ii = 0;
+	RadianceSpectrum rgbSpectrum = computeSingleScatting(threadChunk.atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
+
+	double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
+	double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);
+	double color_b = rgbSpectrum(kLambdaB).to(watt_per_square_meter_per_sr_per_nm);
+
+	Number exposure_ = 10;
+	double testg = 1.0 - std::exp(-color_g * exposure_());
+	color_r = std::pow(1.0 - std::exp(-color_r * exposure_()), 1.0 / 2.2);
+	color_g = std::pow(1.0 - std::exp(-color_g * exposure_()), 1.0 / 2.2);
+	color_b = std::pow(1.0 - std::exp(-color_b * exposure_()), 1.0 / 2.2);
+
+	outRadiance[y * w + x] = Vector3(color_r, color_g, color_b);
+	++g_atomicProgress;
+	++g_freeThread;
+}
+
+void computeSkyRadianceThread2(int w, int h, RayRadianceThreadChunk& threadChunk, Vector3* outRadiance)
+{
+	const size_t totalPixel = w * h;
+	const int cpuCount = std::thread::hardware_concurrency();
+	g_freeThread = cpuCount;
+	g_atomicProgress = 0;
+
+	while (g_atomicProgress < totalPixel)
+	{
+		if (g_freeThread > 0)
+		{
+			--g_freeThread;
+			//分配一个线程计算
+			int indexX = g_atomicProgress % w;
+			int indexY = g_atomicProgress / w;
+
+			std::thread t(computeRayRadianceThread2,indexX,indexY,w,h, threadChunk, outRadiance);
+
+			t.detach();
+		}
+	}
 }
 
 void SkyRenderCPUTest::updateSunDirection()
@@ -307,48 +361,7 @@ void SkyRenderCPUTest::renderSingleScatting()
 
 	std::thread t(computeSkyRadianceThread,m_windowWidth,m_windowHeight,threadChunk, &m_radianceRGBBuffer[0]);
 	t.detach();
-	/*for (int y = 0; y < m_windowHeight; ++y)
-	{
-		for (int x = 0; x < m_windowWidth;)
-		{
-			int pixelXIndex[4];
-			Vector2 uv[4];
-
-			pixelXIndex[0] = x;
-			uv[0] = normalizeUV(x, y);
-
-			++x;
-			pixelXIndex[1] = x % m_windowWidth;
-			uv[1] = normalizeUV(pixelXIndex[1], y);
-
-			++x;
-			pixelXIndex[2] = x % m_windowWidth;
-			uv[2] = normalizeUV(pixelXIndex[2], y);
-
-			++x;
-			pixelXIndex[3] = x % m_windowWidth;
-			uv[3] = normalizeUV(pixelXIndex[3], y);
-
-			++x;
-
-			Vector3 outRadiance[4];
-
-			std::thread t0(computeRayRadianceThread, uv[0], threadChunk, &outRadiance[0]);
-			std::thread t1(computeRayRadianceThread, uv[1], threadChunk, &outRadiance[1]);
-			std::thread t2(computeRayRadianceThread, uv[2], threadChunk, &outRadiance[2]);
-			std::thread t3(computeRayRadianceThread, uv[3], threadChunk, &outRadiance[3]);
-
-			t0.join();
-			t1.join();
-			t2.join();
-			t3.join();
-
-			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[0]] = outRadiance[0];
-			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[1]] = outRadiance[1];
-			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[2]] = outRadiance[2];
-			m_radianceRGBBuffer[y * m_windowWidth + pixelXIndex[3]] = outRadiance[3];
-		}
-	}	*/
+	
 
 #else
 
@@ -420,7 +433,7 @@ void SkyRenderCPUTest::updateCpuSkyTexture()
 	//mappedSubResource.DepthPitch = 0;
 	HRESULT hr = RendererDX11::getInstance().getDeviceContex()->Map(srcTex2d->getTexture2D(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubResource);
 
-	memcpy(mappedSubResource.pData, &m_rgba32Buffer[0], m_rgba32Buffer.size() * 4);
+	memcpy(mappedSubResource.pData, &m_rgba32Buffer[0], m_rgba32Buffer.size() * sizeof(uint32_t));
 
 	RendererDX11::getInstance().getDeviceContex()->Unmap(srcTex2d->getTexture2D(), 0); 
 }
@@ -494,7 +507,7 @@ void SkyRenderCPUTest::onGUI()
 		renderSingleScatting();		
 	}
 
-	ImGui::SliderFloat("sun theta", &m_sunTheta, 0.0f, 90.f);
+	ImGui::SliderFloat("sun theta", &m_sunTheta, 0.0f, 180);  
 
 	ImGui::SliderFloat("sun phi", &m_sunPhi, 0.0f, 360.0f);
 
