@@ -625,9 +625,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Environment\Atmosphere\Functions.hlsl">
-      <Filter>Environment\Atmosphere</Filter>
-    </None>
     <None Include="..\bin\Assets\Shader\Deferred.hlsl">
       <Filter>Shader</Filter>
     </None>
@@ -677,6 +674,9 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="..\bin\Assets\Shader\TextureVS.hlsl">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="..\bin\Assets\Shader\Functions.hlsl">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

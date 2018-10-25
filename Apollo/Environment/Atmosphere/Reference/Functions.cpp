@@ -20,7 +20,57 @@ namespace Apollo
 		{
 			using std::max;
 			using std::min;
-#include "Environment/Atmosphere/Functions.hlsl"
+//#include "Environment/Atmosphere/Functions.hlsl"
+#include "../bin/Assets/Shader/Functions.hlsl"
+
+			bool MyExpectNear(double expected, double actual, double tolerance) 
+			{
+				if (actual - expected > tolerance || expected - actual > tolerance) 
+				{
+					std::cout << expected << " +/- " << tolerance << " expected but got "
+						<< actual << std::endl;
+					//pass_ = false;
+					return false;
+				}
+
+				return true;
+			}
+
+			bool		testRMuMusNuConversion(AtmosphereParameters& atmosphere, Length r, Number mu, Number mu_s, Number nu, bool ray_r_mu_intersects_ground)
+			{
+				float4 uvwz = GetScatteringTextureUvwzFromRMuMuSNu(atmosphere,r,mu,mu_s,nu,ray_r_mu_intersects_ground);
+				constexpr double kEpsilon = 1e-3;
+				Length _r;
+				Number _mu;
+				Number _mu_s;
+				Number _nu;
+
+				//uvwz to uvw
+				Number tex_coord_x = uvwz.x * Number(SCATTERING_TEXTURE_NU_SIZE - 1);
+				Number tex_x = floor(tex_coord_x);
+				Number lerp = tex_coord_x - tex_x;
+				float3 uvw0 = float3((tex_x + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE), uvwz.z, uvwz.w);
+				float3 uvw1 = float3((tex_x + 1.0 + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE), uvwz.z, uvwz.w);
+
+				GetRMuMuSNuFromScatteringTextureFragCoord(atmosphere, uvw0, _r, _mu, _mu_s, _nu, ray_r_mu_intersects_ground);
+
+				//下面函数测试没问题
+				//GetRMuMuSNuFromScatteringTextureUvwz(atmosphere, uvwz, _r, _mu, _mu_s, _nu, ray_r_mu_intersects_ground);
+
+				bool isOk = true;
+				isOk &= MyExpectNear(r.to(m), _r.to(m), (kEpsilon) );
+
+				isOk &= MyExpectNear(mu(), _mu(), (kEpsilon));
+
+				isOk &= MyExpectNear(mu_s(), _mu_s(), (kEpsilon));
+
+				isOk &= MyExpectNear(nu(), _nu(), (kEpsilon));
+
+				if (isOk == false)
+					std::cout << "testRMuMusNuConversion false";
+
+				return isOk;
+			}
 
 			//我自己的test函数
 			DimensionlessSpectrum getTransmittance(const AtmosphereParameters& atmosphere,Length r, Number mu, Length d, bool ray_r_mu_intersects_ground)
@@ -143,6 +193,27 @@ namespace Apollo
 				IrradianceSpectrum rayleighIrradiance = rayleigh_sum * dx * atmosphere.solar_irradiance * atmosphere.rayleigh_scattering;
 				IrradianceSpectrum mieIrradiance = mie_sum * dx * atmosphere.solar_irradiance * atmosphere.mie_scattering;
 
+				//乘相位函数
+				RadianceSpectrum rayleigh = rayleighIrradiance * RayleighPhaseFunction(nu);
+				RadianceSpectrum mie = mieIrradiance * MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
+
+				return rayleigh + mie;
+			}
+
+			RadianceSpectrum recomputeSingleScatting(const AtmosphereParameters& atmosphere, Length r, Number mu, Number mu_s,
+				Number nu, bool ray_r_mu_intersects_ground,
+				LazyTransmittanceTexture&	transmittanceTexture,
+				LazySingleScatteringTexture&	rayleighSingleScattingTexture,
+				LazySingleScatteringTexture& mieSingleScattingTexture)
+			{
+				/*LazyTransmittanceTexture transmittance_texture(atmosphere);
+				LazySingleScatteringTexture single_rayleigh_scattering_texture(atmosphere, transmittance_texture, true);
+				LazySingleScatteringTexture single_mie_scattering_texture(atmosphere, transmittance_texture, false);*/
+
+				//Vertical ray, from bottom atmosphere boundary, scattering angle 0.
+				IrradianceSpectrum rayleighIrradiance = GetScattering(atmosphere, rayleighSingleScattingTexture,r, mu, mu_s, nu, false);
+				IrradianceSpectrum mieIrradiance = GetScattering(atmosphere, mieSingleScattingTexture,r, mu, mu_s, nu, false);
+				
 				//乘相位函数
 				RadianceSpectrum rayleigh = rayleighIrradiance * RayleighPhaseFunction(nu);
 				RadianceSpectrum mie = mieIrradiance * MiePhaseFunction(atmosphere.mie_phase_function_g, nu);

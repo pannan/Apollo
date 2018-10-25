@@ -680,6 +680,12 @@ void GetRMuMuSNuFromScatteringTextureUvwz(_IN(AtmosphereParameters) atmosphere, 
 	_OUT(Length) r, _OUT(Number) mu, _OUT(Number) mu_s, _OUT(Number) nu,
 	_OUT(bool) ray_r_mu_intersects_ground)
 {
+	assert(uvwz.x >= 0.0 && uvwz.x <= 1.0);
+	assert(uvwz.y >= 0.0 && uvwz.y <= 1.0);
+	assert(uvwz.z >= 0.0 && uvwz.z <= 1.0);
+	assert(uvwz.w >= 0.0 && uvwz.w <= 1.0);
+
+	//地面（海拔为0）水平射线和顶部大气层的距离
 	Length H = sqrt(atmosphere.top_radius * atmosphere.top_radius - atmosphere.bottom_radius * atmosphere.bottom_radius);
 	Length K = H * GetUnitRangeFromTextureCoord(uvwz.w,SCATTERING_TEXTURE_R_SIZE);
 	r = sqrt(K*K + atmosphere.bottom_radius * atmosphere.bottom_radius);
@@ -746,6 +752,14 @@ void GetRMuMuSNuFromScatteringTextureFragCoord(_IN(AtmosphereParameters) atmosph
 	Number v0 = sqrt((1.0 - mu*mu) * (1.0 - mu_s*mu_s));
 	nu = clamp(nu, mu*mu_s - v0, mu*mu_s + v0);
 }
+
+//4D坐标映射带3D坐标
+//这个函数原始代码没有，我自己添加
+//void GetScatteringTextureFragCoordFromRMuMuSNu(_IN(AtmosphereParameters) atmosphere, _OUT(float3) fragCoord,
+//	_IN(Length) r, _IN(Number) mu, _IN(Number) mu_s, _IN(Number) nu, _IN(bool) ray_r_mu_intersects_ground)
+//{
+//
+//}
 
 //有了这个映射，我们可以写一个预计算单次散射的函数
 void ComputeSingleScatteringTexture(_IN(AtmosphereParameters) atmosphere, _IN(TransmittanceTexture) transmittance_texture, _IN(float3) fragCoord,

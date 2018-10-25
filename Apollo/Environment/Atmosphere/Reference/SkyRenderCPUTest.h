@@ -44,6 +44,8 @@ protected:
 
 	void			updateSunDirection();
 
+	void			checkRMuMusNuConversion();
+
 private:
 
 	bool			m_isProcessing;

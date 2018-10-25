@@ -6,7 +6,7 @@ function.ccÖĞÌá¹©ÁËC ++¡°ÊµÏÖ¡±£¨¸ÃÎÄ¼şÔÚ¶¨ÒåÁËËüËùÒÀÀµµÄºêÖ®ºóÖ»°üº¬ÁËGLSLÎÄ¼ş£
 */
 
 #include "Environment/Atmosphere/Reference/Definitions.h"
-
+#include "Environment/Atmosphere/Constants.h"
 //namespace Apollo
 //{
 //	namespace Atmosphere
@@ -214,10 +214,222 @@ IrradianceSpectrum GetSunAndSkyIrradiance(
 	const Position& point, const Direction& normal,
 	const Direction& sun_direction, IrradianceSpectrum& sky_irradiance);
 
+//////////////////////////////////////////////////////////////////////////
+
+/*
+Ä³Ğ©µ¥Ôª²âÊÔĞèÒªÔ¤ÏÈ¼ÆËãµÄÎÆÀí×÷ÎªÊäÈë£¬µ«³öÓÚĞ§ÂÊÔ­Òò£¬ÎÒÃÇ²»Ï£ÍûÎª´ËÔ¤ÏÈ¼ÆËãÕû¸öÎÆÀí¡£
+ÎÒÃÇµÄ½â¾ö·½°¸ÊÇÌá¹©ÑÓ³Ù¼ÆËãµÄÎÆÀí£¬¼´ÔÚÎÒÃÇµÚÒ»´Î³¢ÊÔ¶ÁÈ¡ËüÃÇÊ±¼ÆËãÎÆËØµÄÎÆÀí¡£
+ÎÒÃÇĞèÒªµÄµÚÒ»ÖÖÎÆÀíÊÇÑÓ³ÙÍ¸ÉäÎÆÀí£¨¸ºÖµÒâÎ¶×Å¡°ÉĞÎ´¼ÆËã¡±£©£º
+*/
+class LazyTransmittanceTexture : public dimensional::BinaryFunction<
+	TRANSMITTANCE_TEXTURE_WIDTH,
+	TRANSMITTANCE_TEXTURE_HEIGHT,
+	DimensionlessSpectrum>
+{
+public:
+	explicit LazyTransmittanceTexture(const AtmosphereParameters& atmosphere_parameters)
+		: BinaryFunction(DimensionlessSpectrum(-1.0)),
+		atmosphere_parameters_(atmosphere_parameters)
+	{}
+
+	virtual const DimensionlessSpectrum& Get(int i, int j) const
+	{
+		int index = i + j * TRANSMITTANCE_TEXTURE_HEIGHT;
+		if (value_[index][0]() < 0.0)
+		{
+			value_[index] = ComputeTransmittanceToTopAtmosphereBoundaryTexture(atmosphere_parameters_, float2(i + 0.5, j + 0.5));
+		}
+		return value_[index];
+	}
+
+	void Clear()
+	{
+		constexpr unsigned int n = TRANSMITTANCE_TEXTURE_WIDTH * TRANSMITTANCE_TEXTURE_HEIGHT;
+		for (unsigned int i = 0; i < n; ++i)
+		{
+			value_[i] = DimensionlessSpectrum(-1.0);
+		}
+	}
+
+private:
+	const AtmosphereParameters& atmosphere_parameters_;
+};
+
+//ÎÒÃÇÒ²ĞèÒªÒ»¸öÑÓ³Ùµ¥´ÎÉ¢ÉäÎÆÀí
+class LazySingleScatteringTexture : public dimensional::TernaryFunction<
+	SCATTERING_TEXTURE_WIDTH,
+	SCATTERING_TEXTURE_HEIGHT,
+	SCATTERING_TEXTURE_DEPTH,
+	IrradianceSpectrum>
+{
+public:
+	LazySingleScatteringTexture(
+		const AtmosphereParameters& atmosphere_parameters,
+		const TransmittanceTexture& transmittance_texture,
+		bool rayleigh)
+		: TernaryFunction(IrradianceSpectrum(-watt_per_square_meter_per_nm)),
+		atmosphere_parameters_(atmosphere_parameters),
+		transmittance_texture_(transmittance_texture),
+		rayleigh_(rayleigh) {}
+
+	virtual const IrradianceSpectrum& Get(int i, int j, int k) const
+	{
+		int index = i + SCATTERING_TEXTURE_WIDTH * (j + SCATTERING_TEXTURE_HEIGHT * k);
+		if (value_[index][0] < 0.0 * watt_per_square_meter_per_nm)
+		{
+			IrradianceSpectrum rayleigh;
+			IrradianceSpectrum mie;
+			ComputeSingleScatteringTexture(atmosphere_parameters_,
+				transmittance_texture_, float3(i + 0.5, j + 0.5, k + 0.5),
+				rayleigh, mie);
+			value_[index] = rayleigh_ ? rayleigh : mie;
+		}
+		return value_[index];
+	}
+
+private:
+	const AtmosphereParameters& atmosphere_parameters_;
+	const TransmittanceTexture& transmittance_texture_;
+	const bool rayleigh_;
+};
+
+//ÑÓ³Ù¶à´ÎÉ¢ÉäÎÆÀí£¬²½Öè1
+class LazyScatteringDensityTexture : public dimensional::TernaryFunction<
+	SCATTERING_TEXTURE_WIDTH,
+	SCATTERING_TEXTURE_HEIGHT,
+	SCATTERING_TEXTURE_DEPTH,
+	RadianceDensitySpectrum>
+{
+public:
+	LazyScatteringDensityTexture(
+		const AtmosphereParameters& atmosphere_parameters,
+		const TransmittanceTexture& transmittance_texture,
+		const ReducedScatteringTexture& single_rayleigh_scattering_texture,
+		const ReducedScatteringTexture& single_mie_scattering_texture,
+		const ScatteringTexture& multiple_scattering_texture,
+		const IrradianceTexture& irradiance_texture,
+		const int order)
+		: TernaryFunction(
+			RadianceDensitySpectrum(-watt_per_cubic_meter_per_sr_per_nm)),
+		atmosphere_parameters_(atmosphere_parameters),
+		transmittance_texture_(transmittance_texture),
+		single_rayleigh_scattering_texture_(single_rayleigh_scattering_texture),
+		single_mie_scattering_texture_(single_mie_scattering_texture),
+		multiple_scattering_texture_(multiple_scattering_texture),
+		irradiance_texture_(irradiance_texture),
+		order_(order) {}
+
+	virtual const RadianceDensitySpectrum& Get(int i, int j, int k) const
+	{
+		int index = i + SCATTERING_TEXTURE_WIDTH * (j + SCATTERING_TEXTURE_HEIGHT * k);
+		if (value_[index][0] < 0.0 * watt_per_cubic_meter_per_sr_per_nm) {
+			value_[index] = ComputeScatteringDensityTexture(
+				atmosphere_parameters_, transmittance_texture_,
+				single_rayleigh_scattering_texture_, single_mie_scattering_texture_,
+				multiple_scattering_texture_, irradiance_texture_,
+				float3(i + 0.5, j + 0.5, k + 0.5), order_);
+		}
+		return value_[index];
+	}
+
+private:
+	const AtmosphereParameters& atmosphere_parameters_;
+	const TransmittanceTexture& transmittance_texture_;
+	const ReducedScatteringTexture& single_rayleigh_scattering_texture_;
+	const ReducedScatteringTexture& single_mie_scattering_texture_;
+	const ScatteringTexture& multiple_scattering_texture_;
+	const IrradianceTexture& irradiance_texture_;
+	const int order_;
+};
+
+//¶à´ÎÉ¢ÉäÎÆÀí¼ÆËã£¬²½Öè2
+class LazyMultipleScatteringTexture : public dimensional::TernaryFunction<
+	SCATTERING_TEXTURE_WIDTH,
+	SCATTERING_TEXTURE_HEIGHT,
+	SCATTERING_TEXTURE_DEPTH,
+	RadianceSpectrum>
+{
+public:
+	LazyMultipleScatteringTexture(
+		const AtmosphereParameters& atmosphere_parameters,
+		const TransmittanceTexture& transmittance_texture,
+		const ScatteringDensityTexture& scattering_density_texture)
+		: TernaryFunction(RadianceSpectrum(-watt_per_square_meter_per_sr_per_nm)),
+		atmosphere_parameters_(atmosphere_parameters),
+		transmittance_texture_(transmittance_texture),
+		scattering_density_texture_(scattering_density_texture) {}
+
+	virtual const RadianceSpectrum& Get(int i, int j, int k) const
+	{
+		int index = i + SCATTERING_TEXTURE_WIDTH * (j + SCATTERING_TEXTURE_HEIGHT * k);
+		if (value_[index][0] < 0.0 * watt_per_square_meter_per_sr_per_nm)
+		{
+			Number ignored;
+			value_[index] = ComputeMultipleScatteringTexture(atmosphere_parameters_,
+				transmittance_texture_, scattering_density_texture_,
+				float3(i + 0.5, j + 0.5, k + 0.5), ignored);
+		}
+		return value_[index];
+	}
+
+private:
+	const AtmosphereParameters& atmosphere_parameters_;
+	const TransmittanceTexture& transmittance_texture_;
+	const ScatteringDensityTexture& scattering_density_texture_;
+};
+
+//and, finally, a lazy ground irradiance texture:
+class LazyIndirectIrradianceTexture : public dimensional::BinaryFunction<
+	IRRADIANCE_TEXTURE_WIDTH,
+	IRRADIANCE_TEXTURE_HEIGHT,
+	IrradianceSpectrum>
+{
+public:
+	LazyIndirectIrradianceTexture(
+		const AtmosphereParameters& atmosphere_parameters,
+		const ReducedScatteringTexture& single_rayleigh_scattering_texture,
+		const ReducedScatteringTexture& single_mie_scattering_texture,
+		const ScatteringTexture& multiple_scattering_texture,
+		int scattering_order)
+		: BinaryFunction(IrradianceSpectrum(-watt_per_square_meter_per_nm)),
+		atmosphere_parameters_(atmosphere_parameters),
+		single_rayleigh_scattering_texture_(single_rayleigh_scattering_texture),
+		single_mie_scattering_texture_(single_mie_scattering_texture),
+		multiple_scattering_texture_(multiple_scattering_texture),
+		scattering_order_(scattering_order) {}
+
+	virtual const IrradianceSpectrum& Get(int i, int j) const
+	{
+		int index = i + j * IRRADIANCE_TEXTURE_HEIGHT;
+		if (value_[index][0] < 0.0 * watt_per_square_meter_per_nm)
+		{
+			value_[index] = ComputeIndirectIrradianceTexture(atmosphere_parameters_,
+				single_rayleigh_scattering_texture_,
+				single_mie_scattering_texture_,
+				multiple_scattering_texture_,
+				float2(i + 0.5, j + 0.5),
+				scattering_order_);
+		}
+		return value_[index];
+	}
+
+private:
+	const AtmosphereParameters& atmosphere_parameters_;
+	const ReducedScatteringTexture& single_rayleigh_scattering_texture_;
+	const ReducedScatteringTexture& single_mie_scattering_texture_;
+	const ScatteringTexture& multiple_scattering_texture_;
+	int scattering_order_;
+};
 
 //ÎÒ×Ô¼ºµÄtest º¯Êı
 RadianceSpectrum		computeSingleScatting(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s,
 						Number nu, bool ray_r_mu_intersects_ground);
+
+RadianceSpectrum		recomputeSingleScatting(const AtmosphereParameters& atmosphere, Length r, Number mu, Number mu_s,
+			Number nu, bool ray_r_mu_intersects_ground,
+	LazyTransmittanceTexture&	transmittanceTexture,
+	LazySingleScatteringTexture&	rayleighSingleScattingTexture,
+	LazySingleScatteringTexture& mieSingleScattingTexture);
 
 void		computeSingleScattingIntegrand(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, Number nu, 
 	Length d, bool ray_r_mu_intersects_ground,DimensionlessSpectrum& outRayleigh, DimensionlessSpectrum& outMie);
@@ -225,6 +437,10 @@ void		computeSingleScattingIntegrand(const AtmosphereParameters& atmosphere,Leng
 DimensionlessSpectrum		getTransmittance(const AtmosphereParameters& atmosphere,Length r, Number mu, Length d, bool ray_r_mu_intersects_ground);
 
 DimensionlessSpectrum		getTransmittanceToSun(const AtmosphereParameters& atmosphere,Length r, Number mu_s);
+
+bool				testRMuMusNuConversion(AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s,Number nu, bool ray_r_mu_intersects_ground);
+
+
 
 //		}
 //	}

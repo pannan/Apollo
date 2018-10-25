@@ -331,7 +331,36 @@ void SkyRenderCPUTest::updateSunDirection()
 	m_sunDirection.normalize();
 }
 
-#define  ENABLE_THREAD
+void SkyRenderCPUTest::checkRMuMusNuConversion()
+{
+	updateSunDirection();
+
+	Matrix4x4 projMat = m_camera->getProjMat();
+	Matrix4x4 inverseViewMat = m_camera->getViewMat().inverse();
+
+
+	for (int y = 0; y < m_windowHeight; ++y)
+	{
+		for (int x = 0; x < m_windowWidth; ++x)
+		{
+			float u = (float)x / m_windowWidth;
+			float v = (float)y / m_windowHeight;
+
+			Vector3 ray = uvToCameraRay(Vector2(u, v), projMat, inverseViewMat);
+			ray.normalize();
+			double r = m_earthSpacePosVec3.length();
+			Vector3 earthCenterToEyeDirection = m_earthSpacePosVec3 / r;
+			double mu = ray.dot(earthCenterToEyeDirection);
+			double mu_s = m_sunDirection.dot(earthCenterToEyeDirection);
+			double nu = ray.dot(m_sunDirection);
+			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m, mu);
+
+			testRMuMusNuConversion(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
+		}
+	}
+}
+
+//#define  ENABLE_THREAD
 
 void SkyRenderCPUTest::renderSingleScatting()
 {
@@ -357,6 +386,9 @@ void SkyRenderCPUTest::renderSingleScatting()
 	threadChunk.projMat = projMat;
 	threadChunk.sunDirection = m_sunDirection;
 
+	//checkRMuMusNuConversion();
+	//return;
+
 #ifdef ENABLE_THREAD
 
 	std::thread t(computeSkyRadianceThread,m_windowWidth,m_windowHeight,threadChunk, &m_radianceRGBBuffer[0]);
@@ -364,6 +396,11 @@ void SkyRenderCPUTest::renderSingleScatting()
 	
 
 #else
+
+	//m_isProcessing = true;
+	LazyTransmittanceTexture transmittance_texture(m_atmosphereParameters);
+	LazySingleScatteringTexture single_rayleigh_scattering_texture(m_atmosphereParameters, transmittance_texture, true);
+	LazySingleScatteringTexture single_mie_scattering_texture(m_atmosphereParameters, transmittance_texture, false);
 
 	for (int y = 0; y < m_windowHeight; ++y)
 	{
@@ -382,7 +419,9 @@ void SkyRenderCPUTest::renderSingleScatting()
 			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m,mu);
 			if (rayIsIntersectsGround)
 				int ii = 0;
-			RadianceSpectrum rgbSpectrum = computeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround);
+			//RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround);
+			RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
+				transmittance_texture, single_rayleigh_scattering_texture, single_mie_scattering_texture);
 			
 			double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
 			double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);
@@ -397,8 +436,12 @@ void SkyRenderCPUTest::renderSingleScatting()
 			Vector3 color(color_r, color_g, color_b);
 
 			m_radianceRGBBuffer[y * m_windowWidth + x] = color;
+
+		//	++g_atomicProgress;
 		}
 	}
+
+	updateCpuSkyTexture();
 
 #endif
 }

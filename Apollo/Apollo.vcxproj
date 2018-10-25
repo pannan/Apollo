@@ -359,11 +359,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Windows\Win32RenderWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Environment\Atmosphere\Functions.hlsl">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\bin\Assets\Shader\Deferred.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -413,6 +408,11 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
       <FileType>Document</FileType>
     </None>
     <None Include="..\bin\Assets\Shader\TextureVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\Assets\Shader\Functions.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
