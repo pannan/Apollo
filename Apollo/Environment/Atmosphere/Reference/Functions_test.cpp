@@ -822,6 +822,205 @@ public:
 			ComputeMultipleScattering(atmosphere_parameters_, full_transmittance,uniform_scattering_density, kTopRadius, mu, 1.0, mu, true)[0],
 			kRadianceDensity[0] * distance_to_horizon * kEpsilon);
 	}
+
+	/*
+	多个散射纹理，步骤1：检查我们在多次散射计算的第一步得到相同的结果，无论我们是直接计算它，还是通过预计算纹理中的四次插值查找。
+	为此，我们使用与TestComputeScatteringDensity中相同的测试用例，其中最终结果可以通过解析计算。
+	*/
+	void TestComputeAndGetScatteringDensity() 
+	{
+		RadianceSpectrum kRadiance(13.0 * watt_per_square_meter_per_sr_per_nm);
+		TransmittanceTexture full_transmittance(DimensionlessSpectrum(1.0));
+		ReducedScatteringTexture no_single_scattering(
+			IrradianceSpectrum(0.0 * watt_per_square_meter_per_nm));
+		ScatteringTexture uniform_multiple_scattering(kRadiance);
+		IrradianceTexture no_irradiance(
+			IrradianceSpectrum(0.0 * watt_per_square_meter_per_nm));
+		LazyScatteringDensityTexture multiple_scattering1(atmosphere_parameters_,
+			full_transmittance, no_single_scattering, no_single_scattering,
+			uniform_multiple_scattering, no_irradiance, 3);
+
+		RadianceDensitySpectrum scattering_density = GetScattering(
+			atmosphere_parameters_, multiple_scattering1,
+			kBottomRadius, 0.0, 0.0, 1.0, false);
+		SpectralRadianceDensity kExpectedScatteringDensity =
+			(kRayleighScattering + kMieScattering) * kRadiance[0];
+		ExpectNear(
+			1.0,
+			(scattering_density[0] / kExpectedScatteringDensity)(),
+			2.0 * kEpsilon);
+
+		IrradianceSpectrum kIrradiance(13.0 * watt_per_square_meter_per_nm);
+		IrradianceTexture uniform_irradiance(kIrradiance);
+		ScatteringTexture no_multiple_scattering(
+			RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm));
+
+		LazyScatteringDensityTexture multiple_scattering2(atmosphere_parameters_,
+			full_transmittance, no_single_scattering, no_single_scattering,
+			no_multiple_scattering, uniform_irradiance, 3);
+		scattering_density = GetScattering(
+			atmosphere_parameters_, multiple_scattering2,
+			kBottomRadius, 0.0, 0.0, 1.0, false);
+		kExpectedScatteringDensity = (kRayleighScattering + kMieScattering) *
+			kGroundAlbedo / (2.0 * PI * sr) * kIrradiance[0];
+		ExpectNear(
+			1.0,
+			(scattering_density[0] / kExpectedScatteringDensity)(),
+			2.0 * kEpsilon);
+	}
+
+	/*
+	多重散射纹理，步骤2：检查我们得到多次散射计算的第二步的相同结果，无论我们是直接计算它，还是通过预计算纹理中的四次插值查找。 
+	为此，我们使用与TestComputeMultipleScattering中相同的测试用例，其中最终结果可以解析计算。
+	*/
+	void TestComputeAndGetMultipleScattering() 
+	{
+		RadianceDensitySpectrum kRadianceDensity(
+			0.17 * watt_per_cubic_meter_per_sr_per_nm);
+		TransmittanceTexture full_transmittance(DimensionlessSpectrum(1.0));
+		ScatteringDensityTexture uniform_scattering_density(kRadianceDensity);
+		LazyMultipleScatteringTexture multiple_scattering(atmosphere_parameters_,
+			full_transmittance, uniform_scattering_density);
+
+		// Vertical ray, looking bottom.
+		Length r = kBottomRadius * 0.2 + kTopRadius * 0.8;
+		Length distance_to_ground = r - kBottomRadius;
+		ExpectNear(
+			kRadianceDensity[0] * distance_to_ground,
+			GetScattering(atmosphere_parameters_, multiple_scattering,
+				r, -1.0, 1.0, -1.0, true)[0],
+			kRadianceDensity[0] * distance_to_ground * kEpsilon);
+
+		// Ray just below the horizon.
+		Number mu = CosineOfHorizonZenithAngle(kTopRadius);
+		Length distance_to_horizon =
+			sqrt(kTopRadius * kTopRadius - kBottomRadius * kBottomRadius);
+		ExpectNear(
+			kRadianceDensity[0] * distance_to_horizon,
+			GetScattering(atmosphere_parameters_, multiple_scattering,
+				kTopRadius, mu, 1.0, mu, true)[0],
+			kRadianceDensity[0] * distance_to_horizon * kEpsilon);
+	}
+
+	/*
+	地面辐照度，间接情况：检查ComputeIndirectIrradiance中的数值积分是否可以在解析计算此结果的情况下给出预期结果。 
+	更确切地说，如果天空辐射在所有方向上都是相同的，那么地面辐照度应该等于天空辐射的π倍
+	（因为∫[2π,0]∫[π/2,0] cosθ*sinθ*dθ*dφ=π，这也是Lambertian BRDF为1 /π的原因。
+	*/
+	void TestComputeIndirectIrradiance() 
+	{
+		ReducedScatteringTexture no_single_scattering;
+		ScatteringTexture uniform_multiple_scattering(
+			RadianceSpectrum(1.0 * watt_per_square_meter_per_sr_per_nm));
+		IrradianceSpectrum irradiance = ComputeIndirectIrradiance(
+			atmosphere_parameters_, no_single_scattering, no_single_scattering,
+			uniform_multiple_scattering, kBottomRadius, 1.0, 2);
+		// The relative error is about 1% here.
+		ExpectNear(
+			PI,
+			irradiance[0].to(watt_per_square_meter_per_nm),
+			10.0 * kEpsilon);
+	}
+
+	/*
+	映射到地面辐照度纹理坐标：检查r（rbottom和rtop）和mu（-1和1）的边界值是否映射到地面辐照度纹理的边界纹理像素的中心。
+	*/
+	void TestGetIrradianceTextureUvFromRMuS()
+	{
+		ExpectNear(
+			0.5 / IRRADIANCE_TEXTURE_HEIGHT,
+			GetIrradianceTextureUvFromRMuS(
+				atmosphere_parameters_, kBottomRadius, 0.0).y(),
+			kEpsilon);
+		ExpectNear(
+			1.0 - 0.5 / IRRADIANCE_TEXTURE_HEIGHT,
+			GetIrradianceTextureUvFromRMuS(
+				atmosphere_parameters_, kTopRadius, 0.0).y(),
+			kEpsilon);
+		ExpectNear(
+			0.5 / IRRADIANCE_TEXTURE_WIDTH,
+			GetIrradianceTextureUvFromRMuS(
+				atmosphere_parameters_, kBottomRadius, -1.0).x(),
+			kEpsilon);
+		ExpectNear(
+			1.0 - 0.5 / IRRADIANCE_TEXTURE_WIDTH,
+			GetIrradianceTextureUvFromRMuS(
+				atmosphere_parameters_, kBottomRadius, 1.0).x(),
+			kEpsilon);
+	}
+
+	/*
+	从地面辐照度纹理坐标映射：检查地面辐照纹理的边界纹素的中心是否映射到r（rbottom和rtop）和mu（-1和1）的边界值。
+	*/
+	void TestGetRMuSFromIrradianceTextureUv() 
+	{
+		Length r;
+		Number mu_s;
+		GetRMuSFromIrradianceTextureUv(atmosphere_parameters_,
+			float2(0.5 / IRRADIANCE_TEXTURE_WIDTH,
+				0.5 / IRRADIANCE_TEXTURE_HEIGHT),
+			r, mu_s);
+		ExpectNear(kBottomRadius, r, 1.0 * m);
+		GetRMuSFromIrradianceTextureUv(atmosphere_parameters_,
+			float2(0.5 / IRRADIANCE_TEXTURE_WIDTH,
+				1.0 - 0.5 / IRRADIANCE_TEXTURE_HEIGHT),
+			r, mu_s);
+		ExpectNear(kTopRadius, r, 1.0 * m);
+		GetRMuSFromIrradianceTextureUv(atmosphere_parameters_,
+			float2(0.5 / IRRADIANCE_TEXTURE_WIDTH,
+				0.5 / IRRADIANCE_TEXTURE_HEIGHT),
+			r, mu_s);
+		ExpectNear(-1.0, mu_s(), kEpsilon);
+		GetRMuSFromIrradianceTextureUv(atmosphere_parameters_,
+			float2(1.0 - 0.5 / IRRADIANCE_TEXTURE_WIDTH,
+				0.5 / IRRADIANCE_TEXTURE_HEIGHT),
+			r, mu_s);
+		ExpectNear(1.0, mu_s(), kEpsilon);
+	}
+
+	/*
+	地面辐照度纹理：检查我们是否获得相同的地面辐照度，无论我们是使用ComputeIndirectIrradiance直接计算，
+	还是通过预先计算的地面辐照度纹理中的双线性插值查找。
+	*/
+	void TestComputeAndGetIrradiance() 
+	{
+		ReducedScatteringTexture no_single_scattering(IrradianceSpectrum(0.0 * watt_per_square_meter_per_nm));
+		ScatteringTexture fake_multiple_scattering;
+
+		for (unsigned int x = 0; x < fake_multiple_scattering.size_x(); ++x) 
+		{
+			for (unsigned int y = 0; y < fake_multiple_scattering.size_y(); ++y)
+			{
+				for (unsigned int z = 0; z < fake_multiple_scattering.size_z(); ++z) 
+				{
+					double v = z + fake_multiple_scattering.size_z() *(y + fake_multiple_scattering.size_y() * x);
+					fake_multiple_scattering.Set(x, y, z,RadianceSpectrum(v * watt_per_square_meter_per_sr_per_nm));
+				}
+			}
+		}
+
+		Length r = kBottomRadius * 0.8 + kTopRadius * 0.2;
+		Number mu_s = 0.25;
+		int scattering_order = 2;
+		LazyIndirectIrradianceTexture irradiance_texture(atmosphere_parameters_,
+			no_single_scattering, no_single_scattering, fake_multiple_scattering,
+			scattering_order);
+		ExpectNear(
+			1.0,
+			(GetIrradiance(atmosphere_parameters_, irradiance_texture, r, mu_s) /
+				ComputeIndirectIrradiance(atmosphere_parameters_,
+					no_single_scattering, no_single_scattering,
+					fake_multiple_scattering, r, mu_s, scattering_order))[0](),
+			kEpsilon);
+		ExpectNotNear(
+			1.0,
+			(GetIrradiance(atmosphere_parameters_, irradiance_texture, r, mu_s) /
+				ComputeIndirectIrradiance(atmosphere_parameters_,
+					no_single_scattering, no_single_scattering,
+					fake_multiple_scattering, r, 0.5, scattering_order))[0](),
+			kEpsilon);
+	}
+
 private:
 
 	/*
@@ -913,6 +1112,29 @@ private:
 //	"ComputeScatteringDensity",
 //	&FunctionsTest::TestComputeScatteringDensity);
 
+//FunctionsTest compute_multiple_scattering(
+//	"ComputeMultipleScattering",
+//	&FunctionsTest::TestComputeMultipleScattering);
+
+//FunctionsTest compute_and_get_scattering_density(
+//	"ComputeAndGetScatteringDensity",
+//	&FunctionsTest::TestComputeAndGetScatteringDensity);
+//FunctionsTest compute_and_get_multiple_scattering(
+//	"ComputeAndGetMultipleScattering",
+//	&FunctionsTest::TestComputeAndGetMultipleScattering);
+//
+//FunctionsTest compute_indirect_irradiance(
+//	"ComputeIndirectIrradiance",
+//	&FunctionsTest::TestComputeIndirectIrradiance);
+//FunctionsTest get_irradiance_texture_uv_from_rmus(
+//	"GetIrradianceTextureUvFromRMuS",
+//	&FunctionsTest::TestGetIrradianceTextureUvFromRMuS);
+//FunctionsTest get_rmus_from_irradiance_texture_uv(
+//	"GetRMuSFromIrradianceTextureUv",
+//	&FunctionsTest::TestGetRMuSFromIrradianceTextureUv);
+//FunctionsTest get_irradiance(
+//	"GetComputeAndGetIrradiance",
+//	&FunctionsTest::TestComputeAndGetIrradiance);
 
 NAME_SPACE_END
 NAME_SPACE_END

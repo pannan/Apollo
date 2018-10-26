@@ -880,12 +880,7 @@ p -------p'---------q---->ω
 			在n - 2次反弹后的地面辐射(irradiance)接受。我们在下一段解释我们怎么样预计算到纹理。
 			现在，我们假设我们能用下面的函数从预计算纹理接受辐射(irradiance)：
 */
-IrradianceSpectrum GetIrradiance(_IN(AtmosphereParameters) atmosphere, _IN(IrradianceTexture) irradiance_texture, Length r, Number mu_s)
-{
-	//实现在后面，但是现在编译不过，先加点临时代码
-	IrradianceSpectrum ttt;
-	return ttt;
-}
+IrradianceSpectrum GetIrradiance(_IN(AtmosphereParameters) atmosphere, _IN(IrradianceTexture) irradiance_texture, Length r, Number mu_s);
 
 /*
 	在q点的散射系数
@@ -1040,4 +1035,483 @@ RadianceSpectrum ComputeMultipleScattering(
 		rayleigh_mie_sum += rayleigh_mie_i * weight_i;
 	}
 	return rayleigh_mie_sum;
+}
+
+/*
+预计算
+
+如在计算多次散射的整体算法中所解释的，我们需要预先计算纹理中的每个散射order以在计算下一个order时节省计算。 
+并且，为了在纹理中存储函数，我们需要从函数参数到纹理坐标的映射。 
+幸运的是，所有散射order都取决于相同的（r，mu，mu_s，nu）参数作为单个散射，因此我们可以简单地重用为单个散射定义的映射。
+这立即导致以下简单函数：预先计算每次迭代的第一步和第二步的纹理纹理元素，而不是反弹次数：
+*/
+RadianceDensitySpectrum ComputeScatteringDensityTexture(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(ReducedScatteringTexture) single_rayleigh_scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	_IN(ScatteringTexture) multiple_scattering_texture,
+	_IN(IrradianceTexture) irradiance_texture,
+	_IN(float3) gl_frag_coord, int scattering_order) 
+{
+	Length r;
+	Number mu;
+	Number mu_s;
+	Number nu;
+	bool ray_r_mu_intersects_ground;
+	GetRMuMuSNuFromScatteringTextureFragCoord(atmosphere, gl_frag_coord,
+		r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+	return ComputeScatteringDensity(atmosphere, transmittance_texture,
+		single_rayleigh_scattering_texture, single_mie_scattering_texture,
+		multiple_scattering_texture, irradiance_texture, r, mu, mu_s, nu,
+		scattering_order);
+}
+
+RadianceSpectrum ComputeMultipleScatteringTexture(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(ScatteringDensityTexture) scattering_density_texture,
+	_IN(float3) gl_frag_coord, _OUT(Number) nu) 
+{
+	Length r;
+	Number mu;
+	Number mu_s;
+	bool ray_r_mu_intersects_ground;
+	GetRMuMuSNuFromScatteringTextureFragCoord(atmosphere, gl_frag_coord,
+		r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+	return ComputeMultipleScattering(atmosphere, transmittance_texture,
+		scattering_density_texture, r, mu, mu_s, nu,
+		ray_r_mu_intersects_ground);
+}
+
+/*
+查找
+
+同样，我们可以简单地重用为单次散射实现的查找函数GetScattering，以从预先计算的纹理中读取值以进行多次散射。
+实际上，这就是我们在ComputeScatteringDensity和ComputeMultipleScattering函数中所做的。
+
+地面辐照度
+
+地面辐照度是在n≥0反弹之后接收在地面上的太阳光（其中反弹是散射事件或地面反射）。我们需要这个有两个目的：
+
+	1) 当n >= 2 时，为了计算地面上(n - 1)次反弹光路的贡献(需要n - 2次反弹后的地面辐射度)，同时预计算第n-order的散射
+	2)在渲染时，计算地面上最后一次反弹光路的贡献（根据定义，这些路径被排除在我们预先计算的散射纹理之外）
+
+在第一种情况下，我们只需要大气底部水平面的地面辐照度（在预计算期间，我们假设一个完美的球形地面和均匀的反照率）。
+然而，在第二种情况下，我们需要任何高度和任何表面法线的地面辐照度，我们希望预先计算它以提高效率。
+事实上，正如我们的论文所述，我们只对水平表面进行预计算，在任何高度（一般情况下只需要2D纹理，而不是4D纹理），我们对非水平表面使用近似。
+
+以下部分描述了我们如何计算地面辐照度，如何将其存储在预先计算的纹理中，以及我们如何将其读回。
+
+计算
+
+对于直接辐照度，即直接从太阳接收的光，没有任何中间反弹，以及间接辐照度（至少一次反弹），地面辐照度计算是不同的。 
+我们从直接辐照度开始。
+
+辐照度是入射辐射半球的积分，乘以余弦因子。 
+对于直接地面辐照度，入射辐射是大气顶部的太阳辐射，乘以通过大气的透射率。
+并且，由于太阳立体角很小，我们可以用常数近似透射率，即我们可以将它移到辐照度积分之外，这可以在太阳圆盘（而不是半球）的（可见部分）上进行。 
+然后积分变得等于由于球体引起的环境遮挡，也称为视角因子，它在辐射视图因子中给出（第10页）。 对于小立体角，这些复杂的方程可以简化如下：
+*/
+IrradianceSpectrum ComputeDirectIrradiance(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	Length r, Number mu_s) 
+{
+	assert(r >= atmosphere.bottom_radius && r <= atmosphere.top_radius);
+	assert(mu_s >= -1.0 && mu_s <= 1.0);
+
+	Number alpha_s = atmosphere.sun_angular_radius / rad;
+	// Approximate average of the cosine factor mu_s over the visible fraction of
+	// the Sun disc.
+	Number average_cosine_factor =
+		mu_s < -alpha_s ? 0.0 : (mu_s > alpha_s ? mu_s :
+		(mu_s + alpha_s) * (mu_s + alpha_s) / (4.0 * alpha_s));
+
+	return atmosphere.solar_irradiance *
+		GetTransmittanceToTopAtmosphereBoundary(
+			atmosphere, transmittance_texture, r, mu_s) * average_cosine_factor;
+}
+
+/*
+对于间接地面辐照度，必须以数字方式计算半球上的积分。 更确切地说，我们需要计算半球的所有方向ω上的积分：
+
+	1)在n次反弹后从方向w达到的辐射
+	2)余弦因子 wz
+
+这导致以下实现（其中multiple_scattering_texture应该包含第n级散射，如果n> 1，并且scattering_order等于n）：
+*/
+IrradianceSpectrum ComputeIndirectIrradiance(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(ReducedScatteringTexture) single_rayleigh_scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	_IN(ScatteringTexture) multiple_scattering_texture,
+	Length r, Number mu_s, int scattering_order) 
+{
+	assert(r >= atmosphere.bottom_radius && r <= atmosphere.top_radius);
+	assert(mu_s >= -1.0 && mu_s <= 1.0);
+	assert(scattering_order >= 1);
+
+	const int SAMPLE_COUNT = 32;
+	const Angle dphi = pi / Number(SAMPLE_COUNT);
+	const Angle dtheta = pi / Number(SAMPLE_COUNT);
+
+	IrradianceSpectrum result = IrradianceSpectrum(0.0 * watt_per_square_meter_per_nm);
+	float3 omega_s = float3(sqrt(1.0 - mu_s * mu_s), 0.0, mu_s);
+	for (int j = 0; j < SAMPLE_COUNT / 2; ++j) 
+	{
+		Angle theta = (Number(j) + 0.5) * dtheta;
+		for (int i = 0; i < 2 * SAMPLE_COUNT; ++i) 
+		{
+			Angle phi = (Number(i) + 0.5) * dphi;
+			float3 omega = float3(cos(phi) * sin(theta), sin(phi) * sin(theta), cos(theta));
+			SolidAngle domega = (dtheta / rad) * (dphi / rad) * sin(theta) * sr;
+
+			Number nu = dot(omega, omega_s);
+			result += GetScattering(atmosphere, single_rayleigh_scattering_texture,
+				single_mie_scattering_texture, multiple_scattering_texture,
+				r, omega.z, mu_s, nu, false /* ray_r_theta_intersects_ground */,
+				scattering_order) *
+				omega.z * domega;
+		}
+	}
+	return result;
+}
+
+/*
+预计算
+
+为了预先计算纹理中的地面辐照度，我们需要从地面辐照度参数到纹理坐标的映射。
+由于我们仅对水平表面预先计算地面辐照度，因此该辐照度仅取决于r和mu_s，因此我们需要从（r，mu_s）到（u，v）纹理坐标的映射。 
+这里最简单的仿射映射就足够了，因为地面辐照度函数非常平滑：
+*/
+float2 GetIrradianceTextureUvFromRMuS(_IN(AtmosphereParameters) atmosphere,
+	Length r, Number mu_s) 
+{
+	assert(r >= atmosphere.bottom_radius && r <= atmosphere.top_radius);
+	assert(mu_s >= -1.0 && mu_s <= 1.0);
+	Number x_r = (r - atmosphere.bottom_radius) / (atmosphere.top_radius - atmosphere.bottom_radius);
+	Number x_mu_s = mu_s * 0.5 + 0.5;
+	return float2(GetTextureCoordFromUnitRange(x_mu_s, IRRADIANCE_TEXTURE_WIDTH),
+		GetTextureCoordFromUnitRange(x_r, IRRADIANCE_TEXTURE_HEIGHT));
+}
+
+//逆映射
+void GetRMuSFromIrradianceTextureUv(_IN(AtmosphereParameters) atmosphere,
+	_IN(float2) uv, _OUT(Length) r, _OUT(Number) mu_s) 
+{
+	assert(uv.x >= 0.0 && uv.x <= 1.0);
+	assert(uv.y >= 0.0 && uv.y <= 1.0);
+	Number x_mu_s = GetUnitRangeFromTextureCoord(uv.x, IRRADIANCE_TEXTURE_WIDTH);
+	Number x_r = GetUnitRangeFromTextureCoord(uv.y, IRRADIANCE_TEXTURE_HEIGHT);
+	r = atmosphere.bottom_radius + x_r * (atmosphere.top_radius - atmosphere.bottom_radius);
+	mu_s = ClampCosine(2.0 * x_mu_s - 1.0);
+}
+
+/*
+现在可以很容易地定义片段着色器函数来预先计算地面辐照度纹理的纹素，用于直接辐照度：
+*/
+const float2 IRRADIANCE_TEXTURE_SIZE = float2(IRRADIANCE_TEXTURE_WIDTH, IRRADIANCE_TEXTURE_HEIGHT);
+
+IrradianceSpectrum ComputeDirectIrradianceTexture(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(float2) gl_frag_coord)
+{
+	Length r;
+	Number mu_s;
+	GetRMuSFromIrradianceTextureUv(atmosphere, gl_frag_coord / IRRADIANCE_TEXTURE_SIZE, r, mu_s);
+	return ComputeDirectIrradiance(atmosphere, transmittance_texture, r, mu_s);
+}
+
+//间接的
+IrradianceSpectrum ComputeIndirectIrradianceTexture(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(ReducedScatteringTexture) single_rayleigh_scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	_IN(ScatteringTexture) multiple_scattering_texture,
+	_IN(float2) gl_frag_coord, int scattering_order)
+{
+	Length r;
+	Number mu_s;
+	GetRMuSFromIrradianceTextureUv(atmosphere, gl_frag_coord / IRRADIANCE_TEXTURE_SIZE, r, mu_s);
+	return ComputeIndirectIrradiance(atmosphere,
+		single_rayleigh_scattering_texture, single_mie_scattering_texture,
+		multiple_scattering_texture, r, mu_s, scattering_order);
+}
+
+/*
+查找
+
+由于这些预先计算的纹理，我们现在可以通过单个纹理查找获得地面辐照度：
+*/
+IrradianceSpectrum GetIrradiance(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(IrradianceTexture) irradiance_texture,
+	Length r, Number mu_s) 
+{
+	float2 uv = GetIrradianceTextureUvFromRMuS(atmosphere, r, mu_s);
+	return IrradianceSpectrum(texture(irradiance_texture, uv));
+}
+
+/*
+渲染
+
+在这里，我们假设透射率，散射和辐照度纹理已经预先计算，我们提供使用它们来计算天空颜色，空中透视和地面辐射的函数。
+
+更准确地说，我们假设没有相位函数项的单次瑞利散射加上多个散射项（除以维度均匀性的瑞利相位函数）存储在scattering_texture中。
+我们还假设存储了单次Mie散射，没有相位函数项：
+
+	1）单独或在single_mie_scattering_texture中（此选项在我们的原始实现未提供），
+	2）或者，如果定义了COMBINED_SCATTERING_TEXTURES预处理器宏，则在scattering_texture中。
+		 在这种仅适用于GLSL编译器的情况下，瑞利和多次散射存储在RGB通道中，并且单次Mie散射的红色分量存储在alpha通道中。
+
+在第二种情况下，单次Mie散射的绿色和蓝色成分按照我们的论文中的描述进行外推，具有以下功能：
+*/
+#ifdef COMBINED_SCATTERING_TEXTURES
+float3 GetExtrapolatedSingleMieScattering(
+	IN(AtmosphereParameters) atmosphere, IN(vec4) scattering) 
+{
+	if (scattering.r == 0.0) {
+		return float3(0.0);
+	}
+	return scattering.rgb * scattering.a / scattering.r *
+		(atmosphere.rayleigh_scattering.r / atmosphere.mie_scattering.r) *
+		(atmosphere.mie_scattering / atmosphere.rayleigh_scattering);
+}
+#endif
+
+/*
+然后我们可以使用以下函数检索所有散射分量（Rayleigh +一侧多次散射，另一侧是单Mie散射），
+基于GetScattering（我们在这里复制一些代码，而不是使用两次GetScattering调用）
+确保在scattering_texture和single_mie_scattering_texture中的查找之间共享纹理坐标计算：
+*/
+IrradianceSpectrum GetCombinedScattering(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(ReducedScatteringTexture) scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	Length r, Number mu, Number mu_s, Number nu,
+	bool ray_r_mu_intersects_ground,
+	_OUT(IrradianceSpectrum) single_mie_scattering) 
+{
+	float4 uvwz = GetScatteringTextureUvwzFromRMuMuSNu(
+		atmosphere, r, mu, mu_s, nu, ray_r_mu_intersects_ground);
+	Number tex_coord_x = uvwz.x * Number(SCATTERING_TEXTURE_NU_SIZE - 1);
+	Number tex_x = floor(tex_coord_x);
+	Number lerp = tex_coord_x - tex_x;
+	float3 uvw0 = float3((tex_x + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
+	float3 uvw1 = float3((tex_x + 1.0 + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
+#ifdef COMBINED_SCATTERING_TEXTURES
+	float4 combined_scattering =
+		texture(scattering_texture, uvw0) * (1.0 - lerp) +
+		texture(scattering_texture, uvw1) * lerp;
+	IrradianceSpectrum scattering = IrradianceSpectrum(combined_scattering);
+	single_mie_scattering =
+		GetExtrapolatedSingleMieScattering(atmosphere, combined_scattering);
+#else
+	IrradianceSpectrum scattering = IrradianceSpectrum(
+		texture(scattering_texture, uvw0) * (1.0 - lerp) +
+		texture(scattering_texture, uvw1) * lerp);
+	single_mie_scattering = IrradianceSpectrum(
+		texture(single_mie_scattering_texture, uvw0) * (1.0 - lerp) +
+		texture(single_mie_scattering_texture, uvw1) * lerp);
+#endif
+	return scattering;
+}
+
+/*
+天空
+
+为了渲染天空，我们只需要显示天空辐射，我们可以通过在预先计算的散射纹理中查找，乘以在预计算期间省略的相位函数项来获得。 
+我们还可以返回大气的透射率（我们可以通过预先计算的透射率纹理中的单个查找获得），这是正确渲染空间中的对象（例如太阳和月亮）所需的。 
+这导致了以下功能，其中大多数计算用于正确处理大气层外的观察者的情况，以及light shafts的情况：
+*/
+RadianceSpectrum GetSkyRadiance(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(ReducedScatteringTexture) scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	Position camera, _IN(Direction) view_ray, Length shadow_length,
+	_IN(Direction) sun_direction, _OUT(DimensionlessSpectrum) transmittance)
+{
+	// Compute the distance to the top atmosphere boundary along the view ray,
+	// assuming the viewer is in space (or NaN if the view ray does not intersect
+	// the atmosphere).
+	Length r = length(camera);
+	Length rmu = dot(camera, view_ray);
+	Length distance_to_top_atmosphere_boundary = -rmu -
+		sqrt(rmu * rmu - r * r + atmosphere.top_radius * atmosphere.top_radius);
+	// If the viewer is in space and the view ray intersects the atmosphere, move
+	// the viewer to the top atmosphere boundary (along the view ray):
+	if (distance_to_top_atmosphere_boundary > 0.0 * m) {
+		camera = camera + view_ray * distance_to_top_atmosphere_boundary;
+		r = atmosphere.top_radius;
+		rmu += distance_to_top_atmosphere_boundary;
+	}
+	else if (r > atmosphere.top_radius) 
+	{
+		// If the view ray does not intersect the atmosphere, simply return 0.
+		transmittance = DimensionlessSpectrum(1.0);
+		return RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
+	}
+	// Compute the r, mu, mu_s and nu parameters needed for the texture lookups.
+	Number mu = rmu / r;
+	Number mu_s = dot(camera, sun_direction) / r;
+	Number nu = dot(view_ray, sun_direction);
+	bool ray_r_mu_intersects_ground = RayIntersectsGround(atmosphere, r, mu);
+
+	transmittance = ray_r_mu_intersects_ground ? DimensionlessSpectrum(0.0) :
+		GetTransmittanceToTopAtmosphereBoundary(
+			atmosphere, transmittance_texture, r, mu);
+	IrradianceSpectrum single_mie_scattering;
+	IrradianceSpectrum scattering;
+	if (shadow_length == 0.0 * m) 
+	{
+		scattering = GetCombinedScattering(
+			atmosphere, scattering_texture, single_mie_scattering_texture,
+			r, mu, mu_s, nu, ray_r_mu_intersects_ground,
+			single_mie_scattering);
+	}
+	else 
+	{
+		// Case of light shafts (shadow_length is the total length noted l in our
+		// paper): we omit the scattering between the camera and the point at
+		// distance l, by implementing Eq. (18) of the paper (shadow_transmittance
+		// is the T(x,x_s) term, scattering is the S|x_s=x+lv term).
+		Length d = shadow_length;
+		Length r_p =
+			ClampRadius(atmosphere, sqrt(d * d + 2.0 * r * mu * d + r * r));
+		Number mu_p = (r * mu + d) / r_p;
+		Number mu_s_p = (r * mu_s + d * nu) / r_p;
+
+		scattering = GetCombinedScattering(
+			atmosphere, scattering_texture, single_mie_scattering_texture,
+			r_p, mu_p, mu_s_p, nu, ray_r_mu_intersects_ground,
+			single_mie_scattering);
+		DimensionlessSpectrum shadow_transmittance =
+			GetTransmittance(atmosphere, transmittance_texture,
+				r, mu, shadow_length, ray_r_mu_intersects_ground);
+		scattering = scattering * shadow_transmittance;
+		single_mie_scattering = single_mie_scattering * shadow_transmittance;
+	}
+	return scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
+		MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
+}
+
+/*
+空中透视
+
+为了渲染空中透视，我们需要两点之间的透射率和散射（即在观察者和地面上的点之间，其可以在一个高度）。 
+我们已经有了计算两点之间透射率的函数（在纹理中使用2次查找仅包含大气顶部的透射率），但我们没有一个用于2点之间的散射。 
+希望2点之间的散射可以从包含散射到最近大气边界的纹理中的两个查找来计算，对于透射率（除了这里必须减去两个查找结果，而不是分割）。 
+这是我们在以下函数中实现的（初始计算用于正确处理大气层外的查看器的情况）：
+*/
+RadianceSpectrum GetSkyRadianceToPoint(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(ReducedScatteringTexture) scattering_texture,
+	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
+	Position camera, _IN(Position) point, Length shadow_length,
+	_IN(Direction) sun_direction, _OUT(DimensionlessSpectrum) transmittance) 
+{
+	// Compute the distance to the top atmosphere boundary along the view ray,
+	// assuming the viewer is in space (or NaN if the view ray does not intersect
+	// the atmosphere).
+	Direction view_ray = normalize(point - camera);
+	Length r = length(camera);
+	Length rmu = dot(camera, view_ray);
+	Length distance_to_top_atmosphere_boundary = -rmu -
+		sqrt(rmu * rmu - r * r + atmosphere.top_radius * atmosphere.top_radius);
+	// If the viewer is in space and the view ray intersects the atmosphere, move
+	// the viewer to the top atmosphere boundary (along the view ray):
+	if (distance_to_top_atmosphere_boundary > 0.0 * m) 
+	{
+		camera = camera + view_ray * distance_to_top_atmosphere_boundary;
+		r = atmosphere.top_radius;
+		rmu += distance_to_top_atmosphere_boundary;
+	}
+
+	// Compute the r, mu, mu_s and nu parameters for the first texture lookup.
+	Number mu = rmu / r;
+	Number mu_s = dot(camera, sun_direction) / r;
+	Number nu = dot(view_ray, sun_direction);
+	Length d = length(point - camera);
+	bool ray_r_mu_intersects_ground = RayIntersectsGround(atmosphere, r, mu);
+
+	transmittance = GetTransmittance(atmosphere, transmittance_texture,
+		r, mu, d, ray_r_mu_intersects_ground);
+
+	IrradianceSpectrum single_mie_scattering;
+	IrradianceSpectrum scattering = GetCombinedScattering(
+		atmosphere, scattering_texture, single_mie_scattering_texture,
+		r, mu, mu_s, nu, ray_r_mu_intersects_ground,
+		single_mie_scattering);
+
+	// Compute the r, mu, mu_s and nu parameters for the second texture lookup.
+	// If shadow_length is not 0 (case of light shafts), we want to ignore the
+	// scattering along the last shadow_length meters of the view ray, which we
+	// do by subtracting shadow_length from d (this way scattering_p is equal to
+	// the S|x_s=x_0-lv term in Eq. (17) of our paper).
+	d = max(d - shadow_length, 0.0 * m);
+	Length r_p = ClampRadius(atmosphere, sqrt(d * d + 2.0 * r * mu * d + r * r));
+	Number mu_p = (r * mu + d) / r_p;
+	Number mu_s_p = (r * mu_s + d * nu) / r_p;
+
+	IrradianceSpectrum single_mie_scattering_p;
+	IrradianceSpectrum scattering_p = GetCombinedScattering(
+		atmosphere, scattering_texture, single_mie_scattering_texture,
+		r_p, mu_p, mu_s_p, nu, ray_r_mu_intersects_ground,
+		single_mie_scattering_p);
+
+	// Combine the lookup results to get the scattering between camera and point.
+	DimensionlessSpectrum shadow_transmittance = transmittance;
+	if (shadow_length > 0.0 * m) 
+	{
+		// This is the T(x,x_s) term in Eq. (17) of our paper, for light shafts.
+		shadow_transmittance = GetTransmittance(atmosphere, transmittance_texture,
+			r, mu, d, ray_r_mu_intersects_ground);
+	}
+	scattering = scattering - shadow_transmittance * scattering_p;
+	single_mie_scattering =
+		single_mie_scattering - shadow_transmittance * single_mie_scattering_p;
+#ifdef COMBINED_SCATTERING_TEXTURES
+	single_mie_scattering = GetExtrapolatedSingleMieScattering(
+		atmosphere, vec4(scattering, single_mie_scattering.r));
+#endif
+
+	// Hack to avoid rendering artifacts when the sun is below the horizon.
+	single_mie_scattering = single_mie_scattering *
+		smoothstep(Number(0.0), Number(0.01), mu_s);
+
+	return scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
+		MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
+}
+
+/*
+地面
+
+为了渲染地面，我们需要在大气层或地面上0次或更多次弹跳后在地面上接收的辐照度。 
+可以通过GetTransmittanceToSun在透射率纹理中查找来计算直接辐照度，
+而通过预计算辐照度纹理中的查找给出间接辐照度（该纹理仅包含水平表面的辐照度;我们使用本文中定义的近似值） 对于其他情况）。 
+以下功能分别返回直接辐射和间接辐照：
+*/
+IrradianceSpectrum GetSunAndSkyIrradiance(
+	_IN(AtmosphereParameters) atmosphere,
+	_IN(TransmittanceTexture) transmittance_texture,
+	_IN(IrradianceTexture) irradiance_texture,
+	_IN(Position) point, _IN(Direction) normal, _IN(Direction) sun_direction,
+	_OUT(IrradianceSpectrum) sky_irradiance)
+{
+	Length r = length(point);
+	Number mu_s = dot(point, sun_direction) / r;
+
+	// Indirect irradiance (approximated if the surface is not horizontal).
+	sky_irradiance = GetIrradiance(atmosphere, irradiance_texture, r, mu_s) *
+		(1.0 + dot(normal, point) / r) * 0.5;
+
+	// Direct irradiance.
+	return atmosphere.solar_irradiance *
+		GetTransmittanceToSun(
+			atmosphere, transmittance_texture, r, mu_s) *
+		max(dot(normal, sun_direction), 0.0);
 }
