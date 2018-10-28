@@ -22,27 +22,8 @@ public:
 
 	void		init();
 
-	void		saveRadianceRGBBufferToFile();
-
-	//void		computeRayRadianceThread(const Vector2& uv, Vector3& outRadiance);
-	void		onGUI();
-
 protected:
 
-	Vector2	normalizeUV(float x, float y)
-	{
-		float u = (float)x / m_windowWidth;
-		float v = (float)y / m_windowHeight;
-		return Vector2(u, v);
-	}
-
-	void			updateCpuSkyTexture();
-
-	void			rgbaFloatBufferToRgba32Buffer();
-
-	//Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat);
-
-	void			updateSunDirection();
 
 private:
 
