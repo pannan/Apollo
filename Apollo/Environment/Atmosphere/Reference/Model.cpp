@@ -180,10 +180,41 @@ void Model::Init(unsigned int num_scattering_orders)
 	irradiance_texture_->Save(cache_directory_ + "irradiance.dat");
 }
 
+/*
+一旦从缓存计算或加载纹理，它们就可用于计算天空辐射度和太阳和天空辐照度。 
+这样做的函数在functions.h中提供，我们只需要将它们包装在相应的方法中（除了可以直接从模型参数计算的太阳辐射）：
+*/
+RadianceSpectrum Model::GetSolarRadiance() const
+{
+	SolidAngle sun_solid_angle = 2.0 * PI * (1.0 - cos(atmosphere_.sun_angular_radius)) * sr;
+	return atmosphere_.solar_irradiance * (1.0 / sun_solid_angle);
+}
 
+RadianceSpectrum Model::GetSkyRadiance(Position camera, Direction view_ray,
+	Length shadow_length, Direction sun_direction,
+	DimensionlessSpectrum* transmittance) const 
+{
+	return Apollo::Atmosphere::Reference::GetSkyRadiance(atmosphere_, *transmittance_texture_,
+		*scattering_texture_, *single_mie_scattering_texture_,
+		camera, view_ray, shadow_length, sun_direction, *transmittance);
+}
 
+RadianceSpectrum Model::GetSkyRadianceToPoint(Position camera, Position point,
+	Length shadow_length, Direction sun_direction,
+	DimensionlessSpectrum* transmittance) const 
+{
+	return Apollo::Atmosphere::Reference::GetSkyRadianceToPoint(atmosphere_, *transmittance_texture_,
+		*scattering_texture_, *single_mie_scattering_texture_,
+		camera, point, shadow_length, sun_direction, *transmittance);
+}
 
-
+IrradianceSpectrum Model::GetSunAndSkyIrradiance(Position point,
+	Direction normal, Direction sun_direction,
+	IrradianceSpectrum* sky_irradiance) const 
+{
+	return Apollo::Atmosphere::Reference::GetSunAndSkyIrradiance(atmosphere_, *transmittance_texture_,
+		*irradiance_texture_, point, normal, sun_direction, *sky_irradiance);
+}
 
 
 NAME_SPACE_END

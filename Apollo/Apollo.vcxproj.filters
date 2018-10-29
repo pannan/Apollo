@@ -399,6 +399,9 @@
     <ClInclude Include="Environment\Atmosphere\Reference\Model.h">
       <Filter>Environment\Atmosphere\Reference</Filter>
     </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Model.h">
+      <Filter>Environment\Atmosphere</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -629,6 +632,9 @@
     <ClCompile Include="Environment\Atmosphere\Reference\Model.cpp">
       <Filter>Environment\Atmosphere\Reference</Filter>
     </ClCompile>
+    <ClCompile Include="Environment\Atmosphere\Reference\Model_Test.cpp">
+      <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\bin\Assets\Shader\Deferred.hlsl">
@@ -685,5 +691,10 @@
     <None Include="..\bin\Assets\Shader\Functions.hlsl">
       <Filter>Shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\bin\Assets\Shader\Model_Test.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

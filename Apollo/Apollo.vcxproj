@@ -213,6 +213,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\TextureDX11ResourceFactory.h" />
     <ClInclude Include="Environment\Atmosphere\Constants.h" />
     <ClInclude Include="Environment\Atmosphere\Definitions.h" />
+    <ClInclude Include="Environment\Atmosphere\Model.h" />
     <ClInclude Include="Environment\Atmosphere\Reference\Definitions.h" />
     <ClInclude Include="Environment\Atmosphere\Reference\Functions.h" />
     <ClInclude Include="Environment\Atmosphere\Reference\Model.h" />
@@ -313,6 +314,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Environment\Atmosphere\Reference\Functions.cpp" />
     <ClCompile Include="Environment\Atmosphere\Reference\Functions_test.cpp" />
     <ClCompile Include="Environment\Atmosphere\Reference\Model.cpp" />
+    <ClCompile Include="Environment\Atmosphere\Reference\Model_Test.cpp" />
     <ClCompile Include="Environment\Atmosphere\Reference\SkyRenderCPUTest.cpp" />
     <ClCompile Include="Graphics\AABB.cpp" />
     <ClCompile Include="Graphics\Camera.cpp" />
@@ -415,6 +417,11 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\bin\Assets\Shader\Functions.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\Assets\Shader\Model_Test.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
