@@ -221,6 +221,19 @@ namespace Apollo
 				return rayleigh + mie;
 			}
 
+			RadianceSpectrum getSkyScatting(const AtmosphereParameters& atmosphere, Length r, Number mu, Number mu_s,
+				Number nu, bool ray_r_mu_intersects_ground,
+				ReducedScatteringTexture& scattering_texture, ReducedScatteringTexture& single_mie_scattering_texture)
+			{
+				IrradianceSpectrum single_mie_scattering;
+				IrradianceSpectrum scattering = GetCombinedScattering(
+					atmosphere, scattering_texture, single_mie_scattering_texture,
+					r, mu, mu_s, nu, ray_r_mu_intersects_ground, single_mie_scattering);
+
+				return scattering * RayleighPhaseFunction(nu) + single_mie_scattering *
+					MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
+			}
+
 		}
 	}
 }

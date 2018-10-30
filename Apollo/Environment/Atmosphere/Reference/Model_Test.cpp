@@ -7,6 +7,7 @@
 #include "Environment/Atmosphere/Reference/Definitions.h"
 #include "Environment/Atmosphere/Model.h"
 #include "Dimensional/test_case.h"
+#include "SDK/minpng.h"
 
 NAME_SPACE_BEGIN_APOLLO
 NAME_SPACE_BEGIN_ATMOSPHERE
@@ -201,7 +202,7 @@ public:
 	void InitCpuModel() 
 	{
 		reference_model_.reset(
-			new Apollo::Atmosphere::Reference::Model(atmosphere_parameters_, "output/"));
+			new Apollo::Atmosphere::Reference::Model(atmosphere_parameters_, "h:\\"));
 		reference_model_->Init();
 	}
 
@@ -396,6 +397,7 @@ public:
 				//progress_bar.Increment(1);
 			}
 		}
+		write_png("c:\\model_test.png", pixels.get(), kWidth, kHeight);
 		return pixels;
 	}
 
@@ -466,6 +468,41 @@ public:
 		//ExpectLess(47.0, Compare(RenderGpuImage(), RenderCpuImage(), kCaption, false));
 	}
 
+	/*
+	以下测试用例与前一个测试用例几乎相同，只是我们使用GPU模型中的combine_textures选项。 
+	这导致GPU侧的一些近似值，而不是CPU模型中存在的近似值。
+	因此，与之前的测试案例相比，我们预计两幅图像之间的差异会略大：
+	*/
+	void TestRadianceCombineTextures() 
+	{
+		const std::string kCaption = "Left: GPU model, combine_textures = true. "
+			"Right: CPU model. Both images show the spectral radiance at 3 "
+			"predefined wavelengths (i.e. no conversion to sRGB via CIE XYZ).";
+		InitGpuModel(true /* combine_textures */,
+			false /* precomputed_luminance */);
+		InitCpuModel();
+		SetViewParameters(65.0 * deg, 90.0 * deg, false /* use_luminance */);
+		ExpectLess(
+			46.0, Compare(RenderGpuImage(), RenderCpuImage(), kCaption, true));
+	}
+
+	/*
+	对于日落场景，以下测试用例与前一测试用例相同。 
+	在这种情况下，单个Mie散射贡献大于之前的测试，因此我们期望GPU和CPU结果之间的差异更大（由于单个Mie散射项的GPU近似）：
+	*/
+	void TestRadianceCombineTexturesSunSet()
+	{
+		const std::string kCaption = "Left: GPU model, combine_textures = true. "
+			"Right: CPU model. Both images show the spectral radiance at 3 "
+			"predefined wavelengths (i.e. no conversion to sRGB via CIE XYZ).";
+		InitGpuModel(true /* combine_textures */,
+			false /* precomputed_luminance */);
+		InitCpuModel();
+		SetViewParameters(88.0 * deg, 90.0 * deg, false /* use_luminance */);
+		RenderCpuImage();
+	//	ExpectLess(40.0, Compare(RenderGpuImage(), RenderCpuImage(), kCaption, true));
+	}
+
 private:
 	std::string name_;
 	AtmosphereParameters atmosphere_parameters_;
@@ -484,9 +521,17 @@ private:
 	Direction sun_direction_;
 };
 
-ModelTest radiance1(
-	"RadianceSeparateTextures",
-	&ModelTest::TestRadianceSeparateTextures);
+//ModelTest radiance1(
+//	"RadianceSeparateTextures",
+//	&ModelTest::TestRadianceSeparateTextures);
+//
+//ModelTest radiance2(
+//	"RadianceCombineTextures",
+//	&ModelTest::TestRadianceCombineTextures);
+
+//ModelTest radiance3(
+//	"RadianceCombineTexturesSunSet",
+//	&ModelTest::TestRadianceCombineTexturesSunSet);
 
 NAME_SPACE_END
 NAME_SPACE_END

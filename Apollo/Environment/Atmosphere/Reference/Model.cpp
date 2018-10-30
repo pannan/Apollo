@@ -88,6 +88,8 @@ void Model::Init(unsigned int num_scattering_orders)
 		}
 	}
 
+	transmittance_texture_->Save(cache_directory_ + "transmittance.dat");
+
 	//计算直接辐射度，存储在delta_irradiance_texture
 	//用0初始化irradiance_texture（我们想要的直接辐射度不在irradiance_Texture里，只是来自天空的辐射度）
 	for (unsigned int j = 0; j < IRRADIANCE_TEXTURE_HEIGHT; ++j)
@@ -151,6 +153,7 @@ void Model::Init(unsigned int num_scattering_orders)
 				delta_irradiance_texture->Set(i, j, delta_irradiance);
 			}
 		}
+
 		(*irradiance_texture_) += *delta_irradiance_texture;
 
 		//计算多次散射，并储存在delta_multiple_scattering_texture,并且在scattering_texture_中累加
@@ -174,7 +177,7 @@ void Model::Init(unsigned int num_scattering_orders)
 		}
 	}
 
-	transmittance_texture_->Save(cache_directory_ + "transmittance.dat");
+	
 	scattering_texture_->Save(cache_directory_ + "scattering.dat");
 	single_mie_scattering_texture_->Save(cache_directory_ + "single_mie_scattering.dat");
 	irradiance_texture_->Save(cache_directory_ + "irradiance.dat");

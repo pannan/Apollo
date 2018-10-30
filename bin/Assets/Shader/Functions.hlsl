@@ -1188,6 +1188,7 @@ IrradianceSpectrum ComputeIndirectIrradiance(
 float2 GetIrradianceTextureUvFromRMuS(_IN(AtmosphereParameters) atmosphere,
 	Length r, Number mu_s) 
 {
+	//这里没考虑浮点数误差，r可能为6359.999999999,先屏蔽
 	assert(r >= atmosphere.bottom_radius && r <= atmosphere.top_radius);
 	assert(mu_s >= -1.0 && mu_s <= 1.0);
 	Number x_r = (r - atmosphere.bottom_radius) / (atmosphere.top_radius - atmosphere.bottom_radius);

@@ -431,6 +431,10 @@ RadianceSpectrum		recomputeSingleScatting(const AtmosphereParameters& atmosphere
 	LazySingleScatteringTexture&	rayleighSingleScattingTexture,
 	LazySingleScatteringTexture& mieSingleScattingTexture);
 
+RadianceSpectrum		getSkyScatting(const AtmosphereParameters& atmosphere, Length r, Number mu, Number mu_s,
+	Number nu, bool ray_r_mu_intersects_ground, ReducedScatteringTexture& scattering_texture,
+	ReducedScatteringTexture& single_mie_scattering_texture);
+
 void		computeSingleScattingIntegrand(const AtmosphereParameters& atmosphere,Length r, Number mu, Number mu_s, Number nu, 
 	Length d, bool ray_r_mu_intersects_ground,DimensionlessSpectrum& outRayleigh, DimensionlessSpectrum& outMie);
 

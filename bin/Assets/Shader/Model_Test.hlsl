@@ -133,8 +133,8 @@ RadianceSpectrum GetViewRayRadiance(Direction view_ray,Direction view_ray_diff)
 
 	// Compute the radiance reflected by the sphere, if the ray intersects it.
 	Number sphere_alpha = 0.0;
-	RadianceSpectrum sphere_radiance =
-		RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
+	RadianceSpectrum sphere_radiance = RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
+
 	if (distance_to_intersection > 0.0 * m) 
 	{
 		// Compute the distance between the view ray and the sphere, and the
@@ -170,23 +170,36 @@ RadianceSpectrum GetViewRayRadiance(Direction view_ray,Direction view_ray_diff)
 	在下面我们重复上面相同的步骤，但是对于行星球体P而不是球体S（这里不需要平滑的不透明度，所以我们不计算它。
 	还要注意我们如何调制太阳和天空的辐照度 太阳和天空能见度因素接收在地面上）：
 	*/
-	// Compute the distance between the view ray line and the Earth center,
-	// and the distance between the camera and the intersection of the view
-	// ray with the ground (or NaN if there is no intersection).
+
+	/*
+	计算视线和地球中心之间的距离，
+	以及相机和view ray和地面交点的距离（如果没有交叉点则为NaN）
+	*/
+
 	p = camera_ - earth_center_;
 	p_dot_v = dot(p, view_direction);
 	p_dot_p = dot(p, p);
 	Area ray_earth_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
-	distance_to_intersection = -p_dot_v - sqrt(
-		earth_center_.z * earth_center_.z - ray_earth_center_squared_distance);
+	distance_to_intersection = -p_dot_v - sqrt(earth_center_.z * earth_center_.z - ray_earth_center_squared_distance);
 
 	// Compute the radiance reflected by the ground, if the ray intersects it.
 	Number ground_alpha = 0.0;
-	RadianceSpectrum ground_radiance =
-		RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
+	RadianceSpectrum ground_radiance = RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
 	if (distance_to_intersection > 0.0 * m) 
 	{
 		Position point = camera_ + view_direction * distance_to_intersection;
+		//现在有个问题，view ray和地面交点p，可能计算出来p到地心的距离为6359.999999，这个误差需要处理
+		//判断point到地心距离
+		Length pointDisToEarthCenter = length(point - earth_center_);
+		if (pointDisToEarthCenter < atmosphere_parameters_.bottom_radius)
+		{
+			Length dx = atmosphere_parameters_.bottom_radius - pointDisToEarthCenter;
+			Direction vec = (point - earth_center_) / pointDisToEarthCenter;
+			point = point + vec * dx * 1.5;
+
+			//Length pointDisToEarthCenter2 = length(point - earth_center_);
+			//int ii = 0;
+		}
 		Direction normal = normalize(point - earth_center_);
 
 		// Compute the radiance reflected by the ground.

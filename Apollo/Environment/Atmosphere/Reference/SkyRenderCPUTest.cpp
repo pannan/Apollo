@@ -8,7 +8,7 @@
 #include "TextureDX11ResourceFactory.h"
 #include "RendererDX11.h"
 #include "Texture2dDX11.h"
-#include "SDK/minpng.h"
+//#include "SDK/minpng.h"
 #include <thread>
 #include "imgui.h"
 #include<atomic>  
@@ -146,6 +146,27 @@ void SkyRenderCPUTest::init()
 		kLambdaMin * nm, kLambdaMax * nm, absorption_extinction);
 	m_atmosphereParameters.ground_albedo = DimensionlessSpectrum(0.1);
 	m_atmosphereParameters.mu_s_min = cos(102.0 * deg);
+
+	initLookupTexture();
+}
+
+void SkyRenderCPUTest::initLookupTexture()
+{
+	//transmittance_texture_.reset(new TransmittanceTexture());
+	m_scattering_texture.reset(new ReducedScatteringTexture());
+	m_single_mie_scattering_texture.reset(new ReducedScatteringTexture());
+
+	std::ifstream file;
+	file.open("h:\\scattering.dat");
+	if (file.good())
+	{
+		file.close();
+		//transmittance_texture_->Load(cache_directory_ + "transmittance.dat");
+		m_scattering_texture->Load("h:\\scattering.dat");
+		m_single_mie_scattering_texture->Load("h:\\single_mie_scattering.dat");
+		//irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
+		return;
+	}
 }
 
 Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat)
@@ -420,8 +441,10 @@ void SkyRenderCPUTest::renderSingleScatting()
 			if (rayIsIntersectsGround)
 				int ii = 0;
 			//RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround);
-			RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
-				transmittance_texture, single_rayleigh_scattering_texture, single_mie_scattering_texture);
+			//RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
+			//	transmittance_texture, single_rayleigh_scattering_texture, single_mie_scattering_texture);
+			RadianceSpectrum rgbSpectrum = getSkyScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
+				*m_scattering_texture.get(), *m_single_mie_scattering_texture.get());
 			
 			double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
 			double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);
@@ -529,7 +552,7 @@ void SkyRenderCPUTest::saveRadianceRGBBufferToFile()
 
 	rgbaFloatBufferToRgba32Buffer();
 
-	write_png("c:\\out.png", &m_rgba32Buffer[0], m_windowWidth, m_windowHeight);
+	//write_png("c:\\out.png", &m_rgba32Buffer[0], m_windowWidth, m_windowHeight);
 
 	//SAFE_DELETE_ARRAY(iRGBBuffer);
 }

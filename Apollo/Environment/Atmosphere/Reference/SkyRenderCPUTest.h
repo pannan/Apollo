@@ -4,6 +4,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 #include "Definitions.h"
+#include "Environment/Atmosphere/Reference/Definitions.h"
 
 NAME_SPACE_BEGIN_APOLLO
 
@@ -46,6 +47,8 @@ protected:
 
 	void			checkRMuMusNuConversion();
 
+	void			initLookupTexture();
+
 private:
 
 	bool			m_isProcessing;
@@ -66,6 +69,9 @@ private:
 	std::vector<uint32_t>		m_rgba32Buffer;
 
 	AtmosphereParameters m_atmosphereParameters;
+
+	std::unique_ptr<ReducedScatteringTexture> m_scattering_texture;
+	std::unique_ptr<ReducedScatteringTexture> m_single_mie_scattering_texture;
 };
 
 NAME_SPACE_END
