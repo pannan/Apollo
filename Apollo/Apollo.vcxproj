@@ -209,6 +209,8 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="DX11\SubMeshDX11.h" />
     <ClInclude Include="DX11\Texture2dConfigDX11.h" />
     <ClInclude Include="DX11\Texture2dDX11.h" />
+    <ClInclude Include="DX11\Texture3dConfigDX11.h" />
+    <ClInclude Include="DX11\Texture3dDX11.h" />
     <ClInclude Include="DX11\TextureCubeMapDX11.h" />
     <ClInclude Include="DX11\TextureDX11ResourceFactory.h" />
     <ClInclude Include="Environment\Atmosphere\Constants.h" />
@@ -309,6 +311,8 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="DX11\SubMeshDX11.cpp" />
     <ClCompile Include="DX11\Texture2dConfigDX11.cpp" />
     <ClCompile Include="DX11\Texture2dDX11.cpp" />
+    <ClCompile Include="DX11\Texture3dConfigDX11.cpp" />
+    <ClCompile Include="DX11\Texture3dDX11.cpp" />
     <ClCompile Include="DX11\TextureCubeMapDX11.cpp" />
     <ClCompile Include="DX11\TextureDX11ResourceFactory.cpp" />
     <ClCompile Include="Environment\Atmosphere\Reference\Functions.cpp" />
@@ -422,6 +426,11 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\bin\Assets\Shader\Model_Test.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\bin\Assets\Shader\MySkyTest.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

@@ -12,6 +12,9 @@
 #include <thread>
 #include "imgui.h"
 #include<atomic>  
+#include "TextureDX11ResourceFactory.h"
+#include "Texture3dConfigDX11.h"
+#include "Environment/Atmosphere/Reference/Definitions.h"
 
 #define _IN(x) const x&
 #define _OUT(x) x&
@@ -156,17 +159,63 @@ void SkyRenderCPUTest::initLookupTexture()
 	m_scattering_texture.reset(new ReducedScatteringTexture());
 	m_single_mie_scattering_texture.reset(new ReducedScatteringTexture());
 
+	const size_t testSize = sizeof(IrradianceSpectrum);
 	std::ifstream file;
 	file.open("h:\\scattering.dat");
-	if (file.good())
-	{
-		file.close();
-		//transmittance_texture_->Load(cache_directory_ + "transmittance.dat");
-		m_scattering_texture->Load("h:\\scattering.dat");
-		m_single_mie_scattering_texture->Load("h:\\single_mie_scattering.dat");
-		//irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
+	if (!file.good())
 		return;
+
+
+	file.close();
+	//transmittance_texture_->Load(cache_directory_ + "transmittance.dat");
+	m_scattering_texture->Load("h:\\scattering.dat");
+	m_single_mie_scattering_texture->Load("h:\\single_mie_scattering.dat");
+	//irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
+
+
+	std::vector<Vector4> rgbFloatBuffer;
+	rgbFloatBuffer.resize(SCATTERING_TEXTURE_WIDTH * SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_DEPTH);
+	void* test = &rgbFloatBuffer[0];
+	for (int k = 0; k < SCATTERING_TEXTURE_DEPTH; ++k)
+	{
+		float fk = (float)(k + 0.5) / SCATTERING_TEXTURE_DEPTH;
+
+		for (int j = 0; j < SCATTERING_TEXTURE_HEIGHT; ++j)
+		{
+			float fj = (float)(j + 0.5) / SCATTERING_TEXTURE_HEIGHT;
+
+			for (int i = 0; i < SCATTERING_TEXTURE_WIDTH; ++i)
+			{
+				float fi = (float)(i + 0.5) / SCATTERING_TEXTURE_WIDTH;
+
+				float3 uvw(fi, fj, fk);
+				IrradianceSpectrum irradiacne = lookupScatteringTexture(*m_scattering_texture.get(), uvw);
+				float r =  irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
+				float g = irradiacne(kLambdaG).to(watt_per_square_meter_per_nm);
+				float b = irradiacne(kLambdaB).to(watt_per_square_meter_per_nm);
+
+				size_t index = k * (SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH) +
+					j * SCATTERING_TEXTURE_WIDTH + i;
+				rgbFloatBuffer[index] = Vector4(r, g, b,1.0f);
+			}
+		}
 	}
+
+	Texture3dConfigDX11 tex3dConfig;
+	tex3dConfig.SetWidth(SCATTERING_TEXTURE_WIDTH);
+	tex3dConfig.SetHeight(SCATTERING_TEXTURE_HEIGHT);
+	tex3dConfig.SetDepth(SCATTERING_TEXTURE_DEPTH);
+	tex3dConfig.SetFormat(DXGI_FORMAT_R32G32B32A32_FLOAT);
+	tex3dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
+	tex3dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
+
+	D3D11_SUBRESOURCE_DATA subResource;
+	subResource.pSysMem = &rgbFloatBuffer[0];
+	subResource.SysMemPitch = SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+	subResource.SysMemSlicePitch = SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+	uint32_t textureHandle =  TextureDX11ResourceFactory::getInstance().createTexture3D("Scattering_Texture", tex3dConfig, &subResource);
+
+	m_scatteringTextureDX3d = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
 }
 
 Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat)
@@ -443,8 +492,9 @@ void SkyRenderCPUTest::renderSingleScatting()
 			//RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround);
 			//RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
 			//	transmittance_texture, single_rayleigh_scattering_texture, single_mie_scattering_texture);
-			RadianceSpectrum rgbSpectrum = getSkyScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
-				*m_scattering_texture.get(), *m_single_mie_scattering_texture.get());
+			//RadianceSpectrum rgbSpectrum = getSkyScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
+			//	*m_scattering_texture.get(), *m_single_mie_scattering_texture.get());
+			RadianceSpectrum rgbSpectrum = computeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
 			
 			double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
 			double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);

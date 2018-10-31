@@ -139,7 +139,7 @@ void Model::Init(unsigned int num_scattering_orders)
 			}
 		}
 
-		//计算简介辐射度，储存在delta_irradiance_texture并在irradiance_texture_中累加
+		//计算间接辐射度，储存在delta_irradiance_texture并在irradiance_texture_中累加
 		for (unsigned int j = 0; j < IRRADIANCE_TEXTURE_HEIGHT; ++j)
 		{
 			for (unsigned int i = 0; i < IRRADIANCE_TEXTURE_WIDTH; ++i)

@@ -6,6 +6,7 @@
 #include "CharacterTools.h"
 #include "RendererDX11.h"
 #include "Texture2dDX11.h"
+#include "Texture3dDX11.h"
 #include "TextureCubeMapDX11.h"
 
 using namespace Apollo;
@@ -284,6 +285,57 @@ uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Te
 																																	shaderResourceView,unorderedAccessView));
 
 	m_textureResourceList.push_back(tex2dDX11);
+
+	return handle;
+}
+
+uint32_t	TextureDX11ResourceFactory::createTexture3D(const std::string& name, Texture3dConfigDX11& config,
+	D3D11_SUBRESOURCE_DATA* subResource /* = nullptr */)
+{
+	uint32_t index = m_textureResourceList.size();
+	uint32_t handle = RT_TEXTURE;
+	handle |= (index << 8);
+
+	ID3D11Texture3D * tex3d = nullptr;
+	HRESULT hr = RendererDX11::getInstance().getDevice()->CreateTexture3D(&config.GetTextureDesc(), subResource, &tex3d);
+	if (hr != S_OK)
+	{
+		LogManager::getInstance().log(name + " create failed!");
+		return 0;
+	}
+
+	//DepthStencilViewComPtr			depthStencilView;
+	//RenderTargetViewComPtr			renderTargetView;
+	ShaderResourceViewComPtr		shaderResourceView;
+	//UnorderedAccessViewComPtr	unorderedAccessView;
+
+	D3D11_TEXTURE3D_DESC& desc = config.GetTextureDesc();
+	
+	//srv
+	if (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC resourceViewDesc;
+		resourceViewDesc.Format = desc.Format;
+
+		resourceViewDesc.ViewDimension = D3D_SRV_DIMENSION_TEXTURE3D;
+		resourceViewDesc.Texture3D.MipLevels = 1;
+		resourceViewDesc.Texture3D.MostDetailedMip = 0;		
+
+		if (FAILED(RendererDX11::getInstance().getDevice()->CreateShaderResourceView(tex3d,
+			&resourceViewDesc, shaderResourceView.GetAddressOf())))
+		{
+			LogManager::getInstance().log("Failed to create texture resource view.");
+		}
+		else if (desc.MipLevels == 0)
+		{
+			RendererDX11::getInstance().getDeviceContex()->GenerateMips(shaderResourceView.Get());
+		}
+	}
+
+
+	TextureResourcePtr tex3dDX11 = TextureResourcePtr(new Texture3dDX11(name, handle, desc, tex3d,shaderResourceView));
+
+	m_textureResourceList.push_back(tex3dDX11);
 
 	return handle;
 }

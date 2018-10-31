@@ -234,6 +234,10 @@ namespace Apollo
 					MiePhaseFunction(atmosphere.mie_phase_function_g, nu);
 			}
 
+			IrradianceSpectrum lookupScatteringTexture(ReducedScatteringTexture& scattering_texture, float3 uvw)
+			{
+				return texture(scattering_texture, uvw);
+			}
 		}
 	}
 }

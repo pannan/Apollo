@@ -63,7 +63,7 @@ const Luminance kcd_per_square_meter = kcd / m2;
 #define ScatteringDensityTexture sampler3D
 #define IrradianceTexture sampler2D
 
-SamplerState	TransmittanceTexture_Sampler;
+
 
 /*
 大气层参数

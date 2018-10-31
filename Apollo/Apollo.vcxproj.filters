@@ -402,6 +402,12 @@
     <ClInclude Include="Environment\Atmosphere\Model.h">
       <Filter>Environment\Atmosphere</Filter>
     </ClInclude>
+    <ClInclude Include="DX11\Texture3dConfigDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\Texture3dDX11.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -635,6 +641,12 @@
     <ClCompile Include="Environment\Atmosphere\Reference\Model_Test.cpp">
       <Filter>Environment\Atmosphere\Reference</Filter>
     </ClCompile>
+    <ClCompile Include="DX11\Texture3dConfigDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\Texture3dDX11.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\bin\Assets\Shader\Deferred.hlsl">
@@ -691,9 +703,12 @@
     <None Include="..\bin\Assets\Shader\Functions.hlsl">
       <Filter>Shader</Filter>
     </None>
+    <None Include="..\bin\Assets\Shader\Model_Test.hlsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\bin\Assets\Shader\Model_Test.hlsl">
+    <FxCompile Include="..\bin\Assets\Shader\MySkyTest.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

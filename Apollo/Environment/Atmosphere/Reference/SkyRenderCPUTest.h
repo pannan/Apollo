@@ -5,6 +5,7 @@
 #include "Matrix4x4.h"
 #include "Definitions.h"
 #include "Environment/Atmosphere/Reference/Definitions.h"
+#include "Texture3dDX11.h"
 
 NAME_SPACE_BEGIN_APOLLO
 
@@ -72,6 +73,8 @@ private:
 
 	std::unique_ptr<ReducedScatteringTexture> m_scattering_texture;
 	std::unique_ptr<ReducedScatteringTexture> m_single_mie_scattering_texture;
+
+	Texture3dDX11*		m_scatteringTextureDX3d;
 };
 
 NAME_SPACE_END

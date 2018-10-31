@@ -4,6 +4,7 @@
 #include "Singleton.h"
 #include "Resource.h"
 #include "Texture2dConfigDX11.h"
+#include "Texture3dConfigDX11.h"
 #include "TextureResource.h"
 
 namespace Apollo
@@ -26,6 +27,9 @@ namespace Apollo
 
 		//创建一个空的纹理，没有初始化类容
 		uint32_t				createTexture2D(const std::string& name, Texture2dConfigDX11& config, 
+			D3D11_SUBRESOURCE_DATA* subResource = nullptr);
+
+		uint32_t				createTexture3D(const std::string& name, Texture3dConfigDX11& config,
 			D3D11_SUBRESOURCE_DATA* subResource = nullptr);
 
 	protected:

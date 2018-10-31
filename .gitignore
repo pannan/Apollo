@@ -78,3 +78,6 @@ Temporary Items
 *.iobj
 *.iobj
 *.iobj
+x64/Release/Apollo.iobj
+x64/Release/Apollo.ipdb
+x64/Release/Apollo.ipdb

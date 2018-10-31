@@ -350,7 +350,11 @@ DimensionlessSpectrum GetTransmittanceToTopAtmosphereBoundary(_IN(AtmospherePara
 {
 	float2 uv = GetTransmittanceTextureUvFromRMu(atmosphere, r, mu);
 	//return DimensionlessSpectrum(transmittance_texture.Sample(TransmittanceTexture_Sampler, uv));
+#ifdef _HLSL
+	return transmittance_texture.Sample(TransmittanceSampler, uv).rgb;
+#else
 	return DimensionlessSpectrum(texture(transmittance_texture, uv));
+#endif
 }
 
 /*
@@ -794,7 +798,12 @@ AbstractSpectrum GetScattering(_IN(AtmosphereParameters) atmosphere,
 	Number lerp = tex_coord_x - tex_x;
 	float3 uvw0 = float3((tex_x + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
 	float3 uvw1 = float3((tex_x + 1.0 + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
+#ifdef _HLSL
+	return scattering_texture.Sample(ScatteringTextureSampler, uvw0).rgb * (1.0 - lerp) + 
+		scattering_texture.Sample(ScatteringTextureSampler, uvw1).rgb * lerp;
+#else
 	return AbstractSpectrum(texture(scattering_texture, uvw0) * (1.0 - lerp) + texture(scattering_texture, uvw1) * lerp);
+#endif
 }
 
 /*
@@ -1252,7 +1261,11 @@ IrradianceSpectrum GetIrradiance(
 	Length r, Number mu_s) 
 {
 	float2 uv = GetIrradianceTextureUvFromRMuS(atmosphere, r, mu_s);
+#ifdef _HLSL
+	return irradiance_texture.Sample(IrradianceTextureSampler, uv).rgb;
+#else
 	return IrradianceSpectrum(texture(irradiance_texture, uv));
+#endif
 }
 
 /*
@@ -1303,19 +1316,31 @@ IrradianceSpectrum GetCombinedScattering(
 	float3 uvw0 = float3((tex_x + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
 	float3 uvw1 = float3((tex_x + 1.0 + uvwz.y) / Number(SCATTERING_TEXTURE_NU_SIZE),uvwz.z, uvwz.w);
 #ifdef COMBINED_SCATTERING_TEXTURES
-	float4 combined_scattering =
-		texture(scattering_texture, uvw0) * (1.0 - lerp) +
-		texture(scattering_texture, uvw1) * lerp;
+
+#ifdef _HLSL
+	float4 combined_scattering = scattering_texture.Sample(ScatteringTextureSampler, uvw0) * (1.0 - lerp) +
+		scattering_texture.Sample(ScatteringTextureSampler, uvw1) * lerp;
+#else
+	float4 combined_scattering = texture(scattering_texture, uvw0) * (1.0 - lerp) + texture(scattering_texture, uvw1) * lerp;
+#endif
 	IrradianceSpectrum scattering = IrradianceSpectrum(combined_scattering);
-	single_mie_scattering =
-		GetExtrapolatedSingleMieScattering(atmosphere, combined_scattering);
+	single_mie_scattering = GetExtrapolatedSingleMieScattering(atmosphere, combined_scattering);
+#else
+
+#ifdef _HLSL
+	irradiance_texture.Sample(IrradianceTextureSampler, uv).rgb;
+	IrradianceSpectrum scattering = scattering_texture.Sample(ScatteringTextureSampler, uvw0) * (1.0 - lerp) +
+		scattering_texture.Sample(ScatteringTextureSampler, uvw1) * lerp;
+
+	single_mie_scattering = single_mie_scattering_texture.Sample(SingleMieScatteringTextureSampler, uvw0) * (1.0 - lerp) +
+		single_mie_scattering_texture.Sample(SingleMieScatteringTextureSampler, uvw1) * lerp;
 #else
 	IrradianceSpectrum scattering = IrradianceSpectrum(
-		texture(scattering_texture, uvw0) * (1.0 - lerp) +
-		texture(scattering_texture, uvw1) * lerp);
+		texture(scattering_texture, uvw0) * (1.0 - lerp) + texture(scattering_texture, uvw1) * lerp);
 	single_mie_scattering = IrradianceSpectrum(
-		texture(single_mie_scattering_texture, uvw0) * (1.0 - lerp) +
-		texture(single_mie_scattering_texture, uvw1) * lerp);
+		texture(single_mie_scattering_texture, uvw0) * (1.0 - lerp) + texture(single_mie_scattering_texture, uvw1) * lerp);
+#endif
+
 #endif
 	return scattering;
 }
