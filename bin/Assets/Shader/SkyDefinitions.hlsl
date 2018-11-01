@@ -1,13 +1,41 @@
 /*
+我们从六个基本量开始：长度，波长，角度，立体角，功率和发光功率（波长也是一个长度，但我们区分两者以提高清晰度）。
+*/
+#define Length float
+#define Wavelength float
+#define Angle float
+#define SolidAngle float
+#define Power float
+#define LuminousPower float
+
+//由此我们“得出”辐照度，辐射度，光谱辐照度，光谱辐射亮度，亮度等，以及纯数，面积，体积等（实际推导在该文件的C ++等价物中完成）。
+#define Number float
+#define InverseLength float
+#define Area float
+#define Volume float
+#define NumberDensity float
+#define Irradiance float
+#define Radiance float
+#define SpectralPower float
+#define SpectralIrradiance float
+#define SpectralRadiance float
+#define SpectralRadianceDensity float
+#define ScatteringCoefficient float
+#define InverseSolidAngle float
+#define LuminousIntensity float
+#define Luminance float
+#define Illuminance float
+
+/*
 定义6个基本物理单位
 米(m)，纳米(nm),弧度(rad)，球面度(sr)，瓦(watt)，流明(lm)
 */
-const Length m = 1.0;
-const Wavelength nm = 1.0;
-const Angle rad = 1.0;
-const SolidAngle sr = 1.0;
-const Power watt = 1.0;
-const LuminousPower lm = 1.0;
+static const Length m = 1.0;
+static const Wavelength nm = 1.0;
+static const Angle rad = 1.0;
+static const SolidAngle sr = 1.0;
+static const Power watt = 1.0;
+static const LuminousPower lm = 1.0;
 
 /*
 <p>From which we can derive the units for some derived physical quantities,
@@ -15,24 +43,24 @@ as well as some derived units (kilometer km, kilocandela kcd, degree deg):
 从中我们可以推导出某些派生物理量的单位，以及一些衍生单位（公里km，kilocandela kcd，度deg）
 */
 
-const float PI = 3.14159265358979323846;
+static const float PI = 3.14159265358979323846;
 
-const Length km = 1000.0 * m;
-const Area m2 = m * m;
-const Volume m3 = m * m * m;
-const Angle pi = PI * rad;
-const Angle deg = pi / 180.0;
-const Irradiance watt_per_square_meter = watt / m2;
-const Radiance watt_per_square_meter_per_sr = watt / (m2 * sr);
-const SpectralIrradiance watt_per_square_meter_per_nm = watt / (m2 * nm);
-const SpectralRadiance watt_per_square_meter_per_sr_per_nm =
+static const Length km = 1000.0 * m;
+static const Area m2 = m * m;
+static const Volume m3 = m * m * m;
+static const Angle pi = PI * rad;
+static const Angle deg = pi / 180.0;
+static const Irradiance watt_per_square_meter = watt / m2;
+static const Radiance watt_per_square_meter_per_sr = watt / (m2 * sr);
+static const SpectralIrradiance watt_per_square_meter_per_nm = watt / (m2 * nm);
+static const SpectralRadiance watt_per_square_meter_per_sr_per_nm =
 watt / (m2 * sr * nm);
-const SpectralRadianceDensity watt_per_cubic_meter_per_sr_per_nm =
+static const SpectralRadianceDensity watt_per_cubic_meter_per_sr_per_nm =
 watt / (m3 * sr * nm);
-const LuminousIntensity cd = lm / sr;
-const LuminousIntensity kcd = 1000.0 * cd;
-const Luminance cd_per_square_meter = cd / m2;
-const Luminance kcd_per_square_meter = kcd / m2;
+static const LuminousIntensity cd = lm / sr;
+static const LuminousIntensity kcd = 1000.0 * cd;
+static const Luminance cd_per_square_meter = cd / m2;
+static const Luminance kcd_per_square_meter = kcd / m2;
 
 // A generic function from Wavelength to some other type.
 #define AbstractSpectrum float3
@@ -49,21 +77,36 @@ const Luminance kcd_per_square_meter = kcd / m2;
 // A function from Wavelength to ScaterringCoefficient.
 #define ScatteringSpectrum float3
 
-#define Length float
-#define Wavelength float
-#define Angle float
-#define SolidAngle float
-#define Power float
-#define LuminousPower float
+// A position in 3D (3 length values).
+#define Position float3
+// A unit direction vector in 3D (3 unitless values).
+#define Direction float3
+// A vector of 3 luminance values.
+#define Luminance3 float3
+// A vector of 3 illuminance values.
+#define Illuminance3 float3
 
-#define TransmittanceTexture sampler2D
-#define AbstractScatteringTexture sampler3D
-#define ReducedScatteringTexture sampler3D
-#define ScatteringTexture sampler3D
-#define ScatteringDensityTexture sampler3D
-#define IrradianceTexture sampler2D
+#define TransmittanceTexture Texture2D
+#define AbstractScatteringTexture Texture3D
+#define ReducedScatteringTexture Texture3D
+#define ScatteringTexture Texture3D
+#define ScatteringDensityTexture Texture3D
+#define IrradianceTexture Texture2D
 
+static const int TRANSMITTANCE_TEXTURE_WIDTH = 256;
+static const int TRANSMITTANCE_TEXTURE_HEIGHT = 64;
 
+static const int SCATTERING_TEXTURE_R_SIZE = 32;
+static const int SCATTERING_TEXTURE_MU_SIZE = 128;
+static const int SCATTERING_TEXTURE_MU_S_SIZE = 32;
+static const int SCATTERING_TEXTURE_NU_SIZE = 8;
+
+static const int SCATTERING_TEXTURE_WIDTH = SCATTERING_TEXTURE_NU_SIZE * SCATTERING_TEXTURE_MU_S_SIZE;
+static const int SCATTERING_TEXTURE_HEIGHT = SCATTERING_TEXTURE_MU_SIZE;
+static const int SCATTERING_TEXTURE_DEPTH = SCATTERING_TEXTURE_R_SIZE;
+
+static const int IRRADIANCE_TEXTURE_WIDTH = 64;
+static const int IRRADIANCE_TEXTURE_HEIGHT = 16;
 
 /*
 大气层参数

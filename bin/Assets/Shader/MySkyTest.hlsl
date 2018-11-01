@@ -3,21 +3,24 @@
 #define TEMPLATE(x) 
 #define TEMPLATE_ARGUMENT(x) 
 #define _HLSL
+#define assert(x)
+#define mod(x,y) fmod(x,y)
+
+SamplerState	TransmittanceSampler;
+SamplerState	ScatteringTextureSampler;
+SamplerState	IrradianceTextureSampler;
+SamplerState	SingleMieScatteringTextureSampler;
+
+Texture3D	scattering_texture;
+Texture3D  single_mie_scattering_texture;
+//Texture2D irradiance_texture;
 
 #include"SkyDefinitions.hlsl"
 #include"Functions.hlsl"
 
-//SamplerState	TransmittanceSampler;
-SamplerState	ScatteringTextureSampler;
-//SamplerState	IrradianceTextureSampler;
-SamplerState	SingleMieScatteringTextureSampler;
-
-sampler3D	scattering_texture;
-sampler3D  single_mie_scattering_texture;
-
-RadianceSpectrum getSkyScatting(const AtmosphereParameters& atmosphere, Length r, Number mu, Number mu_s,
-	Number nu, bool ray_r_mu_intersects_ground,ReducedScatteringTexture& scattering_texture, 
-	ReducedScatteringTexture& single_mie_scattering_texture)
+RadianceSpectrum getSkyScatting(in AtmosphereParameters atmosphere, Length r, Number mu, Number mu_s,
+	Number nu, bool ray_r_mu_intersects_ground,in ReducedScatteringTexture scattering_texture, 
+	in ReducedScatteringTexture single_mie_scattering_texture)
 {
 	IrradianceSpectrum single_mie_scattering;
 	IrradianceSpectrum scattering = GetCombinedScattering(
@@ -31,12 +34,16 @@ cbuffer GlobalParameters : register(b0)
 {
 	float4			eyeWorldSpacePosition;
 	float4			eyeEarthSpacePosition;
+	float4			sunDirection;
 	float4x4		inverseViewProjMatrix;
 	float4x4		inverseViewMatrix;
 	float4			projMat[4];
 }
 
-cbuffer AtmosphereParameters atmosphere_;
+cbuffer GlobalParameters2 : register(b1)
+{
+	AtmosphereParameters atmosphere_;
+}
 
 struct VS_INPUT
 {
@@ -72,11 +79,11 @@ inline float3 UVToCameraRay2(float2 uv)
 	ray.x = clipPos.x * ray.z * projMat[2].w;
 	ray.y = clipPos.y * ray.z * projMat[2].w / projMat[1].y;
 	ray = normalize(ray);
-	ray = mul(inverseViewMatrix, float4(ray, 0));
+	ray = mul(inverseViewMatrix, float4(ray, 0)).xyz;
 	return ray;
 }
 
-VS_OUTPUT VSMAIN(IN(VS_INPUT input))
+VS_OUTPUT VSMAIN(_IN(VS_INPUT) input)
 {
 	VS_OUTPUT output;
 
@@ -108,6 +115,8 @@ float4 PSMAIN(in VS_OUTPUT input) : SV_Target
 	float3  earthCenterToEyeDirection = eyeEarthSpacePosition.xyz / r;
 	input.eyeDirection = normalize(input.eyeDirection);
 	float mu = dot(earthCenterToEyeDirection, input.eyeDirection);
+	float mu_s = dot(earthCenterToEyeDirection, sunDirection.xyz);
+	float nu = dot(input.eyeDirection, sunDirection.xyz);
 //return float4(input.eyeDirection, 1);
 /*
 在ray(r,mu)方向上距离d的一点可以定义为:r_d(r + mu*d,d * sqrt(1 - mu*mu))
@@ -120,14 +129,14 @@ d = sqrt(R*R + r*r*(mu*mu - 1)) - r*mu
 这样，如果ray(r,mu)和地面相交，R = bottom_radius,并且R*R + r*r*(mu*mu - 1) >= 0
 */
 	bool ray_r_mu_intersects_ground = false;
-	if (mu < 0 && bottom_radius*bottom_radius + r * r*(mu*mu - 1) >= 0)
+	if (mu < 0 && atmosphere_.bottom_radius*atmosphere_.bottom_radius + r * r*(mu*mu - 1) >= 0)
 		ray_r_mu_intersects_ground = true;
 
 //如果相机在大气层外并且不和大气层相交
 //首先如果相机在大气层里，ray肯定和大气层相交，所以相机高度必须超过大气层
 //如果mu是向上的，必定不和大气层相交
 //如果向下，判断R*R + r*r*(mu*mu - 1)是否有解
-	if ((r >= top_radius && mu < 0 && top_radius*top_radius + r * r*(mu*mu - 1) < 0) || (r >= top_radius && mu >= 0))
+	if ((r >= atmosphere_.top_radius && mu < 0 && atmosphere_.top_radius*atmosphere_.top_radius + r * r*(mu*mu - 1) < 0) || (r >= atmosphere_.top_radius && mu >= 0))
 		return float4(0, 0, 0, 1);
 
 	float3 skyColor = getSkyScatting(atmosphere_, r, mu, mu_s, nu, ray_r_mu_intersects_ground, scattering_texture, single_mie_scattering_texture);

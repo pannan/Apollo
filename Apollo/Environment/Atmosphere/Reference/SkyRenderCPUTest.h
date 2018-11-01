@@ -50,6 +50,8 @@ protected:
 
 	void			initLookupTexture();
 
+	void			createScatteringTextureFromMemoryBuffer();
+
 private:
 
 	bool			m_isProcessing;
@@ -74,7 +76,8 @@ private:
 	std::unique_ptr<ReducedScatteringTexture> m_scattering_texture;
 	std::unique_ptr<ReducedScatteringTexture> m_single_mie_scattering_texture;
 
-	Texture3dDX11*		m_scatteringTextureDX3d;
+	Texture3dDX11*		m_scattering3DTexture;
+	Texture3dDX11*		m_singleMieScattering3DTexture;
 };
 
 NAME_SPACE_END

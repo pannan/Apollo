@@ -408,14 +408,22 @@ DimensionlessSpectrum GetTransmittance(_IN(AtmosphereParameters) atmosphere, _IN
 		DimensionlessSpectrum Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, -mu);
 		DimensionlessSpectrum Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, -mu_d);
 		DimensionlessSpectrum Tpq = Tpi / Tqi;
+#ifdef _HLSL
+		return min(Tpq, DimensionlessSpectrum(1.0,1.0,1.0));
+#else
 		return min(Tpq, DimensionlessSpectrum(1.0));
+#endif
 	}
 	else
 	{
 		DimensionlessSpectrum Tpi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, mu);
 		DimensionlessSpectrum Tqi = GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r_d, mu_d);
 		DimensionlessSpectrum Tpq = Tpi / Tqi;
+#ifdef _HLSL
+		return min(Tpq, DimensionlessSpectrum(1.0, 1.0, 1.0));
+#else
 		return min(Tpq, DimensionlessSpectrum(1.0));
+#endif
 	}
 }
 
@@ -570,9 +578,13 @@ void ComputeSingleScattering(_IN(AtmosphereParameters) atmosphere, _IN(Transmitt
 	const int SAMPLE_COUNT = 50;
 	//采样点的间隔长度
 	Length dx = DistanceToNearestAtmosphereBoundary(atmosphere, r, mu, ray_r_mu_intersects_ground) / Number(SAMPLE_COUNT);
-
+#ifdef _HLSL
+	DimensionlessSpectrum rayleigh_sum = DimensionlessSpectrum(0.0,0.0,0.0);
+	DimensionlessSpectrum mie_sum = DimensionlessSpectrum(0.0,0.0,0.0);
+#else
 	DimensionlessSpectrum rayleigh_sum = DimensionlessSpectrum(0.0);
 	DimensionlessSpectrum mie_sum = DimensionlessSpectrum(0.0);
+#endif
 
 	for (int i = 0; i <= SAMPLE_COUNT; ++i)
 	{
@@ -926,7 +938,12 @@ RadianceDensitySpectrum ComputeScatteringDensity(
 	const int SAMPLE_COUNT = 16;
 	const Angle dphi = pi / Number(SAMPLE_COUNT);
 	const Angle dtheta = pi / Number(SAMPLE_COUNT);
+#ifdef _HLSL
+	RadianceDensitySpectrum rayleigh_mie = RadianceDensitySpectrum(0.0 * watt_per_cubic_meter_per_sr_per_nm,
+		0.0 * watt_per_cubic_meter_per_sr_per_nm, 0.0 * watt_per_cubic_meter_per_sr_per_nm);
+#else
 	RadianceDensitySpectrum rayleigh_mie = RadianceDensitySpectrum(0.0 * watt_per_cubic_meter_per_sr_per_nm);
+#endif
 
 	// Nested loops for the integral over all the incident directions omega_i.
 	for (int l = 0; l < SAMPLE_COUNT; ++l) 
@@ -939,8 +956,13 @@ RadianceDensitySpectrum ComputeScatteringDensity(
 		// The distance and transmittance to the ground only depend on theta, so we
 		// can compute them in the outer loop for efficiency.
 		Length distance_to_ground = 0.0 * m;
+#ifdef _HLSL
+		DimensionlessSpectrum transmittance_to_ground = DimensionlessSpectrum(0.0,0.0,0.0);
+		DimensionlessSpectrum ground_albedo = DimensionlessSpectrum(0.0,0.0,0.0);
+#else
 		DimensionlessSpectrum transmittance_to_ground = DimensionlessSpectrum(0.0);
 		DimensionlessSpectrum ground_albedo = DimensionlessSpectrum(0.0);
+#endif
 		if (ray_r_theta_intersects_ground) 
 		{
 			distance_to_ground = DistanceToBottomAtmosphereBoundary(atmosphere, r, cos_theta);
@@ -1019,7 +1041,12 @@ RadianceSpectrum ComputeMultipleScattering(
 	// The integration step, i.e. the length of each integration interval.
 	Length dx = DistanceToNearestAtmosphereBoundary(atmosphere, r, mu, ray_r_mu_intersects_ground) / Number(SAMPLE_COUNT);
 	// Integration loop.
+#ifdef _HLSL
+	RadianceSpectrum rayleigh_mie_sum = RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm,
+		0.0 * watt_per_square_meter_per_sr_per_nm, 0.0 * watt_per_square_meter_per_sr_per_nm);
+#else
 	RadianceSpectrum rayleigh_mie_sum = RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
+#endif
 	for (int i = 0; i <= SAMPLE_COUNT; ++i) 
 	{
 		Length d_i = Number(i) * dx;
@@ -1164,8 +1191,11 @@ IrradianceSpectrum ComputeIndirectIrradiance(
 	const int SAMPLE_COUNT = 32;
 	const Angle dphi = pi / Number(SAMPLE_COUNT);
 	const Angle dtheta = pi / Number(SAMPLE_COUNT);
-
+#ifdef _HLSL
+	IrradianceSpectrum result = IrradianceSpectrum(0.0,0.0,0.0);
+#else
 	IrradianceSpectrum result = IrradianceSpectrum(0.0 * watt_per_square_meter_per_nm);
+#endif
 	float3 omega_s = float3(sqrt(1.0 - mu_s * mu_s), 0.0, mu_s);
 	for (int j = 0; j < SAMPLE_COUNT / 2; ++j) 
 	{
@@ -1221,7 +1251,7 @@ void GetRMuSFromIrradianceTextureUv(_IN(AtmosphereParameters) atmosphere,
 /*
 现在可以很容易地定义片段着色器函数来预先计算地面辐照度纹理的纹素，用于直接辐照度：
 */
-const float2 IRRADIANCE_TEXTURE_SIZE = float2(IRRADIANCE_TEXTURE_WIDTH, IRRADIANCE_TEXTURE_HEIGHT);
+static const float2 IRRADIANCE_TEXTURE_SIZE = float2(IRRADIANCE_TEXTURE_WIDTH, IRRADIANCE_TEXTURE_HEIGHT);
 
 IrradianceSpectrum ComputeDirectIrradianceTexture(
 	_IN(AtmosphereParameters) atmosphere,
@@ -1328,12 +1358,12 @@ IrradianceSpectrum GetCombinedScattering(
 #else
 
 #ifdef _HLSL
-	irradiance_texture.Sample(IrradianceTextureSampler, uv).rgb;
-	IrradianceSpectrum scattering = scattering_texture.Sample(ScatteringTextureSampler, uvw0) * (1.0 - lerp) +
-		scattering_texture.Sample(ScatteringTextureSampler, uvw1) * lerp;
+	//irradiance_texture.Sample(IrradianceTextureSampler, uv).rgb;
+	IrradianceSpectrum scattering = scattering_texture.Sample(ScatteringTextureSampler, uvw0).rgb * (1.0 - lerp) +
+		scattering_texture.Sample(ScatteringTextureSampler, uvw1).rgb * lerp;
 
-	single_mie_scattering = single_mie_scattering_texture.Sample(SingleMieScatteringTextureSampler, uvw0) * (1.0 - lerp) +
-		single_mie_scattering_texture.Sample(SingleMieScatteringTextureSampler, uvw1) * lerp;
+	single_mie_scattering = single_mie_scattering_texture.Sample(SingleMieScatteringTextureSampler, uvw0).rgb * (1.0 - lerp) +
+		single_mie_scattering_texture.Sample(SingleMieScatteringTextureSampler, uvw1).rgb * lerp;
 #else
 	IrradianceSpectrum scattering = IrradianceSpectrum(
 		texture(scattering_texture, uvw0) * (1.0 - lerp) + texture(scattering_texture, uvw1) * lerp);
@@ -1377,18 +1407,26 @@ RadianceSpectrum GetSkyRadiance(
 	else if (r > atmosphere.top_radius) 
 	{
 		// If the view ray does not intersect the atmosphere, simply return 0.
+#ifdef _HLSL
+		transmittance = DimensionlessSpectrum(1.0,1.0,1.0);
+		return RadianceSpectrum(0.0,0.0,0.0);
+#else
 		transmittance = DimensionlessSpectrum(1.0);
 		return RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
+#endif		
 	}
 	// Compute the r, mu, mu_s and nu parameters needed for the texture lookups.
 	Number mu = rmu / r;
 	Number mu_s = dot(camera, sun_direction) / r;
 	Number nu = dot(view_ray, sun_direction);
 	bool ray_r_mu_intersects_ground = RayIntersectsGround(atmosphere, r, mu);
-
+#ifdef _HLSL
+	transmittance = ray_r_mu_intersects_ground ? DimensionlessSpectrum(0.0,0.0,0.0) :
+		GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, mu);
+#else
 	transmittance = ray_r_mu_intersects_ground ? DimensionlessSpectrum(0.0) :
-		GetTransmittanceToTopAtmosphereBoundary(
-			atmosphere, transmittance_texture, r, mu);
+		GetTransmittanceToTopAtmosphereBoundary(atmosphere, transmittance_texture, r, mu);
+#endif
 	IrradianceSpectrum single_mie_scattering;
 	IrradianceSpectrum scattering;
 	if (shadow_length == 0.0 * m) 
@@ -1437,13 +1475,13 @@ RadianceSpectrum GetSkyRadianceToPoint(
 	_IN(TransmittanceTexture) transmittance_texture,
 	_IN(ReducedScatteringTexture) scattering_texture,
 	_IN(ReducedScatteringTexture) single_mie_scattering_texture,
-	Position camera, _IN(Position) point, Length shadow_length,
+	Position camera, _IN(Position) _point, Length shadow_length,
 	_IN(Direction) sun_direction, _OUT(DimensionlessSpectrum) transmittance) 
 {
 	// Compute the distance to the top atmosphere boundary along the view ray,
 	// assuming the viewer is in space (or NaN if the view ray does not intersect
 	// the atmosphere).
-	Direction view_ray = normalize(point - camera);
+	Direction view_ray = normalize(_point - camera);
 	Length r = length(camera);
 	Length rmu = dot(camera, view_ray);
 	Length distance_to_top_atmosphere_boundary = -rmu -
@@ -1461,7 +1499,7 @@ RadianceSpectrum GetSkyRadianceToPoint(
 	Number mu = rmu / r;
 	Number mu_s = dot(camera, sun_direction) / r;
 	Number nu = dot(view_ray, sun_direction);
-	Length d = length(point - camera);
+	Length d = length(_point - camera);
 	bool ray_r_mu_intersects_ground = RayIntersectsGround(atmosphere, r, mu);
 
 	transmittance = GetTransmittance(atmosphere, transmittance_texture,
@@ -1525,15 +1563,15 @@ IrradianceSpectrum GetSunAndSkyIrradiance(
 	_IN(AtmosphereParameters) atmosphere,
 	_IN(TransmittanceTexture) transmittance_texture,
 	_IN(IrradianceTexture) irradiance_texture,
-	_IN(Position) point, _IN(Direction) normal, _IN(Direction) sun_direction,
+	_IN(Position) _point, _IN(Direction) normal, _IN(Direction) sun_direction,
 	_OUT(IrradianceSpectrum) sky_irradiance)
 {
-	Length r = length(point);
-	Number mu_s = dot(point, sun_direction) / r;
+	Length r = length(_point);
+	Number mu_s = dot(_point, sun_direction) / r;
 
 	// Indirect irradiance (approximated if the surface is not horizontal).
 	sky_irradiance = GetIrradiance(atmosphere, irradiance_texture, r, mu_s) *
-		(1.0 + dot(normal, point) / r) * 0.5;
+		(1.0 + dot(normal, _point) / r) * 0.5;
 
 	// Direct irradiance.
 	return atmosphere.solar_irradiance *

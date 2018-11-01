@@ -706,10 +706,8 @@
     <None Include="..\bin\Assets\Shader\Model_Test.hlsl">
       <Filter>Shader</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="..\bin\Assets\Shader\MySkyTest.hlsl">
+    <None Include="..\bin\Assets\Shader\MySkyTest.hlsl">
       <Filter>Shader</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>

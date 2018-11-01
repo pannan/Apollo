@@ -173,9 +173,15 @@ void SkyRenderCPUTest::initLookupTexture()
 	//irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
 
 
-	std::vector<Vector4> rgbFloatBuffer;
-	rgbFloatBuffer.resize(SCATTERING_TEXTURE_WIDTH * SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_DEPTH);
-	void* test = &rgbFloatBuffer[0];
+	createScatteringTextureFromMemoryBuffer();
+}
+
+void SkyRenderCPUTest::createScatteringTextureFromMemoryBuffer()
+{
+	//scattering texture
+	std::vector<Vector4> rgbScatteringFloatBuffer;
+	rgbScatteringFloatBuffer.resize(SCATTERING_TEXTURE_WIDTH * SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_DEPTH);
+
 	for (int k = 0; k < SCATTERING_TEXTURE_DEPTH; ++k)
 	{
 		float fk = (float)(k + 0.5) / SCATTERING_TEXTURE_DEPTH;
@@ -190,13 +196,13 @@ void SkyRenderCPUTest::initLookupTexture()
 
 				float3 uvw(fi, fj, fk);
 				IrradianceSpectrum irradiacne = lookupScatteringTexture(*m_scattering_texture.get(), uvw);
-				float r =  irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
+				float r = irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
 				float g = irradiacne(kLambdaG).to(watt_per_square_meter_per_nm);
 				float b = irradiacne(kLambdaB).to(watt_per_square_meter_per_nm);
 
 				size_t index = k * (SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH) +
 					j * SCATTERING_TEXTURE_WIDTH + i;
-				rgbFloatBuffer[index] = Vector4(r, g, b,1.0f);
+				rgbScatteringFloatBuffer[index] = Vector4(r, g, b, 1.0f);
 			}
 		}
 	}
@@ -210,12 +216,52 @@ void SkyRenderCPUTest::initLookupTexture()
 	tex3dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
 
 	D3D11_SUBRESOURCE_DATA subResource;
-	subResource.pSysMem = &rgbFloatBuffer[0];
+	subResource.pSysMem = &rgbScatteringFloatBuffer[0];
 	subResource.SysMemPitch = SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
 	subResource.SysMemSlicePitch = SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
-	uint32_t textureHandle =  TextureDX11ResourceFactory::getInstance().createTexture3D("Scattering_Texture", tex3dConfig, &subResource);
+	uint32_t textureHandle = TextureDX11ResourceFactory::getInstance().createTexture3D("Scattering_Texture", tex3dConfig, &subResource);
 
-	m_scatteringTextureDX3d = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
+	m_scattering3DTexture = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
+
+	//single mie scattering texture	
+	for (int k = 0; k < SCATTERING_TEXTURE_DEPTH; ++k)
+	{
+		float fk = (float)(k + 0.5) / SCATTERING_TEXTURE_DEPTH;
+
+		for (int j = 0; j < SCATTERING_TEXTURE_HEIGHT; ++j)
+		{
+			float fj = (float)(j + 0.5) / SCATTERING_TEXTURE_HEIGHT;
+
+			for (int i = 0; i < SCATTERING_TEXTURE_WIDTH; ++i)
+			{
+				float fi = (float)(i + 0.5) / SCATTERING_TEXTURE_WIDTH;
+
+				float3 uvw(fi, fj, fk);
+				IrradianceSpectrum irradiacne = lookupScatteringTexture(*m_single_mie_scattering_texture.get(), uvw);
+				float r = irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
+				float g = irradiacne(kLambdaG).to(watt_per_square_meter_per_nm);
+				float b = irradiacne(kLambdaB).to(watt_per_square_meter_per_nm);
+
+				size_t index = k * (SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH) +
+					j * SCATTERING_TEXTURE_WIDTH + i;
+				rgbScatteringFloatBuffer[index] = Vector4(r, g, b, 1.0f);
+			}
+		}
+	}
+
+	tex3dConfig.SetWidth(SCATTERING_TEXTURE_WIDTH);
+	tex3dConfig.SetHeight(SCATTERING_TEXTURE_HEIGHT);
+	tex3dConfig.SetDepth(SCATTERING_TEXTURE_DEPTH);
+	tex3dConfig.SetFormat(DXGI_FORMAT_R32G32B32A32_FLOAT);
+	tex3dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
+	tex3dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
+
+	subResource.pSysMem = &rgbScatteringFloatBuffer[0];
+	subResource.SysMemPitch = SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+	subResource.SysMemSlicePitch = SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+	textureHandle = TextureDX11ResourceFactory::getInstance().createTexture3D("SingleMieScattering_Texture", tex3dConfig, &subResource);
+
+	m_singleMieScattering3DTexture = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
 }
 
 Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat)
@@ -492,9 +538,9 @@ void SkyRenderCPUTest::renderSingleScatting()
 			//RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters,r*m, mu, mu_s, nu, rayIsIntersectsGround);
 			//RadianceSpectrum rgbSpectrum = recomputeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
 			//	transmittance_texture, single_rayleigh_scattering_texture, single_mie_scattering_texture);
-			//RadianceSpectrum rgbSpectrum = getSkyScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
-			//	*m_scattering_texture.get(), *m_single_mie_scattering_texture.get());
-			RadianceSpectrum rgbSpectrum = computeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
+			RadianceSpectrum rgbSpectrum = getSkyScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround,
+				*m_scattering_texture.get(), *m_single_mie_scattering_texture.get());
+			//RadianceSpectrum rgbSpectrum = computeSingleScatting(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
 			
 			double color_r = rgbSpectrum(kLambdaR).to(watt_per_square_meter_per_sr_per_nm);
 			double color_g = rgbSpectrum(kLambdaG).to(watt_per_square_meter_per_sr_per_nm);

@@ -81,14 +81,14 @@ void SkySample::initQuadMesh()
 	//create material
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
 	m_vsShader->loadShaderFromFile(ShaderType::VertexShader,
-		"../bin/Assets/Shader/Sky.hlsl",
+		"../bin/Assets/Shader/MySkyTest.hlsl",
 		ShaderMacros(),
 		"VSMAIN",
 		"vs_5_0");
 
 	m_psShader = ShaderDX11Ptr(new ShaderDX11());
 	m_psShader->loadShaderFromFile(ShaderType::PixelShader,
-		"../bin/Assets/Shader/Sky.hlsl",
+		"../bin/Assets/Shader/MySkyTest.hlsl",
 		ShaderMacros(),
 		"PSMAIN",
 		"ps_5_0");
