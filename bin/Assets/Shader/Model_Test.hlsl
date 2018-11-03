@@ -121,17 +121,14 @@ RadianceSpectrum GetViewRayRadiance(Direction view_ray,Direction view_ray_diff)
 
 	//然后，我们测试视线是否与球体S相交。 如果是，我们使用与GetSunVisibility中相同的近似值计算近似（和偏差）不透明度值：
 
-	// Compute the distance between the view ray line and the sphere center,
-	// and the distance between the camera and the intersection of the view
-	// ray with the sphere (or NaN if there is no intersection).
+	//计算view ray和球心的距离，以及相机和view ray与球交点的距离（如果没有相交为NaN）
 	Position p = camera_ - kSphereCenter;
 	Length p_dot_v = dot(p, view_direction);
 	Area p_dot_p = dot(p, p);
 	Area ray_sphere_center_squared_distance = p_dot_p - p_dot_v * p_dot_v;
-	Length distance_to_intersection = -p_dot_v - sqrt(
-		kSphereRadius * kSphereRadius - ray_sphere_center_squared_distance);
+	Length distance_to_intersection = -p_dot_v - sqrt(kSphereRadius * kSphereRadius - ray_sphere_center_squared_distance);
 
-	// Compute the radiance reflected by the sphere, if the ray intersects it.
+	// 如果相交，计算被球反射的辐射
 	Number sphere_alpha = 0.0;
 	RadianceSpectrum sphere_radiance = RadianceSpectrum(0.0 * watt_per_square_meter_per_sr_per_nm);
 
@@ -140,11 +137,9 @@ RadianceSpectrum GetViewRayRadiance(Direction view_ray,Direction view_ray_diff)
 		// Compute the distance between the view ray and the sphere, and the
 		// corresponding (tangent of the) subtended angle. Finally, use this to
 		// compute the approximate analytic antialiasing factor sphere_alpha.
-		Length ray_sphere_distance =
-			kSphereRadius - sqrt(ray_sphere_center_squared_distance);
+		Length ray_sphere_distance = kSphereRadius - sqrt(ray_sphere_center_squared_distance);
 		Number ray_sphere_angular_distance = -ray_sphere_distance / p_dot_v;
-		sphere_alpha =
-			min(ray_sphere_angular_distance / fragment_angular_size, 1.0);
+		sphere_alpha = min(ray_sphere_angular_distance / fragment_angular_size, 1.0);
 
 		//然后我们可以计算交点及其法线，并使用它们来获得此时收到的太阳和天空辐照度。 通过将辐照度与球体BRDF相乘，得到反射辐射：
 		Position point = camera_ + view_direction * distance_to_intersection;
@@ -152,10 +147,8 @@ RadianceSpectrum GetViewRayRadiance(Direction view_ray,Direction view_ray_diff)
 
 		// Compute the radiance reflected by the sphere.
 		IrradianceSpectrum sky_irradiance;
-		IrradianceSpectrum sun_irradiance = GetSunAndSkyIrradiance(
-			point - earth_center_, normal, sun_direction_, sky_irradiance);
-		sphere_radiance =
-			sphere_albedo_ * (1.0 / (PI * sr)) * (sun_irradiance + sky_irradiance);
+		IrradianceSpectrum sun_irradiance = GetSunAndSkyIrradiance(point - earth_center_, normal, sun_direction_, sky_irradiance);
+		sphere_radiance = sphere_albedo_ * (1.0 / (PI * sr)) * (sun_irradiance + sky_irradiance);
 
 		//最后，我们考虑了相机和球体之间的空中视角，这取决于阴影中这段的长度：
 		Length shadow_length =
