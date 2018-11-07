@@ -26,6 +26,12 @@ public:
 
 	void		saveRadianceRGBBufferToFile();
 
+	Texture3dDX11*		getScatteringTexture() { return m_scattering3DTexture; }
+
+	Texture3dDX11*		getSingleMieScatteringTexture() { return m_singleMieScattering3DTexture; }
+
+	const AtmosphereParameters&	 getAtmosphereParameters() { return m_atmosphereParameters; }
+
 	//void		computeRayRadianceThread(const Vector2& uv, Vector3& outRadiance);
 	void		onGUI();
 

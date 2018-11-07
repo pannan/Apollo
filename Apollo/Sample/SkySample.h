@@ -55,7 +55,7 @@ namespace Apollo
 
 	protected:
 
-		void		initQuadMesh();
+		void		initQuadMeshAndMaterial();
 
 		void		initTestTerrain();
 

@@ -74,7 +74,7 @@ void SkySample::initTestTerrain()
 	m_testTerrainRenderState.createState();
 }
 
-void SkySample::initQuadMesh()
+void SkySample::initQuadMeshAndMaterial()
 {
 	m_quadModelPtr = ModelDX11Ptr(ModelDX11::createFullScreenQuadModel());
 
@@ -101,7 +101,7 @@ void SkySample::initQuadMesh()
 
 void SkySample::init()
 {
-	initQuadMesh();
+	initQuadMeshAndMaterial();
 
 	m_renderState.setCullingMode(D3D11_CULL_NONE);
 	m_renderState.setDepthWriteMask(D3D11_DEPTH_WRITE_MASK_ZERO);
@@ -115,7 +115,9 @@ void SkySample::init()
 	m_vsShader->setConstantBuffer("GlobalParameters", m_globalParametersBuffer);
 	m_psShader->setConstantBuffer("GlobalParameters", m_globalParametersBuffer);
 
-	m_atmosphereParametersBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(AtmosphereParameters_Simple), true, true, nullptr));
+	//m_atmosphereParametersBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(AtmosphereParameters_Simple), true, true, nullptr));
+	m_atmosphereParametersBuffer = 
+		ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(Apollo::Atmosphere::Reference::AtmosphereParameters), true, true, nullptr));
 
 	ZeroMemory(&m_atmosphereParameters, sizeof(AtmosphereParameters_Simple));
 	m_atmosphereParameters.bottom_radius = 6360.0f; 
