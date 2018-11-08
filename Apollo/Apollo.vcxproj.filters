@@ -408,6 +408,9 @@
     <ClInclude Include="DX11\Texture3dDX11.h">
       <Filter>Dx11</Filter>
     </ClInclude>
+    <ClInclude Include="Environment\Atmosphere\Reference\SkyRenderGPUTest.h">
+      <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -646,6 +649,9 @@
     </ClCompile>
     <ClCompile Include="DX11\Texture3dDX11.cpp">
       <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment\Atmosphere\Reference\SkyRenderGPUTest.cpp">
+      <Filter>Environment\Atmosphere\Reference</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

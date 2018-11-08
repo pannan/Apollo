@@ -18,7 +18,7 @@ public:
 
 	SkyRenderGPUTest(int w, int h);
 
-	void		renderSingleScatting();
+	//void		renderSingleScatting();
 
 	void		init();
 
@@ -28,8 +28,8 @@ protected:
 private:
 
 	bool			m_isProcessing;
-	int		m_windowWidth;
-	int		m_windowHeight;
+	int			m_windowWidth;
+	int			m_windowHeight;
 
 	Camera*	m_camera;
 
@@ -44,7 +44,7 @@ private:
 
 	std::vector<uint32_t>		m_rgba32Buffer;
 
-	AtmosphereParameters m_atmosphereParameters;
+	AtmosphereParameters* m_atmosphereParameters;
 };
 
 NAME_SPACE_END

@@ -61,8 +61,8 @@ protected:
 private:
 
 	bool			m_isProcessing;
-	int		m_windowWidth;
-	int		m_windowHeight;
+	int			m_windowWidth;
+	int			m_windowHeight;
 
 	Camera*	m_camera;
 

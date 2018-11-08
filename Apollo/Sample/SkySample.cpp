@@ -81,14 +81,14 @@ void SkySample::initQuadMeshAndMaterial()
 	//create material
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());
 	m_vsShader->loadShaderFromFile(ShaderType::VertexShader,
-		"../bin/Assets/Shader/MySkyTest.hlsl",
+		"../bin/Assets/Shader/Sky.hlsl",
 		ShaderMacros(),
 		"VSMAIN",
 		"vs_5_0");
 
 	m_psShader = ShaderDX11Ptr(new ShaderDX11());
 	m_psShader->loadShaderFromFile(ShaderType::PixelShader,
-		"../bin/Assets/Shader/MySkyTest.hlsl",
+		"../bin/Assets/Shader/Sky.hlsl",
 		ShaderMacros(),
 		"PSMAIN",
 		"ps_5_0");
@@ -115,9 +115,9 @@ void SkySample::init()
 	m_vsShader->setConstantBuffer("GlobalParameters", m_globalParametersBuffer);
 	m_psShader->setConstantBuffer("GlobalParameters", m_globalParametersBuffer);
 
-	//m_atmosphereParametersBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(AtmosphereParameters_Simple), true, true, nullptr));
-	m_atmosphereParametersBuffer = 
-		ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(Apollo::Atmosphere::Reference::AtmosphereParameters), true, true, nullptr));
+	m_atmosphereParametersBuffer = ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(AtmosphereParameters_Simple), true, true, nullptr));
+	//m_atmosphereParametersBuffer = 
+	//	ConstantBufferDX11Ptr(new ConstantBufferDX11(sizeof(Apollo::Atmosphere::Reference::AtmosphereParameters), true, true, nullptr));
 
 	ZeroMemory(&m_atmosphereParameters, sizeof(AtmosphereParameters_Simple));
 	m_atmosphereParameters.bottom_radius = 6360.0f; 
