@@ -44,21 +44,22 @@ SkyRenderCPUTest::SkyRenderCPUTest(int w, int h)
 	m_windowWidth = w;
 	m_windowHeight = h;
 
-	m_sunTheta = 85.0f;
-	m_sunPhi = 0.0f;
+//	m_sunTheta = 85.0f;
+	//m_sunPhi = 0.0f;
 
 	m_cpuSkyTextureHandle = 0;
 
 	Vector3 camPos(0, 1000, 0);
 	Vector3 lookAt = camPos + Vector3(3, 8, 1) * 10;
-	m_camera = new Camera(camPos, lookAt, Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
-	m_camera->setViewportWidth(w);
-	m_camera->setViewportHeight(h);
-	m_camera->updateViewProjMatrix();
+	//m_camera = camera;
 }
 
-void SkyRenderCPUTest::init()
+void SkyRenderCPUTest::init(std::shared_ptr<ReducedScatteringTexture>& scatteringTexture,
+	std::shared_ptr<ReducedScatteringTexture>& singleMieScatteringTexture)
 {
+	m_scattering_texture = scatteringTexture;
+	m_single_mie_scattering_texture = singleMieScatteringTexture; m_scattering_texture;
+
 	// Values from "Reference Solar Spectral Irradiance: ASTM G-173", ETR column
 	// (see http://rredc.nrel.gov/solar/spectra/am1.5/ASTMG173/ASTMG173.html),
 	// summed and averaged in each bin (e.g. the value for 360nm is the average
@@ -150,119 +151,119 @@ void SkyRenderCPUTest::init()
 	m_atmosphereParameters.ground_albedo = DimensionlessSpectrum(0.1);
 	m_atmosphereParameters.mu_s_min = cos(102.0 * deg);
 
-	initLookupTexture();
+	//initLookupTexture();
 }
 
 void SkyRenderCPUTest::initLookupTexture()
 {
 	//transmittance_texture_.reset(new TransmittanceTexture());
-	m_scattering_texture.reset(new ReducedScatteringTexture());
-	m_single_mie_scattering_texture.reset(new ReducedScatteringTexture());
+	//m_scattering_texture.reset(new ReducedScatteringTexture());
+	//m_single_mie_scattering_texture.reset(new ReducedScatteringTexture());
 
-	const size_t testSize = sizeof(IrradianceSpectrum);
-	std::ifstream file;
-	file.open("h:\\scattering.dat");
-	if (!file.good())
-		return;
-
-
-	file.close();
-	//transmittance_texture_->Load(cache_directory_ + "transmittance.dat");
-	m_scattering_texture->Load("h:\\scattering.dat");
-	m_single_mie_scattering_texture->Load("h:\\single_mie_scattering.dat");
-	//irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
+	//const size_t testSize = sizeof(IrradianceSpectrum);
+	//std::ifstream file;
+	//file.open("h:\\scattering.dat");
+	//if (!file.good())
+	//	return;
 
 
-	createScatteringTextureFromMemoryBuffer();
+	//file.close();
+	////transmittance_texture_->Load(cache_directory_ + "transmittance.dat");
+	//m_scattering_texture->Load("h:\\scattering.dat");
+	//m_single_mie_scattering_texture->Load("h:\\single_mie_scattering.dat");
+	////irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
+
+
+	//createScatteringTextureFromMemoryBuffer();
 }
 
-void SkyRenderCPUTest::createScatteringTextureFromMemoryBuffer()
-{
-	//scattering texture
-	std::vector<Vector4> rgbScatteringFloatBuffer;
-	rgbScatteringFloatBuffer.resize(SCATTERING_TEXTURE_WIDTH * SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_DEPTH);
-
-	for (int k = 0; k < SCATTERING_TEXTURE_DEPTH; ++k)
-	{
-		float fk = (float)(k + 0.5) / SCATTERING_TEXTURE_DEPTH;
-
-		for (int j = 0; j < SCATTERING_TEXTURE_HEIGHT; ++j)
-		{
-			float fj = (float)(j + 0.5) / SCATTERING_TEXTURE_HEIGHT;
-
-			for (int i = 0; i < SCATTERING_TEXTURE_WIDTH; ++i)
-			{
-				float fi = (float)(i + 0.5) / SCATTERING_TEXTURE_WIDTH;
-
-				float3 uvw(fi, fj, fk);
-				IrradianceSpectrum irradiacne = lookupScatteringTexture(*m_scattering_texture.get(), uvw);
-				float r = irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
-				float g = irradiacne(kLambdaG).to(watt_per_square_meter_per_nm);
-				float b = irradiacne(kLambdaB).to(watt_per_square_meter_per_nm);
-
-				size_t index = k * (SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH) +
-					j * SCATTERING_TEXTURE_WIDTH + i;
-				rgbScatteringFloatBuffer[index] = Vector4(r, g, b, 1.0f);
-			}
-		}
-	}
-
-	Texture3dConfigDX11 tex3dConfig;
-	tex3dConfig.SetWidth(SCATTERING_TEXTURE_WIDTH);
-	tex3dConfig.SetHeight(SCATTERING_TEXTURE_HEIGHT);
-	tex3dConfig.SetDepth(SCATTERING_TEXTURE_DEPTH);
-	tex3dConfig.SetFormat(DXGI_FORMAT_R32G32B32A32_FLOAT);
-	tex3dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
-	tex3dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
-
-	D3D11_SUBRESOURCE_DATA subResource;
-	subResource.pSysMem = &rgbScatteringFloatBuffer[0];
-	subResource.SysMemPitch = SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
-	subResource.SysMemSlicePitch = SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
-	uint32_t textureHandle = TextureDX11ResourceFactory::getInstance().createTexture3D("Scattering_Texture", tex3dConfig, &subResource);
-
-	m_scattering3DTexture = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
-
-	//single mie scattering texture	
-	for (int k = 0; k < SCATTERING_TEXTURE_DEPTH; ++k)
-	{
-		float fk = (float)(k + 0.5) / SCATTERING_TEXTURE_DEPTH;
-
-		for (int j = 0; j < SCATTERING_TEXTURE_HEIGHT; ++j)
-		{
-			float fj = (float)(j + 0.5) / SCATTERING_TEXTURE_HEIGHT;
-
-			for (int i = 0; i < SCATTERING_TEXTURE_WIDTH; ++i)
-			{
-				float fi = (float)(i + 0.5) / SCATTERING_TEXTURE_WIDTH;
-
-				float3 uvw(fi, fj, fk);
-				IrradianceSpectrum irradiacne = lookupScatteringTexture(*m_single_mie_scattering_texture.get(), uvw);
-				float r = irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
-				float g = irradiacne(kLambdaG).to(watt_per_square_meter_per_nm);
-				float b = irradiacne(kLambdaB).to(watt_per_square_meter_per_nm);
-
-				size_t index = k * (SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH) +
-					j * SCATTERING_TEXTURE_WIDTH + i;
-				rgbScatteringFloatBuffer[index] = Vector4(r, g, b, 1.0f);
-			}
-		}
-	}
-
-	tex3dConfig.SetWidth(SCATTERING_TEXTURE_WIDTH);
-	tex3dConfig.SetHeight(SCATTERING_TEXTURE_HEIGHT);
-	tex3dConfig.SetDepth(SCATTERING_TEXTURE_DEPTH);
-	tex3dConfig.SetFormat(DXGI_FORMAT_R32G32B32A32_FLOAT);
-	tex3dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
-	tex3dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
-
-	subResource.pSysMem = &rgbScatteringFloatBuffer[0];
-	subResource.SysMemPitch = SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
-	subResource.SysMemSlicePitch = SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
-	textureHandle = TextureDX11ResourceFactory::getInstance().createTexture3D("SingleMieScattering_Texture", tex3dConfig, &subResource);
-
-	m_singleMieScattering3DTexture = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
-}
+//void SkyRenderCPUTest::createScatteringTextureFromMemoryBuffer()
+//{
+//	//scattering texture
+//	std::vector<Vector4> rgbScatteringFloatBuffer;
+//	rgbScatteringFloatBuffer.resize(SCATTERING_TEXTURE_WIDTH * SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_DEPTH);
+//
+//	for (int k = 0; k < SCATTERING_TEXTURE_DEPTH; ++k)
+//	{
+//		float fk = (float)(k + 0.5) / SCATTERING_TEXTURE_DEPTH;
+//
+//		for (int j = 0; j < SCATTERING_TEXTURE_HEIGHT; ++j)
+//		{
+//			float fj = (float)(j + 0.5) / SCATTERING_TEXTURE_HEIGHT;
+//
+//			for (int i = 0; i < SCATTERING_TEXTURE_WIDTH; ++i)
+//			{
+//				float fi = (float)(i + 0.5) / SCATTERING_TEXTURE_WIDTH;
+//
+//				float3 uvw(fi, fj, fk);
+//				IrradianceSpectrum irradiacne = lookupScatteringTexture(*m_scattering_texture.get(), uvw);
+//				float r = irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
+//				float g = irradiacne(kLambdaG).to(watt_per_square_meter_per_nm);
+//				float b = irradiacne(kLambdaB).to(watt_per_square_meter_per_nm);
+//
+//				size_t index = k * (SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH) +
+//					j * SCATTERING_TEXTURE_WIDTH + i;
+//				rgbScatteringFloatBuffer[index] = Vector4(r, g, b, 1.0f);
+//			}
+//		}
+//	}
+//
+//	Texture3dConfigDX11 tex3dConfig;
+//	tex3dConfig.SetWidth(SCATTERING_TEXTURE_WIDTH);
+//	tex3dConfig.SetHeight(SCATTERING_TEXTURE_HEIGHT);
+//	tex3dConfig.SetDepth(SCATTERING_TEXTURE_DEPTH);
+//	tex3dConfig.SetFormat(DXGI_FORMAT_R32G32B32A32_FLOAT);
+//	tex3dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
+//	tex3dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
+//
+//	D3D11_SUBRESOURCE_DATA subResource;
+//	subResource.pSysMem = &rgbScatteringFloatBuffer[0];
+//	subResource.SysMemPitch = SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+//	subResource.SysMemSlicePitch = SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+//	uint32_t textureHandle = TextureDX11ResourceFactory::getInstance().createTexture3D("Scattering_Texture", tex3dConfig, &subResource);
+//
+//	m_scattering3DTexture = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
+//
+//	//single mie scattering texture	
+//	for (int k = 0; k < SCATTERING_TEXTURE_DEPTH; ++k)
+//	{
+//		float fk = (float)(k + 0.5) / SCATTERING_TEXTURE_DEPTH;
+//
+//		for (int j = 0; j < SCATTERING_TEXTURE_HEIGHT; ++j)
+//		{
+//			float fj = (float)(j + 0.5) / SCATTERING_TEXTURE_HEIGHT;
+//
+//			for (int i = 0; i < SCATTERING_TEXTURE_WIDTH; ++i)
+//			{
+//				float fi = (float)(i + 0.5) / SCATTERING_TEXTURE_WIDTH;
+//
+//				float3 uvw(fi, fj, fk);
+//				IrradianceSpectrum irradiacne = lookupScatteringTexture(*m_single_mie_scattering_texture.get(), uvw);
+//				float r = irradiacne(kLambdaR).to(watt_per_square_meter_per_nm);
+//				float g = irradiacne(kLambdaG).to(watt_per_square_meter_per_nm);
+//				float b = irradiacne(kLambdaB).to(watt_per_square_meter_per_nm);
+//
+//				size_t index = k * (SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH) +
+//					j * SCATTERING_TEXTURE_WIDTH + i;
+//				rgbScatteringFloatBuffer[index] = Vector4(r, g, b, 1.0f);
+//			}
+//		}
+//	}
+//
+//	tex3dConfig.SetWidth(SCATTERING_TEXTURE_WIDTH);
+//	tex3dConfig.SetHeight(SCATTERING_TEXTURE_HEIGHT);
+//	tex3dConfig.SetDepth(SCATTERING_TEXTURE_DEPTH);
+//	tex3dConfig.SetFormat(DXGI_FORMAT_R32G32B32A32_FLOAT);
+//	tex3dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
+//	tex3dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
+//
+//	subResource.pSysMem = &rgbScatteringFloatBuffer[0];
+//	subResource.SysMemPitch = SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+//	subResource.SysMemSlicePitch = SCATTERING_TEXTURE_HEIGHT * SCATTERING_TEXTURE_WIDTH * 4 * sizeof(float);
+//	textureHandle = TextureDX11ResourceFactory::getInstance().createTexture3D("SingleMieScattering_Texture", tex3dConfig, &subResource);
+//
+//	m_singleMieScattering3DTexture = (Texture3dDX11*)TextureDX11ResourceFactory::getInstance().getResource(textureHandle);
+//}
 
 Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat)
 {
@@ -435,62 +436,62 @@ void computeSkyRadianceThread2(int w, int h, RayRadianceThreadChunk& threadChunk
 	}
 }
 
-void SkyRenderCPUTest::updateSunDirection()
-{
-	//度到弧度
-	float sunTheta_radian = m_sunTheta * PI / 180.0f;
-	float sunphi = m_sunPhi * PI / 180.0f;;
+//void SkyRenderCPUTest::updateSunDirection()
+//{
+//	//度到弧度
+//	float sunTheta_radian = m_sunTheta * PI / 180.0f;
+//	float sunphi = m_sunPhi * PI / 180.0f;;
+//
+//	m_sunDirection.m_y = cos(sunTheta_radian);
+//	m_sunDirection.m_x = sin(sunTheta_radian) * cos(sunphi);
+//	m_sunDirection.m_z = sin(sunTheta_radian) * sin(sunphi);
+//	m_sunDirection.normalize();
+//}
 
-	m_sunDirection.m_y = cos(sunTheta_radian);
-	m_sunDirection.m_x = sin(sunTheta_radian) * cos(sunphi);
-	m_sunDirection.m_z = sin(sunTheta_radian) * sin(sunphi);
-	m_sunDirection.normalize();
-}
-
-void SkyRenderCPUTest::checkRMuMusNuConversion()
-{
-	updateSunDirection();
-
-	Matrix4x4 projMat = m_camera->getProjMat();
-	Matrix4x4 inverseViewMat = m_camera->getViewMat().inverse();
-
-
-	for (int y = 0; y < m_windowHeight; ++y)
-	{
-		for (int x = 0; x < m_windowWidth; ++x)
-		{
-			float u = (float)x / m_windowWidth;
-			float v = (float)y / m_windowHeight;
-
-			Vector3 ray = uvToCameraRay(Vector2(u, v), projMat, inverseViewMat);
-			ray.normalize();
-			double r = m_earthSpacePosVec3.length();
-			Vector3 earthCenterToEyeDirection = m_earthSpacePosVec3 / r;
-			double mu = ray.dot(earthCenterToEyeDirection);
-			double mu_s = m_sunDirection.dot(earthCenterToEyeDirection);
-			double nu = ray.dot(m_sunDirection);
-			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m, mu);
-
-			testRMuMusNuConversion(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
-		}
-	}
-}
+//void SkyRenderCPUTest::checkRMuMusNuConversion()
+//{
+//	updateSunDirection();
+//
+//	Matrix4x4 projMat = m_camera->getProjMat();
+//	Matrix4x4 inverseViewMat = m_camera->getViewMat().inverse();
+//
+//
+//	for (int y = 0; y < m_windowHeight; ++y)
+//	{
+//		for (int x = 0; x < m_windowWidth; ++x)
+//		{
+//			float u = (float)x / m_windowWidth;
+//			float v = (float)y / m_windowHeight;
+//
+//			Vector3 ray = uvToCameraRay(Vector2(u, v), projMat, inverseViewMat);
+//			ray.normalize();
+//			double r = m_earthSpacePosVec3.length();
+//			Vector3 earthCenterToEyeDirection = m_earthSpacePosVec3 / r;
+//			double mu = ray.dot(earthCenterToEyeDirection);
+//			double mu_s = m_sunDirection.dot(earthCenterToEyeDirection);
+//			double nu = ray.dot(m_sunDirection);
+//			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m, mu);
+//
+//			testRMuMusNuConversion(m_atmosphereParameters, r*m, mu, mu_s, nu, rayIsIntersectsGround);
+//		}
+//	}
+//}
 
 //#define  ENABLE_THREAD
 
-void SkyRenderCPUTest::renderSingleScatting()
+void SkyRenderCPUTest::renderSky(Camera* camera,Vector3 sunDirection)
 {
 	g_atomicProgress = 0;
 
-	updateSunDirection();
+	//updateSunDirection();
 
-	Matrix4x4 projMat = m_camera->getProjMat();
-	Matrix4x4 inverseViewMat = m_camera->getViewMat().inverse();
+	Matrix4x4 projMat = camera->getProjMat();
+	Matrix4x4 inverseViewMat = camera->getViewMat().inverse();
 
 	double bottom_radius = m_atmosphereParameters.bottom_radius.to(m);
 	float top_radius = m_atmosphereParameters.top_radius.to(m);
-	Vector3 worldPosVec3 = m_camera->getPosition();
-	m_earthSpacePosVec3 = (m_camera->getPosition() + Vector3(0.0, bottom_radius, 0.0f));
+	Vector3 worldPosVec3 = camera->getPosition();
+	m_earthSpacePosVec3 = (camera->getPosition() + Vector3(0.0, bottom_radius, 0.0f));
 
 	if (m_radianceRGBBuffer.size() != m_windowWidth * m_windowHeight)
 		m_radianceRGBBuffer.resize(m_windowWidth * m_windowHeight);
@@ -500,7 +501,7 @@ void SkyRenderCPUTest::renderSingleScatting()
 	threadChunk.earthSpacePosVec3 = m_earthSpacePosVec3;
 	threadChunk.inverseViewMat = inverseViewMat;
 	threadChunk.projMat = projMat;
-	threadChunk.sunDirection = m_sunDirection;
+	threadChunk.sunDirection = sunDirection;
 
 	//checkRMuMusNuConversion();
 	//return;
@@ -530,8 +531,8 @@ void SkyRenderCPUTest::renderSingleScatting()
 			double r = m_earthSpacePosVec3.length();
 			Vector3 earthCenterToEyeDirection = m_earthSpacePosVec3 / r;
 			double mu = ray.dot(earthCenterToEyeDirection);
-			double mu_s = m_sunDirection.dot(earthCenterToEyeDirection);
-			double nu = ray.dot(m_sunDirection);
+			double mu_s = sunDirection.dot(earthCenterToEyeDirection);
+			double nu = ray.dot(sunDirection);
 			bool rayIsIntersectsGround = RayIntersectsGround(m_atmosphereParameters, r * m,mu);
 			if (rayIsIntersectsGround)
 				int ii = 0;
@@ -653,47 +654,63 @@ void SkyRenderCPUTest::saveRadianceRGBBufferToFile()
 	//SAFE_DELETE_ARRAY(iRGBBuffer);
 }
 
-void SkyRenderCPUTest::onGUI()
+//void SkyRenderCPUTest::onGUI()
+//{
+//	static bool g_overLayShow = true;
+//	ImGui::SetNextWindowPos(ImVec2(100, 300));
+//	if (!ImGui::Begin("SkyRender", &g_overLayShow, ImVec2(500, 800), 0.7f, ImGuiWindowFlags_NoTitleBar))
+//	{
+//		ImGui::End();
+//		return;
+//	}
+//
+//	//if(ImGui::Button("CPU Render", ImVec2(200, 50)))
+//	//{
+//	//	m_isProcessing = true;
+//	//	renderSky();
+//	//}
+//
+//	//ImGui::SliderFloat("sun theta", &m_sunTheta, 0.0f, 180);  
+//
+//	//ImGui::SliderFloat("sun phi", &m_sunPhi, 0.0f, 360.0f);
+//
+//	if (m_isProcessing)
+//	{
+//		float fProgress = (float)g_atomicProgress / (m_windowHeight * m_windowWidth);
+//		ImGui::ProgressBar(fProgress, ImVec2(150, 20));
+//		if (fProgress >= 1.0f)
+//		{
+//			m_isProcessing = false;
+//
+//			updateCpuSkyTexture();
+//		}			
+//	}
+//	
+//	if (m_cpuSkyTextureHandle != 0)
+//	{
+//		Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_cpuSkyTextureHandle);
+//
+//		ImGui::Image(srcTex2d->getShaderResourceView(), ImVec2(200, 200));
+//	}
+//
+//	
+//	ImGui::End();
+//}
+
+Vector3	SkyRenderCPUTest::getVec3SolarIrradiance()
 {
-	static bool g_overLayShow = true;
-	ImGui::SetNextWindowPos(ImVec2(100, 300));
-	if (!ImGui::Begin("SkyRender", &g_overLayShow, ImVec2(500, 800), 0.7f, ImGuiWindowFlags_NoTitleBar))
-	{
-		ImGui::End();
-		return;
-	}
+	double r = m_atmosphereParameters.solar_irradiance(kLambdaR).to(watt_per_square_meter_per_nm);
+	double g = m_atmosphereParameters.solar_irradiance(kLambdaG).to(watt_per_square_meter_per_nm);
+	double b = m_atmosphereParameters.solar_irradiance(kLambdaB).to(watt_per_square_meter_per_nm);
+	return Vector3(r, g, b);
+}
 
-	if(ImGui::Button("CPU Render", ImVec2(200, 50)))
-	{
-		m_isProcessing = true;
-		renderSingleScatting();		
-	}
-
-	ImGui::SliderFloat("sun theta", &m_sunTheta, 0.0f, 180);  
-
-	ImGui::SliderFloat("sun phi", &m_sunPhi, 0.0f, 360.0f);
-
-	if (m_isProcessing)
-	{
-		float fProgress = (float)g_atomicProgress / (m_windowHeight * m_windowWidth);
-		ImGui::ProgressBar(fProgress, ImVec2(150, 20));
-		if (fProgress >= 1.0f)
-		{
-			m_isProcessing = false;
-
-			updateCpuSkyTexture();
-		}			
-	}
-	
-	if (m_cpuSkyTextureHandle != 0)
-	{
-		Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_cpuSkyTextureHandle);
-
-		ImGui::Image(srcTex2d->getShaderResourceView(), ImVec2(200, 200));
-	}
-
-	
-	ImGui::End();
+Vector3	SkyRenderCPUTest::getVec3MieScattering()
+{
+	double r = m_atmosphereParameters.mie_scattering(kLambdaR).to(nm);
+	double g = m_atmosphereParameters.mie_scattering(kLambdaG).to(watt_per_square_meter_per_nm);
+	double b = m_atmosphereParameters.mie_scattering(kLambdaB).to(watt_per_square_meter_per_nm);
+	return Vector3(r, g, b);
 }
 
 NAME_SPACE_END

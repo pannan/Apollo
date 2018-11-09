@@ -20,20 +20,26 @@ public:
 
 	SkyRenderCPUTest(int w, int h);
 
-	void		renderSingleScatting();
+	void		renderSky(Camera* camera,Vector3 sunDirection);
 
-	void		init();
+	void		init(std::shared_ptr<ReducedScatteringTexture>& scatteringTexture,
+		std::shared_ptr<ReducedScatteringTexture>& singleMieScatteringTexture);
 
 	void		saveRadianceRGBBufferToFile();
-
-	Texture3dDX11*		getScatteringTexture() { return m_scattering3DTexture; }
-
-	Texture3dDX11*		getSingleMieScatteringTexture() { return m_singleMieScattering3DTexture; }
 
 	const AtmosphereParameters&	 getAtmosphereParameters() { return m_atmosphereParameters; }
 
 	//void		computeRayRadianceThread(const Vector2& uv, Vector3& outRadiance);
-	void		onGUI();
+	//void		onGUI();
+
+	uint32_t	getSkyRenderTextureHandle() { return m_cpuSkyTextureHandle; }
+
+	//把光谱相关参数转换成rgb
+	Vector3		getVec3SolarIrradiance();
+
+	Vector3		getVec3MieScattering();
+
+	Vector3		getVec3MieExtinction();
 
 protected:
 
@@ -50,13 +56,13 @@ protected:
 
 	//Vector3 uvToCameraRay(Vector2 inUV, const Matrix4x4& projMat, const Matrix4x4& inverseViewMat);
 
-	void			updateSunDirection();
+	//void			updateSunDirection();
 
-	void			checkRMuMusNuConversion();
+	//void			checkRMuMusNuConversion();
 
 	void			initLookupTexture();
 
-	void			createScatteringTextureFromMemoryBuffer();
+	//void			createScatteringTextureFromMemoryBuffer();
 
 private:
 
@@ -64,11 +70,11 @@ private:
 	int			m_windowWidth;
 	int			m_windowHeight;
 
-	Camera*	m_camera;
+//	Camera*	m_camera;
 
-	float			m_sunTheta;	//[0,90] 度
-	float			m_sunPhi;		//[0,360] 度
-	Vector3	m_sunDirection;
+	//float			m_sunTheta;	//[0,90] 度
+//	float			m_sunPhi;		//[0,360] 度
+//	Vector3	m_sunDirection;
 	Vector3	m_earthSpacePosVec3;
 
 	uint32_t	m_cpuSkyTextureHandle;
@@ -79,11 +85,8 @@ private:
 
 	AtmosphereParameters m_atmosphereParameters;
 
-	std::unique_ptr<ReducedScatteringTexture> m_scattering_texture;
-	std::unique_ptr<ReducedScatteringTexture> m_single_mie_scattering_texture;
-
-	Texture3dDX11*		m_scattering3DTexture;
-	Texture3dDX11*		m_singleMieScattering3DTexture;
+	std::shared_ptr<ReducedScatteringTexture> m_scattering_texture;
+	std::shared_ptr<ReducedScatteringTexture> m_single_mie_scattering_texture;
 };
 
 NAME_SPACE_END

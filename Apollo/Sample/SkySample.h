@@ -10,7 +10,7 @@ NAME_SPACE_BEGIN_APOLLO
 NAME_SPACE_BEGIN_ATMOSPHERE
 NAME_SPACE_BEGIN_REFERENCE
 
-class SkyRenderCPUTest;
+class SkyRenderTest;
 
 NAME_SPACE_END
 NAME_SPACE_END
@@ -87,6 +87,6 @@ namespace Apollo
 
 		GlobalParameters			m_globalParameters;
 
-		Apollo::Atmosphere::Reference::SkyRenderCPUTest*		m_skyRenderCPUTest;
+		Apollo::Atmosphere::Reference::SkyRenderTest*		m_skyRenderTest;
 	};
 }

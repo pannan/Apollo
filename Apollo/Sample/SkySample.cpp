@@ -5,7 +5,7 @@
 #include "VertexStruct.h"
 #include "DirectXMath.h"
 #include "Dimensional/test_case.h"
-#include "Environment/Atmosphere/Reference/SkyRenderCPUTest.h"
+#include "Environment/Atmosphere/Reference/SkyRenderTest.h"
 using namespace Apollo;
 using namespace DirectX;
 
@@ -13,13 +13,13 @@ SkySample::SkySample()
 {
 	m_camera = nullptr;
 
-	m_skyRenderCPUTest = nullptr;
+	m_skyRenderTest = nullptr;
 }
 
 SkySample::~SkySample()
 {
 	SAFE_DELETE(m_camera);
-	SAFE_DELETE(m_skyRenderCPUTest);
+	SAFE_DELETE(m_skyRenderTest);
 }
 
 void SkySample::initTestTerrain()
@@ -128,8 +128,8 @@ void SkySample::init()
 	initTestTerrain();
 	dimensional::TestCase::RunAllTests();
 
-	m_skyRenderCPUTest = new Apollo::Atmosphere::Reference::SkyRenderCPUTest(40, 30);
-	m_skyRenderCPUTest->init();
+	m_skyRenderTest = new Apollo::Atmosphere::Reference::SkyRenderTest(40, 30);
+	m_skyRenderTest->init();
 	//m_skyRenderCPUTest->renderSingleScatting();
 	//m_skyRenderCPUTest->saveRadianceRGBBufferToFile();
 }
@@ -317,7 +317,7 @@ void SkySample::drawTestTerrain()
 
 void SkySample::onGUI()
 {
-	m_skyRenderCPUTest->onGUI();
+	m_skyRenderTest->onGUI();
 }
 
 void SkySample::render()
