@@ -15,6 +15,7 @@
 #include "TextureDX11ResourceFactory.h"
 #include "Texture3dConfigDX11.h"
 #include "Environment/Atmosphere/Reference/SkyRenderCPUTest.h"
+#include "Environment/Atmosphere/Reference/SkyRenderGPUTest.h"
 
 //#define _IN(x) const x&
 //#define _OUT(x) x&
@@ -57,12 +58,28 @@ SkyRenderTest::SkyRenderTest(int w, int h)
 	m_camera->updateViewProjMatrix();
 
 	m_skyRenderCPUTest = new SkyRenderCPUTest(w,h);
+	m_skyRenderGPUTest = new SkyRenderGPUTest(w, h);
+}
+
+SkyRenderTest::~SkyRenderTest()
+{
+	SAFE_DELETE(m_skyRenderCPUTest);
+	SAFE_DELETE(m_skyRenderGPUTest);
 }
 
 void SkyRenderTest::init()
 {
 	initLookupTexture();
 	m_skyRenderCPUTest->init(m_scattering_texture, m_single_mie_scattering_texture);
+
+	Vector3 absorptionExtinction = m_skyRenderCPUTest->getVec3AbsorptionExtinction();
+	Vector3 groundAlbedo = m_skyRenderCPUTest->getVec3GroundAlbedo();
+	Vector3 mieExtinction = m_skyRenderCPUTest->getVec3MieExtinction();
+	Vector3 mieScattering = m_skyRenderCPUTest->getVec3MieScattering();
+	Vector3 solarIrradiance = m_skyRenderCPUTest->getVec3SolarIrradiance();
+	Vector3 rayleighScattering = m_skyRenderCPUTest->getRayleighScattering();
+
+	m_skyRenderGPUTest->init(solarIrradiance, rayleighScattering, mieScattering, mieExtinction, groundAlbedo, absorptionExtinction);
 }
 
 void SkyRenderTest::initLookupTexture()

@@ -15,12 +15,15 @@ NAME_SPACE_BEGIN_ATMOSPHERE
 NAME_SPACE_BEGIN_REFERENCE
 
 class SkyRenderCPUTest;
+class SkyRenderGPUTest;
 
 class SkyRenderTest
 {
 public:
 
 	SkyRenderTest(int w, int h);
+
+	~SkyRenderTest();
 
 	void		renderSky();
 
@@ -53,6 +56,7 @@ private:
 	Camera*	m_camera;
 
 	SkyRenderCPUTest*		m_skyRenderCPUTest;
+	SkyRenderGPUTest*		m_skyRenderGPUTest;
 
 	float			m_sunTheta;	//[0,90] ¶È
 	float			m_sunPhi;		//[0,360] ¶È

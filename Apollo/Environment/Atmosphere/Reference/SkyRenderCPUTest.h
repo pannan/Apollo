@@ -37,9 +37,15 @@ public:
 	//把光谱相关参数转换成rgb
 	Vector3		getVec3SolarIrradiance();
 
+	Vector3		getRayleighScattering();
+
 	Vector3		getVec3MieScattering();
 
 	Vector3		getVec3MieExtinction();
+
+	Vector3		getVec3AbsorptionExtinction();
+
+	Vector3		getVec3GroundAlbedo();
 
 protected:
 

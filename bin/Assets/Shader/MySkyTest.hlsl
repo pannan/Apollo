@@ -12,7 +12,7 @@ SamplerState	IrradianceTextureSampler;
 SamplerState	SingleMieScatteringTextureSampler;
 
 Texture3D	scattering_texture;
-Texture3D  single_mie_scattering_texture;
+Texture3D	single_mie_scattering_texture;
 //Texture2D irradiance_texture;
 
 #include"SkyDefinitions.hlsl"

@@ -707,9 +707,41 @@ Vector3	SkyRenderCPUTest::getVec3SolarIrradiance()
 
 Vector3	SkyRenderCPUTest::getVec3MieScattering()
 {
-	double r = m_atmosphereParameters.mie_scattering(kLambdaR).to(nm);
-	double g = m_atmosphereParameters.mie_scattering(kLambdaG).to(watt_per_square_meter_per_nm);
-	double b = m_atmosphereParameters.mie_scattering(kLambdaB).to(watt_per_square_meter_per_nm);
+	double r = m_atmosphereParameters.mie_scattering(kLambdaR).to(1.0f / m);
+	double g = m_atmosphereParameters.mie_scattering(kLambdaG).to(1.0f / m);
+	double b = m_atmosphereParameters.mie_scattering(kLambdaB).to(1.0f / m);
+	return Vector3(r, g, b);
+}
+
+Vector3	SkyRenderCPUTest::getRayleighScattering()
+{
+	double r = m_atmosphereParameters.rayleigh_scattering(kLambdaR).to(1.0f / m);
+	double g = m_atmosphereParameters.rayleigh_scattering(kLambdaG).to(1.0f / m);
+	double b = m_atmosphereParameters.rayleigh_scattering(kLambdaB).to(1.0f / m);
+	return Vector3(r, g, b);
+}
+
+Vector3	SkyRenderCPUTest::getVec3MieExtinction()
+{
+	double r = m_atmosphereParameters.mie_extinction(kLambdaR).to(1.0f / m);
+	double g = m_atmosphereParameters.mie_extinction(kLambdaG).to(1.0f / m);
+	double b = m_atmosphereParameters.mie_extinction(kLambdaB).to(1.0f / m);
+	return Vector3(r, g, b);
+}
+
+Vector3	SkyRenderCPUTest::getVec3AbsorptionExtinction()
+{
+	double r = m_atmosphereParameters.absorption_extinction(kLambdaR).to(1.0f / m);
+	double g = m_atmosphereParameters.absorption_extinction(kLambdaG).to(1.0f / m);
+	double b = m_atmosphereParameters.absorption_extinction(kLambdaB).to(1.0f / m);
+	return Vector3(r, g, b);
+}
+
+Vector3	SkyRenderCPUTest::getVec3GroundAlbedo()
+{
+	double r = m_atmosphereParameters.ground_albedo(kLambdaR)();
+	double g = m_atmosphereParameters.ground_albedo(kLambdaG)();
+	double b = m_atmosphereParameters.ground_albedo(kLambdaB)();
 	return Vector3(r, g, b);
 }
 
