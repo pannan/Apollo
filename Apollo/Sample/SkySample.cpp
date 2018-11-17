@@ -76,7 +76,7 @@ void SkySample::initTestTerrain()
 
 void SkySample::initQuadMeshAndMaterial()
 {
-	m_quadModelPtr = ModelDX11Ptr(ModelDX11::createFullScreenQuadModel());
+	m_quadModelPtr = ModelDX11::createFullScreenQuadModel();
 
 	//create material
 	m_vsShader = ShaderDX11Ptr(new ShaderDX11());

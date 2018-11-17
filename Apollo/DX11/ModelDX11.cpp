@@ -8,6 +8,8 @@
 
 using namespace Apollo;
 
+std::shared_ptr<ModelDX11>		ModelDX11::m_fullScreenModelPtr;
+
 struct DepthSortAscendingLess
 {
 	bool operator()(const IRenderable* a, const IRenderable* b) const
@@ -166,23 +168,28 @@ void ModelDX11::draw()
 	//}
 }
 
-ModelDX11*	ModelDX11::createFullScreenQuadModel()
+ModelDX11Ptr& 	ModelDX11::createFullScreenQuadModel()
 {
-	Vertex_Pos_UV0 data[4];
-	data[0].pos = Vector3(-1, 1, 0);
-	data[0].uv0 = Vector2(0, 0);
-	data[1].pos = Vector3(1, 1, 0);
-	data[1].uv0 = Vector2(1, 0);
-	data[2].pos = Vector3(1, -1, 0);
-	data[2].uv0 = Vector2(1, 1);
-	data[3].pos = Vector3(-1, -1, 0);
-	data[3].uv0 = Vector2(0, 1);
+	if (m_fullScreenModelPtr == nullptr)
+	{
+		Vertex_Pos_UV0 data[4];
+		data[0].pos = Vector3(-1, 1, 0);
+		data[0].uv0 = Vector2(0, 0);
+		data[1].pos = Vector3(1, 1, 0);
+		data[1].uv0 = Vector2(1, 0);
+		data[2].pos = Vector3(1, -1, 0);
+		data[2].uv0 = Vector2(1, 1);
+		data[3].pos = Vector3(-1, -1, 0);
+		data[3].uv0 = Vector2(0, 1);
 
-	//m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0),4);
+		//m_quadMesh->createVertexBuffer(data, sizeof(Vertex_Pos_UV0), 4 * sizeof(Vertex_Pos_UV0),4);
 
-	uint16_t index[6] = { 0,1,2,2,3,0 };
+		uint16_t index[6] = { 0,1,2,2,3,0 };
 
-	ModelDX11* model = new ModelDX11;
-	model->createFromMemory(data, sizeof(Vertex_Pos_UV0), 4, index, 6);
-	return model;
+		ModelDX11* model = new ModelDX11;
+		model->createFromMemory(data, sizeof(Vertex_Pos_UV0), 4, index, 6);
+		m_fullScreenModelPtr = ModelDX11Ptr(model);
+	}
+	
+	return m_fullScreenModelPtr;
 }

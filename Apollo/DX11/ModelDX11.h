@@ -4,7 +4,6 @@
 #include "ShaderDX11.h"
 namespace Apollo
 {
-
 	class ModelDX11
 	{
 	public:
@@ -25,7 +24,7 @@ namespace Apollo
 
 		MaterialPtr&		getMaterial(uint32_t index) { return m_materialList[index]; }
 
-		static ModelDX11*	createFullScreenQuadModel();
+		static std::shared_ptr<ModelDX11>&	createFullScreenQuadModel();
 
 	protected:
 
@@ -41,6 +40,8 @@ namespace Apollo
 		std::vector<MaterialPtr> m_materialList;
 
 		std::vector<SubMeshDX11*>		m_subMeshList;
+
+		static std::shared_ptr<ModelDX11>		m_fullScreenModelPtr;
 
 	private:
 	};

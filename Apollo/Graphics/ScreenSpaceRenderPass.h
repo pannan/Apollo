@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Task.h"
+#include "RenderPass.h"
 
 namespace Apollo
 {
-	class ScreenSpaceRenderPass : public Task
+	class ScreenSpaceRenderPass : public RenderPass
 	{
 	public:
 

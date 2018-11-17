@@ -66,6 +66,10 @@
 #pragma comment(lib, "boost_context.lib")
 #pragma comment(lib, "DirectXTex.lib")
 
+#pragma warning(disable: 4267)
+#pragma warning(disable: 4244)
+#pragma warning(disable: 4305)
+
 #ifdef uint32
 #define typedef std::uint32_t uint32;
 #endif
