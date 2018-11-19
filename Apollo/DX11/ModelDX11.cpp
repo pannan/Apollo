@@ -8,7 +8,7 @@
 
 using namespace Apollo;
 
-std::shared_ptr<ModelDX11>		ModelDX11::m_fullScreenModelPtr;
+//std::shared_ptr<ModelDX11>		ModelDX11::m_fullScreenModelPtr;
 
 struct DepthSortAscendingLess
 {
@@ -168,9 +168,9 @@ void ModelDX11::draw()
 	//}
 }
 
-ModelDX11Ptr& 	ModelDX11::createFullScreenQuadModel()
+ModelDX11Ptr 	ModelDX11::createFullScreenQuadModel()
 {
-	if (m_fullScreenModelPtr == nullptr)
+	//if (m_fullScreenModelPtr == nullptr)
 	{
 		Vertex_Pos_UV0 data[4];
 		data[0].pos = Vector3(-1, 1, 0);
@@ -188,8 +188,8 @@ ModelDX11Ptr& 	ModelDX11::createFullScreenQuadModel()
 
 		ModelDX11* model = new ModelDX11;
 		model->createFromMemory(data, sizeof(Vertex_Pos_UV0), 4, index, 6);
-		m_fullScreenModelPtr = ModelDX11Ptr(model);
+		return ModelDX11Ptr(model);
 	}
 	
-	return m_fullScreenModelPtr;
+	//return m_fullScreenModelPtr;
 }

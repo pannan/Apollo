@@ -24,7 +24,7 @@ namespace Apollo
 
 		MaterialPtr&		getMaterial(uint32_t index) { return m_materialList[index]; }
 
-		static std::shared_ptr<ModelDX11>&	createFullScreenQuadModel();
+		static std::shared_ptr<ModelDX11>	createFullScreenQuadModel();
 
 	protected:
 
@@ -41,7 +41,7 @@ namespace Apollo
 
 		std::vector<SubMeshDX11*>		m_subMeshList;
 
-		static std::shared_ptr<ModelDX11>		m_fullScreenModelPtr;
+	//	static std::shared_ptr<ModelDX11>		m_fullScreenModelPtr;
 
 	private:
 	};
