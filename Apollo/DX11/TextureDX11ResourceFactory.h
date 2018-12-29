@@ -36,6 +36,8 @@ namespace Apollo
 
 		TextureResource*		loadDDS(const std::string& path, uint32_t handle);
 
+		TextureResource*		loadTGA(const std::string& path, uint32_t handle);
+
 	protected:
 
 		std::vector<TextureResourcePtr>		m_textureResourceList;

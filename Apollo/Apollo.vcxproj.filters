@@ -414,6 +414,12 @@
     <ClInclude Include="Environment\Atmosphere\Reference\SkyRenderTest.h">
       <Filter>Environment\Atmosphere\Reference</Filter>
     </ClInclude>
+    <ClInclude Include="Sample\Dxt5NMEncodeSample.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="SDK\TGAImage.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -658,6 +664,12 @@
     </ClCompile>
     <ClCompile Include="Environment\Atmosphere\Reference\SkyRenderTest.cpp">
       <Filter>Environment\Atmosphere\Reference</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\Dxt5NMEnCodeSample.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\TGAImage.cpp">
+      <Filter>SDK</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

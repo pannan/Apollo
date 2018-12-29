@@ -99,6 +99,73 @@ TextureResource* TextureDX11ResourceFactory::loadDDS(const std::string& path, ui
 	return nullptr;
 }
 
+TextureResource* TextureDX11ResourceFactory::loadTGA(const std::string& path, uint32_t handle)
+{
+	TexMetadata mdata;
+
+	wstring wpath;
+	StringToWString(path, wpath);
+	HRESULT hr = GetMetadataFromTGAFile(wpath.c_str(), mdata);
+	if (hr != S_OK)
+	{
+		LogManager::getInstance().log("[TextureDX11ResourceFactory::loadTGA] GetMetadataFromTGAFile error! file:" + path);
+		return nullptr;
+	}
+
+	ScratchImage image;
+	hr = LoadFromTGAFile(wpath.c_str(), &mdata, image);
+	if (FAILED(hr))
+	{
+		LogManager::getInstance().log("[TextureDX11ResourceFactory::loadTGA] LoadFromTGAFile error! file:" + path);
+		return nullptr;
+	}
+
+	// Special case to make sure Texture cubes remain arrays
+	//mdata.miscFlags &= ~TEX_MISC_TEXTURECUBE;
+	ID3D11ShaderResourceView* srv = nullptr;
+	hr = CreateShaderResourceView(RendererDX11::getInstance().getDevice(),
+		image.GetImages(),
+		image.GetImageCount(),
+		mdata,
+		&srv);
+
+	if (hr != S_OK)
+	{
+		LogManager::getInstance().log("[TextureDX11ResourceFactory::loadDDS] LoadFromDDSFile error! file:" + path);
+		return nullptr;
+	}
+
+	ID3D11Resource * resource = nullptr;
+	srv->GetResource(&resource);
+
+	if (mdata.IsCubemap())
+	{
+		TextureCubeMapDX11* texCubeMap = new TextureCubeMapDX11(path, handle, srv);
+		return texCubeMap;
+	}
+	else
+	{
+		if (mdata.dimension == TEX_DIMENSION_TEXTURE1D)
+		{
+			return nullptr;
+		}
+		else if (mdata.dimension == TEX_DIMENSION_TEXTURE2D)
+		{
+			Texture2dDX11* tex2d = new Texture2dDX11(path, handle);
+			ID3D11Texture2D* texdx11 = (ID3D11Texture2D*)resource;
+			tex2d->setTexture2D(texdx11);
+			tex2d->setShaderResourceView(srv);
+			return tex2d;
+		}
+		else
+		{
+			return nullptr;
+		}
+	}
+
+	return nullptr;
+}
+
 uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Texture2dConfigDX11& config, 
 	D3D11_SUBRESOURCE_DATA* subResource)
 {
@@ -360,6 +427,10 @@ uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, con
 	if (suffixName == "dds")
 	{
 		tex = loadDDS(path, handle);
+	}
+	else if (suffixName == "tga")
+	{
+		tex = loadTGA(path, handle);
 	}
 
 
