@@ -8,6 +8,7 @@
 #include "Texture2dDX11.h"
 #include "Texture3dDX11.h"
 #include "TextureCubeMapDX11.h"
+#include "HDRLoader.h"
 
 using namespace Apollo;
 using namespace std;
@@ -164,6 +165,27 @@ TextureResource* TextureDX11ResourceFactory::loadTGA(const std::string& path, ui
 	}
 
 	return nullptr;
+}
+
+uint32_t TextureDX11ResourceFactory::loadHDR(const std::string& path)
+{
+	HDRLoader hdrLoader;
+	hdrLoader.load(path);
+
+	Texture2dConfigDX11 tex2dConfig;
+	tex2dConfig.SetWidth(hdrLoader.getWidth());
+	tex2dConfig.SetHeight(hdrLoader.getHeight());
+	tex2dConfig.SetFormat(DXGI_FORMAT_R32G32B32A32_FLOAT);
+	tex2dConfig.SetMipLevels(1);
+	tex2dConfig.SetUsage(D3D11_USAGE_DYNAMIC);
+	tex2dConfig.SetCPUAccessFlags(D3D11_CPU_ACCESS_WRITE);
+	D3D11_SUBRESOURCE_DATA subResource;
+	subResource.pSysMem = hdrLoader.getRGBAFloatBuffer();
+	subResource.SysMemPitch = hdrLoader.getWidth() * sizeof(float) * 4;
+	subResource.SysMemSlicePitch = 0;
+	uint32_t handle = createTexture2D(m_resourceName, tex2dConfig, &subResource);
+
+	return handle;
 }
 
 uint32_t TextureDX11ResourceFactory::createTexture2D(const std::string& name, Texture2dConfigDX11& config, 
@@ -421,6 +443,7 @@ uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, con
 		return 0;
 	}
 	
+	m_resourceName = name;
 	string suffixName = type;// name.substr(pos + 1, name.size() - pos);
 
 	TextureResource* tex = nullptr;
@@ -431,6 +454,10 @@ uint32_t TextureDX11ResourceFactory::createResource(const std::string& path, con
 	else if (suffixName == "tga")
 	{
 		tex = loadTGA(path, handle);
+	}
+	else if (suffixName == "hdr")
+	{
+		return loadHDR(path);
 	}
 
 

@@ -420,6 +420,12 @@
     <ClInclude Include="SDK\TGAImage.h">
       <Filter>SDK</Filter>
     </ClInclude>
+    <ClInclude Include="Base\HDRLoader.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\PreFilterEnvMapSample.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -670,6 +676,12 @@
     </ClCompile>
     <ClCompile Include="SDK\TGAImage.cpp">
       <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\HDRLoader.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\PreFilterEnvMapSample.cpp">
+      <Filter>Sample</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

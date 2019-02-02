@@ -169,6 +169,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   <ItemGroup>
     <ClInclude Include="Base\CharacterTools.h" />
     <ClInclude Include="Base\EventManager.h" />
+    <ClInclude Include="Base\HDRLoader.h" />
     <ClInclude Include="Base\HLSLResource.h" />
     <ClInclude Include="Base\HLSLResourceFactory.h" />
     <ClInclude Include="Base\IEventListener.h" />
@@ -261,6 +262,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\GPUParticleSample.h" />
     <ClInclude Include="Sample\HeightMapTerrain.h" />
     <ClInclude Include="Sample\OutDoorScene.h" />
+    <ClInclude Include="Sample\PreFilterEnvMapSample.h" />
     <ClInclude Include="Sample\SampleBase.h" />
     <ClInclude Include="Sample\SampleManager.h" />
     <ClInclude Include="Sample\SkySample.h" />
@@ -288,6 +290,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Apollo.cpp" />
     <ClCompile Include="Base\CharacterTools.cpp" />
     <ClCompile Include="Base\EventManager.cpp" />
+    <ClCompile Include="Base\HDRLoader.cpp" />
     <ClCompile Include="Base\HLSLResourceFactory.cpp" />
     <ClCompile Include="Base\LogManager.cpp" />
     <ClCompile Include="Base\MaterialParse.cpp" />
@@ -352,6 +355,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Sample\GPUParticleSample.cpp" />
     <ClCompile Include="Sample\HeightMapTerrain.cpp" />
     <ClCompile Include="Sample\OutDoorScene.cpp" />
+    <ClCompile Include="Sample\PreFilterEnvMapSample.cpp" />
     <ClCompile Include="Sample\SampleManager.cpp" />
     <ClCompile Include="Sample\SkySample.cpp" />
     <ClCompile Include="Sample\TestSample.cpp" />

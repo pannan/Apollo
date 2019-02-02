@@ -7,6 +7,7 @@
 #include "Dxt5NMEncodeSample.h"
 #include "SkySample.h"
 #include "Timer.h"
+#include "PreFilterEnvMapSample.h"
 using namespace Apollo;
 
 
@@ -29,7 +30,7 @@ SampleManager::~SampleManager()
 
 void SampleManager::init()
 {
-	m_currentSample = new Dxt5NMEnCodeSample;// new SkySample;//
+	m_currentSample = new PreFilterEnvMapSample;//
 	m_currentSample->init();
 	m_sampleList.push_back(m_currentSample);
 }

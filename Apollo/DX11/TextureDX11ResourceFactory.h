@@ -38,7 +38,12 @@ namespace Apollo
 
 		TextureResource*		loadTGA(const std::string& path, uint32_t handle);
 
+		uint32_t						loadHDR(const std::string& path);
+
 	protected:
+
+		//当前加载的资源名字
+		std::string			m_resourceName;
 
 		std::vector<TextureResourcePtr>		m_textureResourceList;
 
