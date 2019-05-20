@@ -9,10 +9,10 @@ NAME_SPACE_BEGIN_APOLLO
 struct SpringParticles
 {
 	Vector3			pos;	//位置
-	Vector3			velocity;
-	float					mass;
-	unsigned int	adjacentParticles[4];		//二维gird，最多四个相邻节点。保存index
-	int					adjacentParticlesCount;	
+	float				velocity;
+	float				mass;
+	size_t			adjacentParticles[4];		//二维gird，最多四个相邻节点。保存index
+	int				adjacentParticlesCount;	
 };
 
 //保存粒子的数据结构
@@ -21,6 +21,11 @@ class SpringGridMesh
 public:
 	friend class Spring;
 
+	void				initTopology();
+
+protected:
+
+	void				getAdjacent(int x,int y,size_t  adjacent[4],int& adjacentCount);
 
 private:
 	int				m_width;
@@ -33,9 +38,22 @@ private:
 class Spring
 {
 public:
+
+	Spring(float springStiffness,float springLength,float dampingCoefficient);
+
+	void		update(float dtime);
+
 protected:
+
+	Vector3		springForce(const Vector3& x0,const Vector3& x1);
+
+	Vector3		dampingFroce(const Vector3& x0, const Vector3& x1, const float& v0, const float& v1);
+
 private:
 
+	float			m_springStiffness;
+	float			m_springLength;
+	float			m_dampingCoefficient;
 
 };
 
