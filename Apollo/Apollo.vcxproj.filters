@@ -67,6 +67,12 @@
     <Filter Include="Thread">
       <UniqueIdentifier>{b01e7052-6de4-41bf-aec8-dd19fe56d5e3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{67a17af3-5566-41ea-9cdd-6e9190f28669}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\MassSpringSystems">
+      <UniqueIdentifier>{af1ce9e1-60ba-4d6c-b47e-8c92dd17ee40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -425,6 +431,9 @@
     </ClInclude>
     <ClInclude Include="Sample\PreFilterEnvMapSample.h">
       <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\MassSpringSystems\Spring.h">
+      <Filter>Physics\MassSpringSystems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

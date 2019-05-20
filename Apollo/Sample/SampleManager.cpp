@@ -30,7 +30,7 @@ SampleManager::~SampleManager()
 
 void SampleManager::init()
 {
-	m_currentSample = new PreFilterEnvMapSample;//
+	m_currentSample = new SkySample;//
 	m_currentSample->init();
 	m_sampleList.push_back(m_currentSample);
 }

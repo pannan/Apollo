@@ -257,6 +257,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Vector2.h" />
     <ClInclude Include="Math\Vector3.h" />
     <ClInclude Include="Math\Vector4.h" />
+    <ClInclude Include="Physics\MassSpringSystems\Spring.h" />
     <ClInclude Include="Sample\ComputerShaderProcessTexture.h" />
     <ClInclude Include="Sample\Dxt5NMEncodeSample.h" />
     <ClInclude Include="Sample\GPUParticleSample.h" />
