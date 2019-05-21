@@ -70,6 +70,10 @@ Spring::Spring(float springStiffness,float springLength,float dampingCoefficient
 
 }
 
+/*
+springforce = Ks * (x1 - x0) / length(x1 - x0) * (lenght(x1 - x0) - springLength)
+*/
+
 Vector3 Spring::springForce(const Vector3& x0, const Vector3& x1)
 {
 	Vector3 vec = x1 - x0;
@@ -80,19 +84,73 @@ Vector3 Spring::springForce(const Vector3& x0, const Vector3& x1)
 	return force;
 }
 
-Vector3 Spring::dampingFroce(const Vector3& x0, const Vector3& x1, const float& v0, const float& v1)
+/*
+dampingforce = Kd * (v1 - v0) dot ((x1 - x0) / length(x1 - x0))
+这里有问题，按上面dot出来的是一个float，但是springforce的是float3
+从代码上看着里少乘一个normalize(x1 - x0)
+修改后的公式:
+normalize(x1 - x0) = (x1 - x0) / length(x1 - x0)
+dampingforce = Ks * dot( (v1 - v0), normalize(x1 - x0)) * normalize(x1 - x0);
+*/
+
+Vector3 Spring::dampingFroce(const Vector3& x0, const Vector3& x1, const Vector3& v0, const Vector3& v1)
 {
-	float velocity = v1 - v0;
+	Vector3 velocity = v1 - v0;
 	Vector3 vec = x1 - x0;
 	vec.normalize();
 
-	Vector3 force = vec * velocity * m_dampingCoefficient;
+	Vector3 force = vec * vec.dot(velocity) * m_dampingCoefficient;
 	return force;
 }
 
-void Spring::update(float dtime)
+Vector3 Spring::computeForce(const Vector3& x0, const Vector3& x1, const Vector3& v0, const Vector3& v1)
 {
+	Vector3 force0 = springForce(x0, x1);
+	Vector3 force1 = dampingFroce(x0, x1, v0, v1);
+	return force0 + force1;
+}
 
+void Spring::updateForce(SpringGridMesh& springMesh,float dtime)
+{
+	for (size_t i = 0; i < springMesh.m_particlesList.size(); ++i)
+	{
+		Vector3 particelsForce = Vector3::s_ZeroVec;
+
+		SpringParticles& particle = springMesh.m_particlesList[i];
+
+		for (int j = 0; j < particle.adjacentParticlesCount; ++j)
+		{
+			size_t adjacentIndex = particle.adjacentParticles[j];
+			SpringParticles& adjacentParticle = springMesh.m_particlesList[adjacentIndex];
+
+			Vector3 force = computeForce(particle.pos, adjacentParticle.pos, particle.velocity, adjacentParticle.velocity);
+			particelsForce += force;
+		}
+
+		//加上重力和碰撞力，这里碰撞力忽略
+		particelsForce += Vector3(0, -1, 0) * 9.8f * particle.mass;
+
+		particle.force = particelsForce;
+	}
+}
+
+void Spring::verletIntegrationUpdate(SpringGridMesh& springMesh, float dtime)
+{
+	for (size_t i = 0; i < springMesh.m_particlesList.size(); ++i)
+	{
+		SpringParticles& particle = springMesh.m_particlesList[i];
+
+		Vector3 nextPos = particle.pos + particle.velocity * dtime + particle.force * dtime * dtime / particle.mass;
+		particle.velocity = (nextPos - particle.pos) / dtime;
+		particle.pos = nextPos;
+	}
+}
+
+void Spring::update(SpringGridMesh& springMesh,float dtime)
+{
+	updateForce(springMesh, dtime);
+
+	verletIntegrationUpdate(springMesh, dtime);
 }
 
 NAME_SPACE_END

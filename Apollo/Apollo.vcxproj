@@ -267,6 +267,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\SampleBase.h" />
     <ClInclude Include="Sample\SampleManager.h" />
     <ClInclude Include="Sample\SkySample.h" />
+    <ClInclude Include="Sample\SpringParticleSample.h" />
     <ClInclude Include="Sample\TestSample.h" />
     <ClInclude Include="Scene\SceneNode.h" />
     <ClInclude Include="SDK\coroutine.h" />
@@ -351,6 +352,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Math\Quaternion.cpp" />
     <ClCompile Include="Math\Vector3.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
+    <ClCompile Include="Physics\MassSpringSystems\Spring.cpp" />
     <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp" />
     <ClCompile Include="Sample\Dxt5NMEnCodeSample.cpp" />
     <ClCompile Include="Sample\GPUParticleSample.cpp" />
@@ -359,6 +361,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Sample\PreFilterEnvMapSample.cpp" />
     <ClCompile Include="Sample\SampleManager.cpp" />
     <ClCompile Include="Sample\SkySample.cpp" />
+    <ClCompile Include="Sample\SpringParticleSample.cpp" />
     <ClCompile Include="Sample\TestSample.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="SDK\TGAImage.cpp" />

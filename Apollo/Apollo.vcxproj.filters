@@ -435,6 +435,9 @@
     <ClInclude Include="Physics\MassSpringSystems\Spring.h">
       <Filter>Physics\MassSpringSystems</Filter>
     </ClInclude>
+    <ClInclude Include="Sample\SpringParticleSample.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -690,6 +693,12 @@
       <Filter>Base</Filter>
     </ClCompile>
     <ClCompile Include="Sample\PreFilterEnvMapSample.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\MassSpringSystems\Spring.cpp">
+      <Filter>Physics\MassSpringSystems</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\SpringParticleSample.cpp">
       <Filter>Sample</Filter>
     </ClCompile>
   </ItemGroup>
