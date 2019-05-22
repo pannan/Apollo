@@ -228,6 +228,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Graphics\ClearRenderTargetPass.h" />
     <ClInclude Include="Graphics\DeferredRenderLightPass.h" />
     <ClInclude Include="Graphics\Frustum.h" />
+    <ClInclude Include="Graphics\GeometryGenerator.h" />
     <ClInclude Include="Graphics\IRenderable.h" />
     <ClInclude Include="Graphics\RenderPass.h" />
     <ClInclude Include="Graphics\RenderPipeline.h" />
@@ -336,6 +337,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Graphics\ClearRenderTargetPass.cpp" />
     <ClCompile Include="Graphics\DeferredRenderLightPass.cpp" />
     <ClCompile Include="Graphics\Frustum.cpp" />
+    <ClCompile Include="Graphics\GeometryGenerator.cpp" />
     <ClCompile Include="Graphics\IRenderable.cpp" />
     <ClCompile Include="Graphics\RenderPass.cpp" />
     <ClCompile Include="Graphics\RenderPipeline.cpp" />

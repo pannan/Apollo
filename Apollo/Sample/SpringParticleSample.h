@@ -30,6 +30,7 @@ protected:
 private:
 
 	Camera * m_camera;
+	RenderStateDX11		m_renderState;
 
 	SpringGridMesh	m_springMesh;
 	Spring					m_spring;
