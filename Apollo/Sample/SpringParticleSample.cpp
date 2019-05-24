@@ -37,7 +37,7 @@ void SpringParticleSample::init()
 	m_renderState.setDepthWriteMask(D3D11_DEPTH_WRITE_MASK_ZERO);
 	m_renderState.createState();
 
-	m_camera = new Camera(Vector3(40, 30, 0), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
+	m_camera = new Camera(Vector3(40, 30, 0), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * APOLLO_PI / 180.0f);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
 }

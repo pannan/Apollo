@@ -24,7 +24,7 @@ class GeometryGenerator
 public:
 
 	//原点默认为0，半径为1.
-	static void		generatorSphere(int phiStepCount,int theatStepCount,std::vector<Vector3>& outPos,std::vector<unsigned short>& outIndex);
+	static void		generatorSphere(int phiStepCount,int thetaStepCount,std::vector<Vector3>& outPos,std::vector<unsigned short>& outIndex);
 
 protected:
 

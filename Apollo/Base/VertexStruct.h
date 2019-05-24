@@ -11,6 +11,12 @@ namespace Apollo
 		Vector3 pos;
 	};
 
+	struct  Vertex_Pos_Color
+	{
+		Vector3 pos;
+		unsigned int	color;
+	};
+
 	struct  Vertex_Pos_UV0
 	{
 		Vector3 pos;

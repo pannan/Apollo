@@ -74,8 +74,6 @@
 #define typedef std::uint32_t uint32;
 #endif
 
-#define GLYPH_PI 3.14159265f
-
 #define SAFE_DELETE( x ) {if(x){delete (x);(x)=NULL;}}
 
 #define SAFE_RELEASE(x) { if (x) x->Release(); x = NULL; }
@@ -86,7 +84,7 @@
 
 #define GET_RESOURCE_INDEX(handle) ((handle >> 8) & 0x00ffffff);
 
-#define _PI			3.14159265358979323846
+#define APOLLO_PI			3.14159265358979323846
 
 typedef int8_t int8;
 typedef int16_t int16;

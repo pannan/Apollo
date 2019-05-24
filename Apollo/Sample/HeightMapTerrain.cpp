@@ -38,7 +38,7 @@ HeightMapTerrain::~HeightMapTerrain()
 
 void HeightMapTerrain::init()
 {
-	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
+	m_camera = new Camera(Vector3(400, 100, -150), Vector3(0, 0, 0), Vector3(0, 1, 0), 0.001, 5000, 90 * APOLLO_PI / 180.0f);
 	m_camera->setViewportWidth(1280);
 	m_camera->setViewportHeight(800);
 	//m_camera = new FirstPersonCamera(1280.0f / 800.0f, Pi_4 * 0.75f, 0.01, 10000);

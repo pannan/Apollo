@@ -52,7 +52,7 @@ SkyRenderTest::SkyRenderTest(int w, int h)
 
 	Vector3 camPos(0, 1000, 0);
 	Vector3 lookAt = camPos + Vector3(3, 8, 1) * 10;
-	m_camera = new Camera(camPos, lookAt, Vector3(0, 1, 0), 0.001, 5000, 90 * _PI / 180.0f);
+	m_camera = new Camera(camPos, lookAt, Vector3(0, 1, 0), 0.001, 5000, 90 * APOLLO_PI / 180.0f);
 	m_camera->setViewportWidth(w);
 	m_camera->setViewportHeight(h);
 	m_camera->updateViewProjMatrix();
