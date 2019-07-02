@@ -22,7 +22,7 @@
     <ProjectGuid>{94D5A1EC-8144-4AA4-83F1-D1BC5F9A436E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Apollo</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -192,6 +192,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Base\Visitor.h" />
     <ClInclude Include="DX11\BufferManagerDX11.h" />
     <ClInclude Include="DX11\ConstantBufferDX11.h" />
+    <ClInclude Include="DX11\DirectXTexEXR.h" />
     <ClInclude Include="DX11\GeometryDX11.h" />
     <ClInclude Include="DX11\HLSLDX11Factory.h" />
     <ClInclude Include="DX11\HLSLDX11Resource.h" />
@@ -258,9 +259,9 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Vector2.h" />
     <ClInclude Include="Math\Vector3.h" />
     <ClInclude Include="Math\Vector4.h" />
-    <ClInclude Include="Physics\MassSpringSystems\Spring.h" />
     <ClInclude Include="Sample\ComputerShaderProcessTexture.h" />
     <ClInclude Include="Sample\Dxt5NMEncodeSample.h" />
+    <ClInclude Include="Sample\ExrFileIOSample.h" />
     <ClInclude Include="Sample\GPUParticleSample.h" />
     <ClInclude Include="Sample\HeightMapTerrain.h" />
     <ClInclude Include="Sample\OutDoorScene.h" />
@@ -268,7 +269,6 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\SampleBase.h" />
     <ClInclude Include="Sample\SampleManager.h" />
     <ClInclude Include="Sample\SkySample.h" />
-    <ClInclude Include="Sample\SpringParticleSample.h" />
     <ClInclude Include="Sample\TestSample.h" />
     <ClInclude Include="Scene\SceneNode.h" />
     <ClInclude Include="SDK\coroutine.h" />
@@ -304,6 +304,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Base\Timer.cpp" />
     <ClCompile Include="DX11\BufferManagerDX11.cpp" />
     <ClCompile Include="DX11\ConstantBufferDX11.cpp" />
+    <ClCompile Include="DX11\DirectXTexEXR.cpp" />
     <ClCompile Include="DX11\GeometryDX11.cpp" />
     <ClCompile Include="DX11\HLSLDX11Factory.cpp" />
     <ClCompile Include="DX11\HLSLDX11Resource.cpp" />
@@ -354,16 +355,15 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Math\Quaternion.cpp" />
     <ClCompile Include="Math\Vector3.cpp" />
     <ClCompile Include="Math\Vector4.cpp" />
-    <ClCompile Include="Physics\MassSpringSystems\Spring.cpp" />
     <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp" />
     <ClCompile Include="Sample\Dxt5NMEnCodeSample.cpp" />
+    <ClCompile Include="Sample\ExrFileIOSample.cpp" />
     <ClCompile Include="Sample\GPUParticleSample.cpp" />
     <ClCompile Include="Sample\HeightMapTerrain.cpp" />
     <ClCompile Include="Sample\OutDoorScene.cpp" />
     <ClCompile Include="Sample\PreFilterEnvMapSample.cpp" />
     <ClCompile Include="Sample\SampleManager.cpp" />
     <ClCompile Include="Sample\SkySample.cpp" />
-    <ClCompile Include="Sample\SpringParticleSample.cpp" />
     <ClCompile Include="Sample\TestSample.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="SDK\TGAImage.cpp" />
@@ -436,6 +436,7 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <None Include="..\bin\Assets\Shader\TextureVS.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\bin\Assets\Shader\Functions.hlsl">
@@ -454,5 +455,16 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\openexr-msvc-x64.2.3.0.8788\build\native\OpenEXR-msvc-x64.targets" Condition="Exists('..\packages\openexr-msvc-x64.2.3.0.8788\build\native\OpenEXR-msvc-x64.targets')" />
+    <Import Project="..\packages\boost.1.70.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.70.0.0\build\boost.targets')" />
+    <Import Project="..\packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets" Condition="Exists('..\packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\openexr-msvc-x64.2.3.0.8788\build\native\OpenEXR-msvc-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\openexr-msvc-x64.2.3.0.8788\build\native\OpenEXR-msvc-x64.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.70.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.70.0.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\zlib-msvc-x64.1.2.11.8900\build\native\zlib-msvc-x64.targets'))" />
+  </Target>
 </Project>

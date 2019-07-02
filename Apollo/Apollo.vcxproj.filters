@@ -432,14 +432,14 @@
     <ClInclude Include="Sample\PreFilterEnvMapSample.h">
       <Filter>Sample</Filter>
     </ClInclude>
-    <ClInclude Include="Physics\MassSpringSystems\Spring.h">
-      <Filter>Physics\MassSpringSystems</Filter>
-    </ClInclude>
-    <ClInclude Include="Sample\SpringParticleSample.h">
-      <Filter>Sample</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\GeometryGenerator.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="DX11\DirectXTexEXR.h">
+      <Filter>Dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\ExrFileIOSample.h">
+      <Filter>Sample</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -698,14 +698,14 @@
     <ClCompile Include="Sample\PreFilterEnvMapSample.cpp">
       <Filter>Sample</Filter>
     </ClCompile>
-    <ClCompile Include="Physics\MassSpringSystems\Spring.cpp">
-      <Filter>Physics\MassSpringSystems</Filter>
-    </ClCompile>
-    <ClCompile Include="Sample\SpringParticleSample.cpp">
-      <Filter>Sample</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\GeometryGenerator.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="DX11\DirectXTexEXR.cpp">
+      <Filter>Dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\ExrFileIOSample.cpp">
+      <Filter>Sample</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -769,5 +769,6 @@
     <None Include="..\bin\Assets\Shader\MySkyTest.hlsl">
       <Filter>Shader</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

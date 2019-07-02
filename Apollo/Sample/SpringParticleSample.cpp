@@ -19,7 +19,7 @@ void SpringParticleSample::init()
 	SpringParticles particle;
 
 	//最简单的两个点的spring
-	particle.force = 0;
+	particle.force = Vector3(0,0,0);
 	particle.mass = 1;
 	particle.pos = Vector3(0, 10, 0);
 	particle.velocity = Vector3::s_ZeroVec;

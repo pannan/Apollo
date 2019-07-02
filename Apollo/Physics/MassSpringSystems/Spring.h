@@ -8,12 +8,12 @@ NAME_SPACE_BEGIN_APOLLO
 //弹簧粒子
 struct SpringParticles
 {
+	SpringParticles();
 	Vector3		pos;	//位置
 	Vector3		velocity;
 	float				mass;
 	size_t			adjacentParticles[4];		//二维gird，最多四个相邻节点。保存index
 	int				adjacentParticlesCount;	
-
 	Vector3		force;
 };
 
@@ -42,6 +42,8 @@ private:
 class Spring
 {
 public:
+
+	Spring();
 
 	Spring(float springStiffness,float springLength,float dampingCoefficient);
 
