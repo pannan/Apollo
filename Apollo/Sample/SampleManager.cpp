@@ -78,19 +78,23 @@ void SampleManager::debugOverlay()
 	}
 
 	Camera* cam = m_currentSample->getCamera();
-	Vector3 camPos = cam->getPosition();
-	Vector3 forward = cam->getDirection();
-	Vector3 rightDir = cam->getRightDir();
-	ImGui::Text("FPS: (%.1i)", frameRate);
-	ImGui::Separator();
-	ImGui::Text("Camera Position: (%.1f,%.1f,%.1f)", camPos.m_x, camPos.m_y, camPos.m_z);
-	ImGui::Text("Camera Forward: (%.1f,%.1f,%.1f)", forward.m_x, forward.m_y, forward.m_z);
-	ImGui::Text("Camera RightDir: (%.1f,%.1f,%.1f)", rightDir.m_x, rightDir.m_y, rightDir.m_z);
-	ImGui::Text("GPU Times: (%.1f)", m_gpuFrameTimes);
+	if (cam)
+	{
+		Vector3 camPos = cam->getPosition();
+		Vector3 forward = cam->getDirection();
+		Vector3 rightDir = cam->getRightDir();
+		ImGui::Text("FPS: (%.1i)", frameRate);
+		ImGui::Separator();
+		ImGui::Text("Camera Position: (%.1f,%.1f,%.1f)", camPos.m_x, camPos.m_y, camPos.m_z);
+		ImGui::Text("Camera Forward: (%.1f,%.1f,%.1f)", forward.m_x, forward.m_y, forward.m_z);
+		ImGui::Text("Camera RightDir: (%.1f,%.1f,%.1f)", rightDir.m_x, rightDir.m_y, rightDir.m_z);
+		ImGui::Text("GPU Times: (%.1f)", m_gpuFrameTimes);
 
-	float camMaxHeight = (6420 - 6360) * 1000 + 20000;
-	ImGui::SliderFloat("Camera Altitude", &m_cameraAltitude, 10.0, camMaxHeight);
-	camPos.m_y = m_cameraAltitude;
-	cam->setposition(camPos);
+		float camMaxHeight = (6420 - 6360) * 1000 + 20000;
+		ImGui::SliderFloat("Camera Altitude", &m_cameraAltitude, 10.0, camMaxHeight);
+		camPos.m_y = m_cameraAltitude;
+		cam->setposition(camPos);
+	}
+	
 	ImGui::End();
 }

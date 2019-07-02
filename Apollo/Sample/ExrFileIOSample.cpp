@@ -11,7 +11,7 @@ using namespace DirectX;
 
 ExrFileIOSample::ExrFileIOSample()
 {
-
+	m_exrTextureHandle = 0;
 }
 
 ExrFileIOSample::~ExrFileIOSample()
@@ -40,5 +40,26 @@ void ExrFileIOSample::init()
 	data.SysMemPitch = image.GetImages()->rowPitch;
 	data.SysMemSlicePitch = image.GetImages()->slicePitch;
 	//创建cs写入的uav
-	TextureDX11ResourceFactory::getInstance().createTexture2D("CS_Texture_Process", tex2dConfig,&data);
+	m_exrTextureHandle = TextureDX11ResourceFactory::getInstance().createTexture2D("CS_Texture_Process", tex2dConfig,&data);
+}
+
+void ExrFileIOSample::onGUI()
+{
+	ImGui::SetNextWindowPos(ImVec2(100, 300));
+	static bool g_overLayShow = true;
+	ImGui::SetNextWindowPos(ImVec2(100, 300));
+	if (!ImGui::Begin("ExrTexture", &g_overLayShow, ImVec2(500, 800), 0.7f, ImGuiWindowFlags_NoTitleBar))
+	{
+		ImGui::End();
+		return;
+	}
+	
+	{
+		Texture2dDX11* srcTex2d = (Texture2dDX11*)TextureDX11ResourceFactory::getInstance().getResource(m_exrTextureHandle);
+
+		ImGui::Image(srcTex2d->getShaderResourceView(), ImVec2(200, 200));
+	}
+
+
+	ImGui::End();
 }
