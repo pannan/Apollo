@@ -21,6 +21,8 @@ namespace Apollo
 
 	protected:
 
+		//加载多张单独的mipmap纹理到一个纹理
+		void		combineMipmapToTexture();
 
 	protected:
 
