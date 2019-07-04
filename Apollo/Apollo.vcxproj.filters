@@ -73,6 +73,9 @@
     <Filter Include="Physics\MassSpringSystems">
       <UniqueIdentifier>{af1ce9e1-60ba-4d6c-b47e-8c92dd17ee40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sample\Exr Sample">
+      <UniqueIdentifier>{ce356d5d-2e72-422e-95da-05f38835720a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -441,6 +444,15 @@
     <ClInclude Include="Sample\ExrFileIOSample.h">
       <Filter>Sample</Filter>
     </ClInclude>
+    <ClInclude Include="Sample\Exr Sample\drawImage.h">
+      <Filter>Sample\Exr Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\Exr Sample\rgbaInterfaceTiledExamples.h">
+      <Filter>Sample\Exr Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\Exr Sample\namespaceAlias.h">
+      <Filter>Sample\Exr Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -706,6 +718,12 @@
     </ClCompile>
     <ClCompile Include="Sample\ExrFileIOSample.cpp">
       <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\Exr Sample\drawImage.cpp">
+      <Filter>Sample\Exr Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\Exr Sample\rgbaInterfaceTiledExamples.cpp">
+      <Filter>Sample\Exr Sample</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

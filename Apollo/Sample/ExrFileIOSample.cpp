@@ -11,6 +11,8 @@
 #include <ImfStringAttribute.h>
 #include <ImfMatrixAttribute.h>
 #include <ImfArray.h>
+#include "Exr Sample/rgbaInterfaceTiledExamples.h"
+#include "DirectXTex.h"
 //#include <drawImage.h>
 
 using namespace Apollo;
@@ -65,7 +67,7 @@ void writeRgba1(const char fileName[],
 	file.writePixels(height); // 3
 }
 
-void writeTiledRgbaONE1(const char fileName[],
+void MyWriteTiledRgbaONE1(const char fileName[],
 	const Rgba *pixels,
 	int width, int height,
 	int tileWidth, int tileHeight)
@@ -80,7 +82,7 @@ void writeTiledRgbaONE1(const char fileName[],
 	out.writeTiles(0, out.numXTiles() - 1, 0, out.numYTiles() - 1); // 3
 }
 void
-writeTiledRgbaMIP1(const char fileName[],
+MywriteTiledRgbaMIP1(const char fileName[],
 	int width, int height,
 	int tileWidth, int tileHeight, ScratchImage* imageArray,int mipmapCount)
 {
@@ -160,17 +162,19 @@ void ExrFileIOSample::combineMipmapToTexture()
 	}
 
 	//这个函数只能存image？不能存mipmap数据?
-	/*wstringstream ss;
-	ss << "h:\\textExr.exr";
-	SaveToEXRFile(desTex.GetImages()[1],ss.str().c_str());*/
+	wstringstream ss;
+	ss << "h:\\textMipMapExr.exr";
+	//SaveToEXRFile(desTex.GetImages()[1], ss.str().c_str());
 
 	//
-	Image& saveImage = (Image&)desTex.GetImages()[1];
+	//Image& saveImage = (Image&)desTex.GetImages()[1];
 	//writeRgba1("h:\\textExr2.exr", (Imf::Rgba *)saveImage.pixels, saveImage.width, saveImage.height);
 	//writeTiledRgbaONE1("h:\\textExr3.exr", (Imf::Rgba *)saveImage.pixels, saveImage.width, saveImage.height, saveImage.width, saveImage.height);
 
 	//tile width = level0 width + level1 width ......
-	writeTiledRgbaMIP1("h:\\textExr4.exr", level0Image->width, level0Image->height, 100, 75, imageArray, 12);
+	//MywriteTiledRgbaMIP1("h:\\textExr4.exr", level0Image->width, level0Image->height, 100, 75, imageArray, 12);
+	rgbaInterfaceTiledExamples();
+	HRESULT hr = SaveToDDSFile(desTex.GetImages(), 12, desTex.GetMetadata(),0,ss.str().c_str());
 }
 
 

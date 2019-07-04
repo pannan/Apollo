@@ -84,3 +84,23 @@ x64/Release/Apollo.ipdb
 
 packages
 .vs
+Apollo/third_party/zlib/lib/zlib.lib
+Apollo/third_party/zlib/lib/zlibd.lib
+bin/Assets/Texture/evnTex_0.exr
+bin/Assets/Texture/evnTex_1.exr
+bin/Assets/Texture/evnTex_10.exr
+bin/Assets/Texture/evnTex_11.exr
+bin/Assets/Texture/evnTex_2.exr
+bin/Assets/Texture/evnTex_3.exr
+bin/Assets/Texture/evnTex_4.exr
+bin/Assets/Texture/evnTex_5.exr
+bin/Assets/Texture/evnTex_6.exr
+bin/Assets/Texture/evnTex_7.exr
+bin/Assets/Texture/evnTex_8.exr
+bin/Assets/Texture/evnTex_9.exr
+Apollo/tiledrgba1.exr
+Apollo/tiledrgba2.exr
+Apollo/tiledrgba3.exr
+Apollo/tiledrgba4.exr
+Apollo/tiledrgba5.exr
+Apollo/tiledrgba6.exr

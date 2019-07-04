@@ -263,6 +263,9 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Math\Vector4.h" />
     <ClInclude Include="Sample\ComputerShaderProcessTexture.h" />
     <ClInclude Include="Sample\Dxt5NMEncodeSample.h" />
+    <ClInclude Include="Sample\Exr Sample\drawImage.h" />
+    <ClInclude Include="Sample\Exr Sample\namespaceAlias.h" />
+    <ClInclude Include="Sample\Exr Sample\rgbaInterfaceTiledExamples.h" />
     <ClInclude Include="Sample\ExrFileIOSample.h" />
     <ClInclude Include="Sample\GPUParticleSample.h" />
     <ClInclude Include="Sample\HeightMapTerrain.h" />
@@ -359,6 +362,8 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Math\Vector4.cpp" />
     <ClCompile Include="Sample\ComputerShaderProcessTexture.cpp" />
     <ClCompile Include="Sample\Dxt5NMEnCodeSample.cpp" />
+    <ClCompile Include="Sample\Exr Sample\drawImage.cpp" />
+    <ClCompile Include="Sample\Exr Sample\rgbaInterfaceTiledExamples.cpp" />
     <ClCompile Include="Sample\ExrFileIOSample.cpp" />
     <ClCompile Include="Sample\GPUParticleSample.cpp" />
     <ClCompile Include="Sample\HeightMapTerrain.cpp" />
