@@ -119,6 +119,8 @@ writeTiledRgbaONE2 (const char fileName[],
     }
 }
 
+static const int g_maxMipMapLevel = 7;
+Rgba g_mipmapColor[g_maxMipMapLevel] = { Rgba(1,0,0,1),Rgba(0,1,0,1), Rgba(0,0,1,1), Rgba(1,1,0,1), Rgba(1,0,1,1), Rgba(1,1,1,1), Rgba(1,1,1,1) };
 
 void
 writeTiledRgbaMIP1 (const char fileName[],
@@ -141,11 +143,26 @@ writeTiledRgbaMIP1 (const char fileName[],
 
     for (int level = 0; level < out.numLevels (); ++level)
     {
-        drawImage4 (pixels,
-		    out.levelWidth (level), out.levelHeight (level),
-                    0, out.levelWidth (level),
-		    0, out.levelHeight (level),
-                    level, level);
+		/* drawImage4 (pixels,
+			 out.levelWidth (level), out.levelHeight (level),
+					 0, out.levelWidth (level),
+			 0, out.levelHeight (level),
+					 level, level);*/
+		int colorIndex = level < g_maxMipMapLevel ? level : g_maxMipMapLevel - 1;
+		Rgba mipmapColor = g_mipmapColor[colorIndex];
+		int width = out.levelWidth(level);
+		int height = out.levelHeight(level);
+
+		for (int y = 0; y < height; ++y)
+		{
+			for (int x = 0; x < width; ++x)
+			{
+				pixels[y][x] = mipmapColor;
+			}
+		}
+
+		int numX = out.numXTiles(level);
+		int numY = out.numYTiles(level);
 
 	out.writeTiles (0, out.numXTiles (level) - 1,
 			0, out.numYTiles (level) - 1,

@@ -65,7 +65,7 @@
 #pragma comment(lib, "freetype263MTd.lib")
 #pragma comment(lib, "boost_context.lib")
 #pragma comment(lib, "DirectXTex.lib")
-
+#pragma comment(lib, "gdi32.lib")
 #pragma warning(disable: 4267)
 #pragma warning(disable: 4244)
 #pragma warning(disable: 4305)

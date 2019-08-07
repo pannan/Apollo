@@ -397,7 +397,7 @@ public:
 				//progress_bar.Increment(1);
 			}
 		}
-		write_png("c:\\model_test.png", pixels.get(), kWidth, kHeight);
+		write_png("h:\\model_test.png", pixels.get(), kWidth, kHeight);
 		return pixels;
 	}
 
@@ -529,9 +529,9 @@ private:
 //	"RadianceCombineTextures",
 //	&ModelTest::TestRadianceCombineTextures);
 
-//ModelTest radiance3(
-//	"RadianceCombineTexturesSunSet",
-//	&ModelTest::TestRadianceCombineTexturesSunSet);
+ModelTest radiance3(
+	"RadianceCombineTexturesSunSet",
+	&ModelTest::TestRadianceCombineTexturesSunSet);
 
 NAME_SPACE_END
 NAME_SPACE_END

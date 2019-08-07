@@ -80,7 +80,8 @@ void MyWriteTiledRgbaONE1(const char fileName[],
 		WRITE_RGBA); // channels in file // 1
 	out.setFrameBuffer(pixels, 1, width); // 2
 	out.writeTiles(0, out.numXTiles() - 1, 0, out.numYTiles() - 1); // 3
-}
+}
+
 void
 MywriteTiledRgbaMIP1(const char fileName[],
 	int width, int height,
@@ -121,7 +122,8 @@ MywriteTiledRgbaMIP1(const char fileName[],
 			0, out.numYTiles(level) - 1,
 			level);
 	}
-}
+}
+
 
 void ExrFileIOSample::combineMipmapToTexture()
 {
@@ -173,11 +175,12 @@ void ExrFileIOSample::combineMipmapToTexture()
 
 	//tile width = level0 width + level1 width ......
 	//MywriteTiledRgbaMIP1("h:\\textExr4.exr", level0Image->width, level0Image->height, 100, 75, imageArray, 12);
-	rgbaInterfaceTiledExamples();
+	//rgbaInterfaceTiledExamples();
 	HRESULT hr = SaveToDDSFile(desTex.GetImages(), 12, desTex.GetMetadata(),0,ss.str().c_str());
 }
 
-
+
+
 
 //void loadExr(ScratchImage& image, TexMetadata& data,std::wstring path)
 //{
