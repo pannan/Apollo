@@ -54,6 +54,22 @@ mu = cos(a) = op * pi / （||op|| * ||pi||) = dot(op,pi)（dot需要归一化向量）
 /*
 点到顶部大气层边缘的距离
 从点p沿着[p,i)距离d的点的坐标为[d*sqrt(1 - mu * mu),r + d*mu)
+
+这里的坐标使用来计算和球（地球，大气层上下界三个层）的距离的，由于对称性，这里的坐标是由向量OP和PI组成的明面上的坐标，所以只有两维(x,y)
+
+y轴
+|             i
+|           /
+|         /
+|       q
+|     /
+|   /
+p
+|
+|
+O------------------x轴
+
+
 这里mu=cos(view zenith angle),所以sqrt(1 - mu * mu) = sin(view zenith angle)
 d * sin(view zenith angle)=线段[p,i]在xz屏幕的长度
 r + d *mu= 线段[O,i]投影到[O,p]的长度
