@@ -136,6 +136,10 @@ r : optical depth（光学深度）
 我们现在可以计算p和i之间的透射率。根据Beer-Lambert law，会涉及沿着线段[p,i]上的空气分子的密度的数值积分，以及气溶胶密度的数值积分和
 吸收光（比如臭氧）的空气分子的密度的数值积分。当线段[p,i]不和地面相交时，这个3个积分有一样的形式（exp(-r)），它们可以再接下来的一些辅助
 函数（使用trapezoidal rule）的帮助下进行数值计算。
+
+对于Rayleight,exp_scale是-0.000125
+因为RayleighScaleHeight = 8000，也就是Rayleight厚度为8000，
+这样exp的参数为[0,-1]，值大概为[1,0.4]
 */
 Number GetLayerDensity(_IN(DensityProfileLayer) layer, Length altitude)
 {
@@ -150,6 +154,7 @@ Number GetProfileDensity(_IN(DensityProfile) profile, Length altitude)
 		GetLayerDensity(profile.layers[1], altitude);
 }
 
+//求积分路径上的密度积分，现在的情况是值范围在[0.4,1] 
 Length ComputeOpticalLengthToTopAtmosphereBoundary(_IN(AtmosphereParameters) atmosphere, _IN(DensityProfile) profile, Length r, Number mu)
 {
 	//数值积分的间隔数量
@@ -179,8 +184,11 @@ p和i之间的透射率现在很容易计算了（我们继续假设线段没有和地面相交）
 */
 DimensionlessSpectrum ComputeTransmittanceToTopAtmosphereBoundary(_IN(AtmosphereParameters) atmosphere, Length r, Number mu)
 {
+	//最大范围8000
 	Length opticalLength_rayleigh = ComputeOpticalLengthToTopAtmosphereBoundary(atmosphere, atmosphere.rayleigh_density, r, mu);
+	//最大范围1200
 	Length opticalLength_mie = ComputeOpticalLengthToTopAtmosphereBoundary(atmosphere, atmosphere.mie_density, r, mu);
+	//最大范围15000
 	Length opticalLength_absorption = ComputeOpticalLengthToTopAtmosphereBoundary(atmosphere, atmosphere.absorption_density, r, mu);
 	
 	/*opticalLength_rayleigh *= atmosphere.rayleigh_scattering;

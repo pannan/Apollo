@@ -107,6 +107,7 @@ public:
 			double lambda = static_cast<double>(l) * 1e-3;  // micro-meters
 			SpectralIrradiance solar = kSolarIrradiance[(l - kLambdaMin) / 10] *
 				watt_per_square_meter_per_nm;
+			float test = pow(lambda, -4);
 			ScatteringCoefficient rayleigh = kRayleigh * pow(lambda, -4);
 			ScatteringCoefficient mie = kMieAngstromBeta / kMieScaleHeight *
 				pow(lambda, -kMieAngstromAlpha);
