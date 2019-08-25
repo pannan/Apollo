@@ -157,6 +157,35 @@ public:
 
 		ground_albedo_ = GetGrassAlbedo();
 		sphere_albedo_ = GetSnowAlbedo();
+
+		double ground_albedo_R = ground_albedo_(kLambdaR).to(1);
+		double ground_albedo_G = ground_albedo_(kLambdaG).to(1);
+		double ground_albedo_B = ground_albedo_(kLambdaB).to(1);
+
+		double sphere_albedo_R = sphere_albedo_(kLambdaR).to(1);
+		double sphere_albedo_G = sphere_albedo_(kLambdaG).to(1);
+		double sphere_albedo_B = sphere_albedo_(kLambdaB).to(1);
+
+		//for rgb
+		double solar_R = atmosphere_parameters_.solar_irradiance(kLambdaR).to(watt_per_square_meter_per_nm);
+		double solar_G = atmosphere_parameters_.solar_irradiance(kLambdaG).to(watt_per_square_meter_per_nm);
+		double solar_B = atmosphere_parameters_.solar_irradiance(kLambdaB).to(watt_per_square_meter_per_nm);
+
+		double rayLeighScatter_R = atmosphere_parameters_.rayleigh_scattering(kLambdaR).to(1.0/m);
+		double rayLeighScatter_G = atmosphere_parameters_.rayleigh_scattering(kLambdaG).to(1.0 / m);
+		double rayLeighScatter_B = atmosphere_parameters_.rayleigh_scattering(kLambdaB).to(1.0 / m);
+
+		double mieScattering_R = atmosphere_parameters_.mie_scattering(kLambdaR).to(1.0 / m);
+		double mieScattering_G = atmosphere_parameters_.mie_scattering(kLambdaG).to(1.0 / m);
+		double mieScattering_B = atmosphere_parameters_.mie_scattering(kLambdaB).to(1.0 / m);
+
+		double mieExtinction_R = atmosphere_parameters_.mie_extinction(kLambdaR).to(1.0 / m);
+		double mieExtinction_G = atmosphere_parameters_.mie_extinction(kLambdaG).to(1.0 / m);
+		double mieExtinction_B = atmosphere_parameters_.mie_extinction(kLambdaB).to(1.0 / m);
+
+		double absorptionExtinction_R = atmosphere_parameters_.absorption_extinction(kLambdaR).to(1.0 / m);
+		double absorptionExtinction_G = atmosphere_parameters_.absorption_extinction(kLambdaG).to(1.0 / m);
+		double absorptionExtinction_B = atmosphere_parameters_.absorption_extinction(kLambdaB).to(1.0 / m);
 	}
 
 	//地面和球的albedo
@@ -522,17 +551,17 @@ private:
 	Direction sun_direction_;
 };
 
-//ModelTest radiance1(
-//	"RadianceSeparateTextures",
-//	&ModelTest::TestRadianceSeparateTextures);
+ModelTest radiance1(
+	"RadianceSeparateTextures",
+	&ModelTest::TestRadianceSeparateTextures);
 //
 //ModelTest radiance2(
 //	"RadianceCombineTextures",
 //	&ModelTest::TestRadianceCombineTextures);
 
-ModelTest radiance3(
-	"RadianceCombineTexturesSunSet",
-	&ModelTest::TestRadianceCombineTexturesSunSet);
+//ModelTest radiance3(
+//	"RadianceCombineTexturesSunSet",
+//	&ModelTest::TestRadianceCombineTexturesSunSet);
 
 NAME_SPACE_END
 NAME_SPACE_END

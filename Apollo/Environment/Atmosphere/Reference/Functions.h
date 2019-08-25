@@ -365,9 +365,10 @@ public:
 		if (value_[index][0] < 0.0 * watt_per_square_meter_per_sr_per_nm)
 		{
 			Number ignored;
-			value_[index] = ComputeMultipleScatteringTexture(atmosphere_parameters_,
+			RadianceSpectrum t = ComputeMultipleScatteringTexture(atmosphere_parameters_,
 				transmittance_texture_, scattering_density_texture_,
 				float3(i + 0.5, j + 0.5, k + 0.5), ignored);
+			value_[index] = t;
 		}
 		return value_[index];
 	}

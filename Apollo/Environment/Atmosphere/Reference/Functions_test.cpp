@@ -1119,10 +1119,10 @@ private:
 //FunctionsTest compute_and_get_scattering_density(
 //	"ComputeAndGetScatteringDensity",
 //	&FunctionsTest::TestComputeAndGetScatteringDensity);
-//FunctionsTest compute_and_get_multiple_scattering(
-//	"ComputeAndGetMultipleScattering",
-//	&FunctionsTest::TestComputeAndGetMultipleScattering);
-//
+FunctionsTest compute_and_get_multiple_scattering(
+	"ComputeAndGetMultipleScattering",
+	&FunctionsTest::TestComputeAndGetMultipleScattering);
+
 //FunctionsTest compute_indirect_irradiance(
 //	"ComputeIndirectIrradiance",
 //	&FunctionsTest::TestComputeIndirectIrradiance);

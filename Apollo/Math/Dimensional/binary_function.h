@@ -119,6 +119,7 @@ class BinaryFunction {
 
   void Load(const std::string& filename) {
     std::ifstream file(filename, std::ifstream::binary | std::ifstream::in);
+	int ss = sizeof(T);
     file.read(reinterpret_cast<char*>(value_.get()), NX * NY * sizeof(T));
     file.close();
   }
