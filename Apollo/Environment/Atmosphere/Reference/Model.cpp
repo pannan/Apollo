@@ -25,7 +25,7 @@ Model::Model(const AtmosphereParameters& atmosphere,const std::string& cache_dir
 	irradiance_texture_.reset(new IrradianceTexture());
 }
 
-# define TryLoadData
+//# define TryLoadData
 
 //初始化是通过以下方法完成的，如果它们已经预先计算，它首先尝试从磁盘加载纹理。
 void Model::Init(unsigned int num_scattering_orders) 

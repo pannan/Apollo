@@ -113,6 +113,28 @@ class TernaryFunction {
     int j1 = std::max(0, std::min(static_cast<int>(NY) - 1, j + 1));
     int k0 = std::max(0, std::min(static_cast<int>(NZ) - 1, k));
     int k1 = std::max(0, std::min(static_cast<int>(NZ) - 1, k + 1));
+
+	//for debug
+	T v0 = Get(i0, j0, k0);// *((1.0 - u) * (1.0 - v) * (1.0 - w)) +
+	T v1 = Get(i1, j0, k0);// *(u * (1.0 - v) * (1.0 - w)) +
+	T v2 = Get(i0, j1, k0);// *((1.0 - u) * v * (1.0 - w)) +
+	T v3 = Get(i1, j1, k0);// *(u * v * (1.0 - w)) +
+	T v4 = Get(i0, j0, k1);// *((1.0 - u) * (1.0 - v) * w) +
+	T v5 = Get(i1, j0, k1);// *(u * (1.0 - v) * w) +
+	T v6 = Get(i0, j1, k1);// *((1.0 - u) * v * w) +
+	T v7 = Get(i1, j1, k1);// *(u * v * w);
+
+	double d0 = ((1.0 - u) * (1.0 - v) * (1.0 - w));
+	double d1 = (u * (1.0 - v) * (1.0 - w));
+	double d2 = ((1.0 - u) * v * (1.0 - w));
+	double d3 = (u * v * (1.0 - w));
+	double d4 = ((1.0 - u) * (1.0 - v) * w);
+	double d5 = (u * (1.0 - v) * w);
+	double d6 = ((1.0 - u) * v * w);
+	double d7 = (u * v * w);
+
+	T res = v0 * d0 + v1 * d1 + v2 * d2 + v3 * d3 + v4 * d4 + v5 * d5 + v6 * d6 + v7 * d7;
+
     return Get(i0, j0, k0) * ((1.0 - u) * (1.0 - v) * (1.0 - w)) +
         Get(i1, j0, k0) * (u * (1.0 - v) * (1.0 - w)) +
         Get(i0, j1, k0) * ((1.0 - u) * v * (1.0 - w)) +
