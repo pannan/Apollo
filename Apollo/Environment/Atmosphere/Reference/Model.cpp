@@ -25,7 +25,125 @@ Model::Model(const AtmosphereParameters& atmosphere,const std::string& cache_dir
 	irradiance_texture_.reset(new IrradianceTexture());
 }
 
-//# define TryLoadData
+//保存纹理为rgb格式
+void Model::saveTextureRGB()
+{
+	constexpr Wavelength kLambdaR = 680.0 * nm;
+	constexpr Wavelength kLambdaG = 550.0 * nm;
+	constexpr Wavelength kLambdaB = 440.0 * nm;
+
+	//save transmittance_texture_
+	int count = transmittance_texture_->size_x() * transmittance_texture_->size_y();
+	double* transmittance_buffer = new double[count * 3];
+	for (int y = 0; y < transmittance_texture_->size_y(); ++y)
+	{
+		for (int x = 0; x < transmittance_texture_->size_x(); ++x)
+		{
+			DimensionlessSpectrum& ds = transmittance_texture_->Get(x,y);
+			double R = ds(kLambdaR).to(1);
+			double G = ds(kLambdaG).to(1);
+			double B = ds(kLambdaB).to(1);
+
+			int index = y * transmittance_texture_->size_x() + x;
+			transmittance_buffer[index * 3] = R;
+			transmittance_buffer[index * 3 + 1] = G;
+			transmittance_buffer[index * 3 + 2] = B;
+		}		
+	}
+
+	string transmittance_texture_savePath = "f:\\transmittance_texture.dat";
+	std::ofstream file0(transmittance_texture_savePath, std::ofstream::binary);
+	file0.write(reinterpret_cast<const char*>(transmittance_buffer), count * 3 * sizeof(double));
+	file0.close();
+
+	delete[] transmittance_buffer;
+
+	//save irradiance_texture_
+	count = irradiance_texture_->size_x() * transmittance_texture_->size_y();
+	double* irradiance_buffer = new double[count * 3];
+	for (int y = 0; y < irradiance_texture_->size_y(); ++y)
+	{
+		for (int x = 0; x < irradiance_texture_->size_x(); ++x)
+		{
+			IrradianceSpectrum&  is = irradiance_texture_->Get(x, y);
+			double R = is(kLambdaR).to(watt_per_square_meter_per_nm);
+			double G = is(kLambdaG).to(watt_per_square_meter_per_nm);
+			double B = is(kLambdaB).to(watt_per_square_meter_per_nm);
+
+			int index = y * irradiance_texture_->size_x() + x;
+			irradiance_buffer[index * 3] = R;
+			irradiance_buffer[index * 3 + 1] = G;
+			irradiance_buffer[index * 3 + 2] = B;
+		}
+	}
+	string irradiance_texture_savePath = "f:\\irradiance_texture.dat";
+	std::ofstream file1(irradiance_texture_savePath, std::ofstream::binary);
+	file1.write(reinterpret_cast<const char*>(irradiance_buffer), count * 3 * sizeof(double));
+	file1.close();
+	
+	delete[] irradiance_buffer;
+
+	//save scattering_texture_
+	count = scattering_texture_->size_x() * scattering_texture_->size_y() * scattering_texture_->size_z();
+	double* scattering_buffer = new double[count * 3];
+	for (int z = 0; z < scattering_texture_->size_z(); ++z)
+	{
+		for (int y = 0; y < scattering_texture_->size_y(); ++y)
+		{
+			for (int x = 0; x < scattering_texture_->size_x(); ++x)
+			{
+				const IrradianceSpectrum&  is = scattering_texture_->Get(x, y, z);
+				double R = is(kLambdaR).to(watt_per_square_meter_per_nm);
+				double G = is(kLambdaG).to(watt_per_square_meter_per_nm);
+				double B = is(kLambdaB).to(watt_per_square_meter_per_nm);
+
+				int index = (z * scattering_texture_->size_y() * scattering_texture_->size_x() + y * scattering_texture_->size_x() + x);
+				scattering_buffer[index * 3] = R;
+				scattering_buffer[index * 3 + 1] = G;
+				scattering_buffer[index * 3 + 2] = B;
+			}
+			
+		}
+	}
+	string scattering_texture_savePath = "f:\\scattering_texture.dat";
+	std::ofstream file2(scattering_texture_savePath, std::ofstream::binary);
+	file2.write(reinterpret_cast<const char*>(scattering_buffer), count * 3 * sizeof(double));
+	file2.close();
+
+	delete[] scattering_buffer;
+
+	//save single_mie_scattering_texture_
+	count = single_mie_scattering_texture_->size_x() * single_mie_scattering_texture_->size_y() * single_mie_scattering_texture_->size_z();
+	double* single_mie_scattering_buffer = new double[count * 3];
+	for (int z = 0; z < single_mie_scattering_texture_->size_z(); ++z)
+	{
+		for (int y = 0; y < single_mie_scattering_texture_->size_y(); ++y)
+		{
+			for (int x = 0; x < single_mie_scattering_texture_->size_x(); ++x)
+			{
+				const IrradianceSpectrum&  is = scattering_texture_->Get(x, y, z);
+				double R = is(kLambdaR).to(watt_per_square_meter_per_nm);
+				double G = is(kLambdaG).to(watt_per_square_meter_per_nm);
+				double B = is(kLambdaB).to(watt_per_square_meter_per_nm);
+
+				int index = (z * single_mie_scattering_texture_->size_y() * single_mie_scattering_texture_->size_x() + y * single_mie_scattering_texture_->size_x() + x);
+				single_mie_scattering_buffer[index * 3] = R;
+				single_mie_scattering_buffer[index * 3 + 1] = G;
+				single_mie_scattering_buffer[index * 3 + 2] = B;
+			}
+
+		}
+	}
+	string single_mie_scattering_texture_savePath = "f:\\single_mie_scattering_texture.dat";
+	std::ofstream file3(single_mie_scattering_texture_savePath, std::ofstream::binary);
+	file3.write(reinterpret_cast<const char*>(single_mie_scattering_buffer), count * 3 * sizeof(double));
+	file3.close();
+
+	delete[] single_mie_scattering_buffer;
+	
+}
+
+# define TryLoadData
 
 //初始化是通过以下方法完成的，如果它们已经预先计算，它首先尝试从磁盘加载纹理。
 void Model::Init(unsigned int num_scattering_orders) 
@@ -41,6 +159,8 @@ void Model::Init(unsigned int num_scattering_orders)
 		single_mie_scattering_texture_->Load(
 			cache_directory_ + "single_mie_scattering.dat");
 		irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
+
+		saveTextureRGB();
 		return;
 	}
 #endif

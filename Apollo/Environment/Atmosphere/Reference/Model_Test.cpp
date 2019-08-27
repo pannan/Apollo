@@ -551,17 +551,17 @@ private:
 	Direction sun_direction_;
 };
 
-ModelTest radiance1(
-	"RadianceSeparateTextures",
-	&ModelTest::TestRadianceSeparateTextures);
+//ModelTest radiance1(
+//	"RadianceSeparateTextures",
+//	&ModelTest::TestRadianceSeparateTextures);
 //
 //ModelTest radiance2(
 //	"RadianceCombineTextures",
 //	&ModelTest::TestRadianceCombineTextures);
 
-//ModelTest radiance3(
-//	"RadianceCombineTexturesSunSet",
-//	&ModelTest::TestRadianceCombineTexturesSunSet);
+ModelTest radiance3(
+	"RadianceCombineTexturesSunSet",
+	&ModelTest::TestRadianceCombineTexturesSunSet);
 
 NAME_SPACE_END
 NAME_SPACE_END

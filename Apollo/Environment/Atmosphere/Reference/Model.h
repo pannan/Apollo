@@ -22,6 +22,8 @@ public:
 
 	void Init(unsigned int num_scattering_orders = 4);
 
+	void saveTextureRGB();
+
 	RadianceSpectrum GetSolarRadiance() const;
 
 	RadianceSpectrum GetSkyRadiance(Position camera, Direction view_ray,
