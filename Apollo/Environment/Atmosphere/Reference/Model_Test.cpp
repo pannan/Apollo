@@ -346,7 +346,7 @@ public:
 
 #define _OUT(x) x&
 #include "../bin/Assets/Shader/Model_Test.hlsl"
-
+//#define SaveRGBFloat
 	/*
 	通过这种CPU实现，我们可以在所有像素上使用简单循环渲染图像，为每个像素调用GetViewRayRadiance，
 	并使用与GPU版本相同的色调映射函数将结果转换为最终颜色。 
@@ -371,6 +371,10 @@ public:
 		const auto cie_y_bar = DimensionlessSpectrum(wavelengths, y_values);
 		const auto cie_z_bar = DimensionlessSpectrum(wavelengths, z_values);
 
+#ifdef SaveRGBFloat
+		//保存float rgb在unity里创建纹理矫正在unity的结果
+		float* floatRGBBuffer = new float[kWidth * kHeight * 3];
+#endif
 		Image pixels(new unsigned int[kWidth * kHeight]);
 		//ProgressBar progress_bar(kWidth * kHeight);
 		for (unsigned int j = 0; j < kHeight; ++j) 
@@ -420,6 +424,14 @@ public:
 				r = std::pow(1.0 - std::exp(-r * exposure_()), 1.0 / 2.2);
 				g = std::pow(1.0 - std::exp(-g * exposure_()), 1.0 / 2.2);
 				b = std::pow(1.0 - std::exp(-b * exposure_()), 1.0 / 2.2);
+
+#ifdef SaveRGBFloat
+				//for  debug
+				int index = j * kWidth + i;
+				floatRGBBuffer[index * 3] = r;
+				floatRGBBuffer[index * 3 + 1] = g;
+				floatRGBBuffer[index * 3 + 2] = b;
+#endif
 				unsigned int red = static_cast<unsigned int>(r * 255.0);
 				unsigned int green = static_cast<unsigned int>(g * 255.0);
 				unsigned int blue = static_cast<unsigned int>(b * 255.0);
@@ -428,6 +440,16 @@ public:
 			}
 		}
 		write_png("h:\\model_test.png", pixels.get(), kWidth, kHeight);
+
+#ifdef SaveRGBFloat
+		//for debug
+		std::string renderImageRGB_savePath = "f:\\renderImageRGB.dat";
+		std::ofstream file0(renderImageRGB_savePath, std::ofstream::binary);
+		file0.write(reinterpret_cast<const char*>(floatRGBBuffer), kWidth * kHeight * 3 * sizeof(float));
+		file0.close();
+		delete[] floatRGBBuffer;
+#endif
+
 		return pixels;
 	}
 

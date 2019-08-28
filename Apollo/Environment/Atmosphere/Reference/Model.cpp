@@ -121,7 +121,7 @@ void Model::saveTextureRGB()
 		{
 			for (int x = 0; x < single_mie_scattering_texture_->size_x(); ++x)
 			{
-				const IrradianceSpectrum&  is = scattering_texture_->Get(x, y, z);
+				const IrradianceSpectrum&  is = single_mie_scattering_texture_->Get(x, y, z);
 				double R = is(kLambdaR).to(watt_per_square_meter_per_nm);
 				double G = is(kLambdaG).to(watt_per_square_meter_per_nm);
 				double B = is(kLambdaB).to(watt_per_square_meter_per_nm);
@@ -144,7 +144,8 @@ void Model::saveTextureRGB()
 }
 
 # define TryLoadData
-
+//#define SaveData
+//#define SaveRGBData
 //初始化是通过以下方法完成的，如果它们已经预先计算，它首先尝试从磁盘加载纹理。
 void Model::Init(unsigned int num_scattering_orders) 
 {
@@ -159,8 +160,9 @@ void Model::Init(unsigned int num_scattering_orders)
 		single_mie_scattering_texture_->Load(
 			cache_directory_ + "single_mie_scattering.dat");
 		irradiance_texture_->Load(cache_directory_ + "irradiance.dat");
-
+#ifdef SaveRGBData
 		saveTextureRGB();
+#endif
 		return;
 	}
 #endif
@@ -210,9 +212,7 @@ void Model::Init(unsigned int num_scattering_orders)
 		{
 			transmittance_texture_->Set(i, j, ComputeTransmittanceToTopAtmosphereBoundaryTexture(atmosphere_, float2(i + 0.5, j + 0.5)));
 		}
-	}
-
-	transmittance_texture_->Save(cache_directory_ + "transmittance.dat");
+	}	
 
 	//计算直接辐射度，存储在delta_irradiance_texture
 	//用0初始化irradiance_texture（我们想要的直接辐射度不在irradiance_Texture里，只是来自天空的辐射度）
@@ -235,6 +235,13 @@ void Model::Init(unsigned int num_scattering_orders)
 				IrradianceSpectrum rayleigh;
 				IrradianceSpectrum mie;
 				ComputeSingleScatteringTexture(atmosphere_, *transmittance_texture_, float3(i + 0.5, j + 0.5, k + 0.5), rayleigh, mie);
+				//for debug
+				/*constexpr Wavelength kLambdaR = 680.0 * nm;
+				constexpr Wavelength kLambdaG = 550.0 * nm;
+				constexpr Wavelength kLambdaB = 440.0 * nm;
+				double R = mie(kLambdaR).to(watt_per_square_meter_per_nm);
+				double G = mie(kLambdaG).to(watt_per_square_meter_per_nm);
+				double B = mie(kLambdaB).to(watt_per_square_meter_per_nm);*/
 				delta_rayleigh_scattering_texture->Set(i, j, k, rayleigh);
 				delta_mie_scattering_texture->Set(i, j, k, mie);
 				scattering_texture_->Set(i, j, k, rayleigh);
@@ -301,10 +308,15 @@ void Model::Init(unsigned int num_scattering_orders)
 		}
 	}
 
-	
+#ifdef SaveData
+	transmittance_texture_->Save(cache_directory_ + "transmittance.dat");
 	scattering_texture_->Save(cache_directory_ + "scattering.dat");
 	single_mie_scattering_texture_->Save(cache_directory_ + "single_mie_scattering.dat");
 	irradiance_texture_->Save(cache_directory_ + "irradiance.dat");
+#endif
+#ifdef SaveRGBData
+	saveTextureRGB();
+#endif	
 }
 
 /*
