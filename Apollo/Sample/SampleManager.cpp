@@ -9,6 +9,7 @@
 #include "Timer.h"
 #include "PreFilterEnvMapSample.h"
 #include "ExrFileIOSample.h"
+#include "TGALoaderSample.h"
 using namespace Apollo;
 
 
@@ -31,7 +32,7 @@ SampleManager::~SampleManager()
 
 void SampleManager::init()
 {
-	m_currentSample = new SkySample;//
+	m_currentSample = new TGALoaderSample;//
 	m_currentSample->init();
 	m_sampleList.push_back(m_currentSample);
 }

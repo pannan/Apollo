@@ -276,10 +276,12 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClInclude Include="Sample\SampleManager.h" />
     <ClInclude Include="Sample\SkySample.h" />
     <ClInclude Include="Sample\TestSample.h" />
+    <ClInclude Include="Sample\TGALoaderSample.h" />
     <ClInclude Include="Scene\SceneNode.h" />
     <ClInclude Include="SDK\coroutine.h" />
     <ClInclude Include="SDK\minpng.h" />
     <ClInclude Include="SDK\TGAImage.h" />
+    <ClInclude Include="SDK\TGAImageExt.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UI\AssetsDirectoryViewUI.h" />
@@ -373,8 +375,10 @@ xcopy $(OutDir)$(ProjectName).pdb $(SolutionDir)bin\ /Y</Command>
     <ClCompile Include="Sample\SampleManager.cpp" />
     <ClCompile Include="Sample\SkySample.cpp" />
     <ClCompile Include="Sample\TestSample.cpp" />
+    <ClCompile Include="Sample\TGALoaderSample.cpp" />
     <ClCompile Include="SceneNode.cpp" />
     <ClCompile Include="SDK\TGAImage.cpp" />
+    <ClCompile Include="SDK\TGAImageExt.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

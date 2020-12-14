@@ -453,6 +453,12 @@
     <ClInclude Include="Sample\Exr Sample\namespaceAlias.h">
       <Filter>Sample\Exr Sample</Filter>
     </ClInclude>
+    <ClInclude Include="SDK\TGAImageExt.h">
+      <Filter>SDK</Filter>
+    </ClInclude>
+    <ClInclude Include="Sample\TGALoaderSample.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -724,6 +730,12 @@
     </ClCompile>
     <ClCompile Include="Sample\Exr Sample\rgbaInterfaceTiledExamples.cpp">
       <Filter>Sample\Exr Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="SDK\TGAImageExt.cpp">
+      <Filter>SDK</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\TGALoaderSample.cpp">
+      <Filter>Sample</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
