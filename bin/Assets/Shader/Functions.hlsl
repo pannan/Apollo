@@ -524,14 +524,14 @@ DimensionlessSpectrum GetTransmittanceToSun(_IN(AtmosphereParameters) atmosphere
 考虑在达到点p之前，太阳光在点q被空气分子散射的情况（对气溶胶用"Mie"替换“Rayleigh”）
 
 				----------
-	-----          |        ------
+	-----        |        ------
  -----			 |					--i----
-----				 | cos(a)   q            ------atmosphere
+----			 | cos(a)   q            ------atmosphere
 		------    p
-		 | ------ |-------
- ---	 |			|      -----
------	r			|           -----
---		|			|                 -------earth
+		| ------ |-------
+ ---	|		 |      -----
+-----	r		 |           -----
+--		|		 |                 -------earth
 -----------   O
 
 达到p点的radiance的生成：

@@ -56,12 +56,12 @@ namespace Apollo
 
 	Matrix4x4& Matrix4x4::transposition()
 	{
-		std::swap<float,float>(m_matrix[0][1],m_matrix[1][0]);
-		std::swap<float,float>(m_matrix[0][2],m_matrix[2][0]);
-		std::swap<float, float>(m_matrix[1][2],m_matrix[2][1]);
-		std::swap<float, float>(m_matrix[3][0],m_matrix[0][3]);
-		std::swap<float, float>(m_matrix[3][1],m_matrix[1][3]);
-		std::swap<float, float>(m_matrix[3][2],m_matrix[2][3]);
+		std::swap<float>(m_matrix[0][1],m_matrix[1][0]);
+		std::swap<float>(m_matrix[0][2],m_matrix[2][0]);
+		std::swap<float>(m_matrix[1][2],m_matrix[2][1]);
+		std::swap<float>(m_matrix[3][0],m_matrix[0][3]);
+		std::swap<float>(m_matrix[3][1],m_matrix[1][3]);
+		std::swap<float>(m_matrix[3][2],m_matrix[2][3]);
 
 		return *this;
 	}

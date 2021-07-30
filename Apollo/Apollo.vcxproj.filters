@@ -459,6 +459,12 @@
     <ClInclude Include="Sample\TGALoaderSample.h">
       <Filter>Sample</Filter>
     </ClInclude>
+    <ClInclude Include="Sample\DDSLoaderSample.h">
+      <Filter>Sample</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\tinyddsloader.h">
+      <Filter>Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -735,6 +741,9 @@
       <Filter>SDK</Filter>
     </ClCompile>
     <ClCompile Include="Sample\TGALoaderSample.cpp">
+      <Filter>Sample</Filter>
+    </ClCompile>
+    <ClCompile Include="Sample\DDSLoaderSample.cpp">
       <Filter>Sample</Filter>
     </ClCompile>
   </ItemGroup>

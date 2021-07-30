@@ -37,9 +37,9 @@ namespace Apollo
 
 	Matrix3x3& Matrix3x3::transposition()
 	{
-		std::swap<float,float>(m_matrix[0][1],m_matrix[1][0]);
-		std::swap<float, float>(m_matrix[0][2],m_matrix[2][0]);
-		std::swap<float, float>(m_matrix[1][2],m_matrix[2][1]);
+		std::swap<float>(m_matrix[0][1],m_matrix[1][0]);
+		std::swap<float>(m_matrix[0][2],m_matrix[2][0]);
+		std::swap<float>(m_matrix[1][2],m_matrix[2][1]);
 
 		return *this;
 	}

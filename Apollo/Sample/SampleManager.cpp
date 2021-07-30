@@ -10,6 +10,7 @@
 #include "PreFilterEnvMapSample.h"
 #include "ExrFileIOSample.h"
 #include "TGALoaderSample.h"
+#include "DDSLoaderSample.h"
 using namespace Apollo;
 
 
@@ -32,7 +33,7 @@ SampleManager::~SampleManager()
 
 void SampleManager::init()
 {
-	m_currentSample = new TGALoaderSample;//
+	m_currentSample = new DDSLoaderSample;//
 	m_currentSample->init();
 	m_sampleList.push_back(m_currentSample);
 }
